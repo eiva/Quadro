@@ -12,18 +12,27 @@
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
 <part id="1"/>
+<part id="2"/>
+<part id="3"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
 <editor id="org.coocox.welcome.ui.WelcomePage" name="" partName="welcome" title="welcome" tooltip="" workbook="DefaultEditorWorkbook">
-<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">
-<org.coocox.welcome.ui.WelcomePage/>
+<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">&#x0A;<org.coocox.welcome.ui.WelcomePage/>
 </input>
 </editor>
-<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="Z:/GitHub/Quadro/ControlBoard/main.c" title="main.c" tooltip="Z:/GitHub/Quadro/ControlBoard/main.c" workbook="DefaultEditorWorkbook">
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="Z:/GitHub/Quadro/ControlBoard/main.c" title="main.c" tooltip="Z:/GitHub/Quadro/ControlBoard/main.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/ControlBoard/main.c"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
+</editor>
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="nRF24L01.h" partName="nRF24L01.h" path="Z:/GitHub/Quadro/ControlBoard/RF/nRF24L01.h" title="nRF24L01.h" tooltip="Z:/GitHub/Quadro/ControlBoard/RF/nRF24L01.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/ControlBoard/RF/nRF24L01.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1007" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="nRF14L01.c" partName="nRF14L01.c" path="Z:/GitHub/Quadro/ControlBoard/RF/nRF14L01.c" title="nRF14L01.c" tooltip="Z:/GitHub/Quadro/ControlBoard/RF/nRF14L01.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/ControlBoard/RF/nRF14L01.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="108" selectionTopPixel="0"/>
 </editor>
 </editors>
 <views>
@@ -31,10 +40,10 @@
 <viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="0">
 <expanded>
 <element path="/ControlBoard"/>
-<element path="/ControlBoard/syscalls"/>
+<element path="/ControlBoard/RF"/>
 </expanded>
 <selection>
-<element path="/ControlBoard/main.c"/>
+<element path="/ControlBoard/RF/nRF14L01.c"/>
 </selection>
 </viewState>
 </view>
@@ -148,12 +157,23 @@
 <subPage/>
 </editor>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ControlBoard/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ControlBoard/RF/nRF24L01.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ControlBoard/RF/nRF14L01.c"/>
 </editors>
 <item historyLabel="welcome" index="0"/>
 <item historyLabel="Repository" index="1"/>
 <item historyLabel="welcome" index="0"/>
-<item active="true" historyLabel="main.c" index="2">
+<item historyLabel="main.c" index="2">
 <position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="nRF24L01.h" index="3">
+<position info="not_deleted" x="1007" y="0"/>
+</item>
+<item historyLabel="nRF14L01.c" index="4">
+<position info="not_deleted" x="108" y="0"/>
+</item>
+<item active="true" historyLabel="nRF24L01.h" index="3">
+<position info="not_deleted" x="1007" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -162,17 +182,27 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="nRF14L01.c" tooltip="ControlBoard/RF/nRF14L01.c">
+<persistable path="/ControlBoard/RF/nRF14L01.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="nRF24L01.h" tooltip="ControlBoard/RF/nRF24L01.h">
+<persistable path="/ControlBoard/RF/nRF24L01.h"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="ControlBoard/main.c">
 <persistable path="/ControlBoard/main.c"/>
 </file>
 <file factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory" id="org.coocox.builder.ui.editors.repository.RepositoryBrowser" name="Repository" tooltip="Repository">
-<persistable>
-<subPage/>
+<persistable>&#x0A;<subPage/>
 </persistable>
 </file>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage" name="" tooltip="">
-<persistable>
-<org.coocox.welcome.ui.WelcomePage/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="printf.c" tooltip="ControlBoard/stdio/printf.c">
+<persistable path="/ControlBoard/stdio/printf.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="ControlBoard/main.c">
+<persistable path="/ControlBoard/main.c"/>
+</file>
+<file factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory" id="org.coocox.builder.ui.editors.repository.RepositoryBrowser" name="Repository" tooltip="Repository">
+<persistable>&#x0A;<subPage/>
 </persistable>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="printf.c" tooltip="ControlBoard/stdio/printf.c">
