@@ -22,7 +22,6 @@
 #include <MirfHardwareSpiDriver.h>
 
 void setup(){
-  Serial.begin(9600);
   /*
    * Setup pins / SPI.
    */
@@ -43,7 +42,7 @@ void setup(){
    * Configure reciving address.
    */
    
-  Mirf.setRADDR((byte *)"clie1");
+  Mirf.setRADDR((byte *)"WolkT");
   
   /*
    * Set the payload length to sizeof(unsigned long) the
@@ -67,33 +66,19 @@ void setup(){
    */
    
   Mirf.config();
-  
-  Serial.println("Beginning ... "); 
 }
 
+byte state = 0;
+
 void loop(){
-  unsigned long time = millis();
+  Mirf.setTADDR((byte *)"WolkT");
   
-  Mirf.setTADDR((byte *)"serv1");
+  Mirf.send((byte *)&state);
   
-  Mirf.send((byte *)&time);
+  state++;
   
   while(Mirf.isSending()){
   }
-  Serial.println("Finished sending");
-  delay(10);
-  while(!Mirf.dataReady()){
-    //Serial.println("Waiting");
-    if ( ( millis() - time ) > 1000 ) {
-      Serial.println("Timeout on response from server!");
-      return;
-    }
-  }
-  
-  Mirf.getData((byte *) &time);
-  
-  Serial.print("Ping: ");
-  Serial.println((millis() - time));
   
   delay(1000);
 } 
