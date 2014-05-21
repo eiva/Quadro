@@ -6,50 +6,44 @@
 //#include <delay.h>
 
 
-uint8_t nRF24_RX_addr[nRF24_RX_ADDR_WIDTH] = {'W','o','l','k','T'};
-uint8_t nRF24_TX_addr[nRF24_TX_ADDR_WIDTH] = {'W','o','l','k','T'};
+uint8_t nRF24_RX_addr[nRF24_RX_ADDR_WIDTH] = {0xDB,0xDB,0xDB,0xDB,0xDB};
+uint8_t nRF24_TX_addr[nRF24_TX_ADDR_WIDTH] = {0xDB,0xDB,0xDB,0xDB,0xDB};
 
 
 // SPI initialization with given prescaler
 void nRF24_SPI_Init(uint16_t prescaler) {
-	SPI_InitTypeDef SPI;
-	SPI.SPI_Mode = SPI_Mode_Master;
-	SPI.SPI_BaudRatePrescaler = prescaler;
-	SPI.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-	SPI.SPI_CPOL = SPI_CPOL_Low;
-	SPI.SPI_CPHA = SPI_CPHA_1Edge;
-	SPI.SPI_CRCPolynomial = 7;
-	SPI.SPI_DataSize = SPI_DataSize_8b;
-	SPI.SPI_FirstBit = SPI_FirstBit_MSB;
-	SPI.SPI_NSS = SPI_NSS_Soft;
-	SPI_Init(SPI_PORT,&SPI);
 
-	// NSS must be set to '1' due to NSS_Soft settings (otherwise it will be Multimaster mode).
-	SPI_NSSInternalSoftwareConfig(SPI_PORT,SPI_NSSInternalSoft_Set);
 }
 
 // GPIO and SPI initialization
 void nRF24_init() {
-#if _SPI_PORT == 1
-	// SPI1
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1 | RCC_APB2Periph_GPIOA,ENABLE);
-#elif _SPI_PORT == 2
-	// SPI2
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2,ENABLE);
-#elif _SPI_PORT == 3
-	// SPI3
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3,ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); // Disable JTAG for use PB3
-#endif
 
 	GPIO_InitTypeDef PORT;
+	GPIO_StructInit(&PORT);
+
 	// Configure SPI pins
+	/*
 	PORT.GPIO_Speed = GPIO_Speed_50MHz;
 	PORT.GPIO_Pin = SPI_SCK_PIN | SPI_MISO_PIN | SPI_MOSI_PIN;
 	PORT.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_Init(SPI_GPIO_PORT,&PORT);*/
+
+	// MY
+
+	PORT.GPIO_Speed = GPIO_Speed_50MHz;
+	PORT.GPIO_Pin = SPI_SCK_PIN | SPI_MOSI_PIN;
+	PORT.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(SPI_GPIO_PORT,&PORT);
+
+
+	PORT.GPIO_Speed = GPIO_Speed_50MHz;
+	PORT.GPIO_Pin = SPI_MISO_PIN;
+	PORT.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(SPI_GPIO_PORT,&PORT);
+
+	// END MY
+
 	// Configure CS pin as output with Push-Pull
 	PORT.GPIO_Pin = SPI_CS_PIN;
 	PORT.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -63,7 +57,25 @@ void nRF24_init() {
 	PORT.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_Init(nRF24_IRQ_PORT,&PORT);
 
-	nRF24_SPI_Init(SPI_BaudRatePrescaler_2); // Which SPI speed do we need?
+	SPI_InitTypeDef SPI;
+	SPI_StructInit(&SPI);
+	SPI.SPI_Mode = SPI_Mode_Master;
+	SPI.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
+	SPI.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	// Mode 0
+	SPI.SPI_CPOL = SPI_CPOL_Low;
+	SPI.SPI_CPHA = SPI_CPHA_1Edge;
+	SPI.SPI_CRCPolynomial = 7;
+	SPI.SPI_DataSize = SPI_DataSize_8b;
+	SPI.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI.SPI_NSS = SPI_NSS_Soft;
+	SPI_Init(SPI_PORT,&SPI);
+
+	// NSS must be set to '1' due to NSS_Soft settings (otherwise it will be Multimaster mode).
+	SPI_NSSInternalSoftwareConfig(SPI_PORT,SPI_NSSInternalSoft_Set);
+
+
+
 	SPI_Cmd(SPI_PORT,ENABLE);
 
 	CSN_H();
@@ -166,10 +178,13 @@ uint8_t nRF24_Check(void) {
 void nRF24_RXMode(uint8_t RX_PAYLOAD) {
 	CE_L();
 	nRF24_WriteBuf(nRF24_CMD_WREG | nRF24_REG_RX_ADDR_P0,nRF24_RX_addr,nRF24_RX_ADDR_WIDTH); // Set static RX address
+	nRF24_WriteBuf(nRF24_CMD_WREG | nRF24_REG_RX_ADDR_P1,nRF24_RX_addr,nRF24_RX_ADDR_WIDTH); // Set static RX address
 	nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_EN_AA,0x01); // Enable ShockBurst for data pipe 0
 	nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_EN_RXADDR,0x01); // Enable data pipe 0
-	nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,0x6E); // Set frequency channel 110 (2.510MHz)
+	//nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,0x6E); // Set frequency channel 110 (2.510MHz)
+	nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,0x01); // Set frequency channel 110 (2.510MHz)
 	nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P0,RX_PAYLOAD); // Set RX payload length (10 bytes)
+	nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P1,RX_PAYLOAD); // Set RX payload length (10 bytes)
 	nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RF_SETUP,0x06); // Setup: 1Mbps, 0dBm, LNA off
 	nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_CONFIG,0x0F); // Config: CRC on (2 bytes), Power UP, RX/TX ctl = PRX
 	CE_H();
@@ -203,14 +218,24 @@ uint8_t nRF24_DataReady(void) {
     return (status & nRF24_FIFO_RX_EMPTY) ? 0 : 1;
 }
 
+// Check that sending is still in progress.
+// return:
+//   0 -> no data
+//   1 -> RX_DR is set or some bytes present in FIFO
+uint8_t nRF24_IsSending(void) {
+   return 0;
+}
+
 uint8_t nRF24_RXPacket(uint8_t* pBuf, uint8_t RX_PAYLOAD) {
 	uint8_t status;
 
-    status = nRF24_ReadReg(nRF24_REG_STATUS); // Read status register
+	status = nRF24_ReadReg(nRF24_REG_STATUS); // Read status register
     if (status & nRF24_MASK_RX_DR) {
     	if ((status & 0x0E) == 0) {
     		// pipe 0
+    		CSN_L();
     		nRF24_ReadBuf(nRF24_CMD_R_RX_PAYLOAD,pBuf,RX_PAYLOAD); // read received payload from RX FIFO buffer
+    		CSN_H();
     	}
 		nRF24_ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
 		nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_STATUS,status | 0x70); // Clear RX_DR, TX_DS, MAX_RT flags

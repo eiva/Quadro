@@ -6,6 +6,7 @@
  ********************************************************************************/
 #include <stdio.h>
 #include <stdarg.h>
+#include <semihosting.h>
 
 
 /**
@@ -20,7 +21,8 @@ void PrintChar(char c)
 	/* Send a char like: 
 	   while(Transfer not completed);
 	   Transmit a char;
-	*/	
+	*/
+	SH_SendChar((int)c);
 }
 
 /** Maximum string size allowed (in bytes). */
@@ -499,7 +501,9 @@ signed int sprintf(char *pStr, const char *pFormat, ...)
  */
 signed int puts(const char *pStr)
 {
-    return fputs(pStr, stdout);
+	signed int res = fputs(pStr, stdout);
+	fputs("\n", stdout);
+	return res;
 }
 
 

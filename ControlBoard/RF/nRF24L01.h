@@ -1,5 +1,5 @@
 /* Which SPI use */
-#define _SPI_PORT 2
+#define _SPI_PORT 1
 
 #if _SPI_PORT == 1
 	#define SPI_PORT      SPI1
@@ -25,8 +25,8 @@
 #endif
 
 // nRF24L01 CE (Chip Enable) pin
-#define nRF24_CE_PORT     GPIOB
-#define nRF24_CE_PIN      GPIO_Pin_11    // PB11
+#define nRF24_CE_PORT     GPIOA
+#define nRF24_CE_PIN      GPIO_Pin_3    // PB11
 
 // nRF24L01 IRQ pin
 #define nRF24_IRQ_PORT    GPIOB
@@ -109,6 +109,8 @@ uint8_t nRF24_Check(void);
 void nRF24_RXMode(uint8_t RX_PAYLOAD);
 void nRF24_TXMode(void);
 uint8_t nRF24_DataReady(void);
+uint8_t nRF24_IsSending(void);
+
 uint8_t nRF24_TXPacket(uint8_t * pBuf, uint8_t TX_PAYLOAD);
 uint8_t nRF24_RXPacket(uint8_t* pBuf, uint8_t RX_PAYLOAD);
 void nRF24_ClearIRQFlags(void);
