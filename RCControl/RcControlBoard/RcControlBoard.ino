@@ -21,6 +21,8 @@
 #include <nRF24L01.h>
 #include <MirfHardwareSpiDriver.h>
 
+  byte addr[]={0xDB,0xDB,0xDB,0xDB,0xDB};
+
 void setup(){
   /*
    * Setup pins / SPI.
@@ -41,8 +43,8 @@ void setup(){
   /*
    * Configure reciving address.
    */
-   
-  Mirf.setRADDR((byte *)"WolkT");
+
+  Mirf.setRADDR(addr);
   
   /*
    * Set the payload length to sizeof(unsigned long) the
@@ -51,7 +53,7 @@ void setup(){
    * NB: payload on client and server must be the same.
    */
    
-  Mirf.payload = sizeof(unsigned long);
+  Mirf.payload = 1;
   
   /*
    * Write channel and payload config then power up reciver.
@@ -71,7 +73,7 @@ void setup(){
 byte state = 0;
 
 void loop(){
-  Mirf.setTADDR((byte *)"WolkT");
+  Mirf.setTADDR(addr);
   
   Mirf.send((byte *)&state);
   
