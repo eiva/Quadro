@@ -61,7 +61,8 @@ int main(void)
 		printf("NRF Failed to check! HALT!\n");
 		while(1);
 	}
-
+	nRF24_RXMode(RX_PAYLOAD);
+	nRF24_ClearIRQFlags();
 	unsigned char i,v;
 
 		for (i = 0; i < 0x1D; i++) {
@@ -71,7 +72,7 @@ int main(void)
 
 		}
 
-		return 0;
+		//return 0;
 
 		nRF24_RXMode(RX_PAYLOAD);
 		nRF24_ClearIRQFlags();
@@ -108,27 +109,20 @@ int main(void)
 			if (nRF24_DataReady())
 			{
 				for (i = 0; i < RX_PAYLOAD; i++) buf[i] = 0x00;
-						status = nRF24_RXPacket(buf,RX_PAYLOAD);
-						nRF24_ClearIRQFlags();
+				status = nRF24_RXPacket(buf,RX_PAYLOAD);
+				nRF24_ClearIRQFlags();
 
-						if (status == 0x0E) {
+				if (status == 0x0E) {
 				//			UART_SendStr(" => FIFO Empty (fake alarm)\n");
-
-						} else {
-							have_data = 1;
+				} else {
+				have_data = 1;
 				//			UART_SendChar('\n');
-
-						}
-
-						GPIOC->ODR ^= GPIO_Pin_9; // Toggle LED
-
-						nRF24_RXMode(RX_PAYLOAD);
-						nRF24_ClearIRQFlags();
-			}
-			else {
-				{
-					GPIOC->ODR ^= GPIO_Pin_8; // Toggle LED
 				}
+				GPIOC->ODR ^= GPIO_Pin_9; // Toggle LED
+				nRF24_RXMode(RX_PAYLOAD);
+				nRF24_ClearIRQFlags();
+			} else {
+			GPIOC->ODR ^= GPIO_Pin_8; // Toggle LED
 			}
 		}
 }
