@@ -14,7 +14,7 @@ uint8_t have_data;
 /*void EXTI15_10_IRQHandler(void) {
 	uint8_t i;
 	uint8_t status;
-
+	GPIOC->ODR ^= GPIO_Pin_9; // Toggle LED
 	if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
 		for (i = 0; i < RX_PAYLOAD; i++) buf[i] = 0x00;
 		status = nRF24_RXPacket(buf,RX_PAYLOAD);
@@ -27,8 +27,6 @@ uint8_t have_data;
 //			UART_SendChar('\n');
 		}
 
-		GPIOC->ODR ^= GPIO_Pin_9; // Toggle LED
-
 		nRF24_RXMode(RX_PAYLOAD);
 		nRF24_ClearIRQFlags();
 
@@ -39,52 +37,42 @@ uint8_t have_data;
 
 int main(void)
 {
-
-	printf("Start...\n");
+	printf("Start\n");
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC,ENABLE);
+	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	//GPIO_EXTILineConfig(GPIO_PortSourceGPIOB,GPIO_PinSource10);
 
 	GPIO_InitTypeDef PORT;
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE);
+	GPIO_StructInit(&PORT);
 	PORT.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_8;
 	PORT.GPIO_Mode = GPIO_Mode_Out_PP;
 	PORT.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC,&PORT);
 
-	printf("Init nrf...\n");
 	nRF24_init();
-	printf("NRF Done...\n");
 
-	printf("Checking NRF\n");
 	if (nRF24_Check() != 0) {
 		//	UART_SendStr("Got wrong answer from SPI device.\n");
 		//	UART_SendStr("MCU is now halt.\n");
 		GPIOC->ODR ^= GPIO_Pin_9; // Toggle LED
-		printf("NRF Failed to check! HALT!\n");
+		GPIOC->ODR ^= GPIO_Pin_8; // Toggle LED
+	//	printf("NRF Failed to check! HALT!\n");
 		while(1);
 	}
+
 	nRF24_RXMode(RX_PAYLOAD);
 	nRF24_ClearIRQFlags();
 	unsigned char i,v;
 
-		for (i = 0; i < 0x1D; i++) {
-
-			v = nRF24_ReadReg(i);
-			printf("Register %d = %d\n",i,v);
-
-		}
-
-		//return 0;
-
-		nRF24_RXMode(RX_PAYLOAD);
-		nRF24_ClearIRQFlags();
-
 	// Enable Alternative function (for EXTI)
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
-/*
-		// EXTI pin
-		GPIO_EXTILineConfig(GPIO_PortSourceGPIOB,GPIO_PinSource10);
+	//
 
+		// EXTI pin
+	//
+/*
 		// Configure EXTI line1
 		EXTI_InitTypeDef EXTIInit;
+		EXTI_StructInit(&EXTIInit);
 		EXTIInit.EXTI_Line = EXTI_Line10;             // EXTI will be on line 10
 		EXTIInit.EXTI_LineCmd = ENABLE;               // EXTI1 enabled
 		EXTIInit.EXTI_Mode = EXTI_Mode_Interrupt;     // Generate IRQ
@@ -100,9 +88,14 @@ int main(void)
 		NVIC_Init(&NVICInit);
 
 		while(1) {
-				while(!have_data);
+				while(!have_data)
+				{
+					GPIOC->ODR ^= GPIO_Pin_8; // Toggle LED
+				}
 				uint8_t val = buf[0];
-		}*/
+
+		}
+*/
 
 		uint8_t status;
 		while(1){
@@ -110,15 +103,16 @@ int main(void)
 			{
 				for (i = 0; i < RX_PAYLOAD; i++) buf[i] = 0x00;
 				status = nRF24_RXPacket(buf,RX_PAYLOAD);
-				nRF24_ClearIRQFlags();
 
 				if (status == 0x0E) {
 				//			UART_SendStr(" => FIFO Empty (fake alarm)\n");
 				} else {
 				have_data = 1;
 				//			UART_SendChar('\n');
+					GPIOC->ODR ^= GPIO_Pin_9; // Toggle LED
+					int recievedData = buf[0];
+					printf("Tick:%d\n",recievedData);
 				}
-				GPIOC->ODR ^= GPIO_Pin_9; // Toggle LED
 				nRF24_RXMode(RX_PAYLOAD);
 				nRF24_ClearIRQFlags();
 			} else {
