@@ -25,6 +25,10 @@
 extern uint8_t nRF24_RX_addr[nRF24_RX_ADDR_WIDTH];
 extern uint8_t nRF24_TX_addr[nRF24_TX_ADDR_WIDTH];
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Function prototypes */
 void nRF24_init();
@@ -44,3 +48,7 @@ uint8_t nRF24_IsSending(void);
 uint8_t nRF24_TXPacket(uint8_t * pBuf, uint8_t TX_PAYLOAD);
 uint8_t nRF24_RXPacket(uint8_t* pBuf, uint8_t RX_PAYLOAD);
 void nRF24_ClearIRQFlags(void);
+
+#ifdef __cplusplus
+} // extern "c"
+#endif
