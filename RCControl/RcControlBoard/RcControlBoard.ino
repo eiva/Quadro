@@ -33,10 +33,7 @@ void setup(){
    * Mirf.csnPin = 9;
    * Mirf.cePin = 7;
    */
-  /*
-  Mirf.cePin = 7;
-  Mirf.csnPin = 8;
-  */
+   
   Mirf.spi = &MirfHardwareSpi;
   Mirf.init();
   
