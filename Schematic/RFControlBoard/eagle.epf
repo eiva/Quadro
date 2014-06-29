@@ -350,7 +350,7 @@ UsedLibrary="Z:/GitHub/ArduinoPrinter/Schematic/WatherStation/ATMEGA328.lbr"
 
 [Win_1]
 Type="Control Panel"
-Loc="247 0 1670 1040"
+Loc="62 0 974 1040"
 State=2
 Number=0
 
