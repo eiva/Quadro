@@ -88,7 +88,7 @@ void setup(){
 }
 
 void loop(){
-  delay(250); // For testing reasons
+  delay(10); // For testing reasons
   while(Mirf.isSending()){} // Wait previous transmit
 
   // Read Joystick
