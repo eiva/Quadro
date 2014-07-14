@@ -134,6 +134,37 @@ public:
 };
 
 /**********************************************************************
+Led information display
+***********************************************************************/
+
+class LedInfo{
+ long long _r, _g, _b, _w;
+public:
+  LedInfo():_r(3),_g(2),_b(4), _w(A6){}
+  void Init(){
+    pinMode(_r, OUTPUT);
+    pinMode(_g, OUTPUT);
+    pinMode(_b, OUTPUT);
+    pinMode(_w, OUTPUT);
+  }
+  void R(bool on){
+    digitalWrite(_r, on?HIGH:LOW);
+  }
+  void G(bool on){
+    digitalWrite(_g, on?HIGH:LOW);
+  }
+  void B(bool on){
+    digitalWrite(_b, on?HIGH:LOW);
+  }
+  void W(bool on){
+    digitalWrite(_w, on?HIGH:LOW);
+  }
+  void RGBW(bool r, bool g, bool b, bool w){
+    R(r); G(g); B(b); W(w);
+  }
+};
+
+/**********************************************************************
 Motor controller
 ***********************************************************************/
 
@@ -144,29 +175,37 @@ Motor controller
 class Motors{
   // Motors
   Servo _motor[4];
+  LedInfo& _info;
 public:
-  
+  Motors(LedInfo& info):_info(info){}
+
   void Init(){
     _motor[0].attach(6);
     _motor[1].attach(5);
     _motor[2].attach(10);
     _motor[3].attach(9);
+    _info.R(true);
     calibrateESC();
+    _info.R(false);
   }
 
   // центр - 0 от -255 до 255
   void Update(uint16_t thr, int16_t yaw, int16_t roll, int16_t pitch){
     if (thr == 0){
+      _info.B(true);
+      _info.W(false);
       for(int i=0;i<4;++i)
         commandEsc(i, MIN_SIGNAL);
       return;
+    }else{
+      _info.B(false);
+      _info.W(true);
     }
     #define L(x,l) (x>l?l:(x<-l?-l:x));
     yaw = L(yaw, 255);
     roll = L(roll, 255);
     pitch = L(pitch, 255);
     #define MIXPWM(r,p,y) map(255 + thr + roll * r + pitch* p +  yaw * y, 0, 8*255, MIN_SIGNAL, MAX_SIGNAL)
-    Serial.print(" PWM:");
     commandEsc(0, MIXPWM(-1,+1,-1));
     commandEsc(1, MIXPWM(-1,-1,+1));
     commandEsc(2, MIXPWM(+1,+1,+1));
@@ -185,10 +224,7 @@ private:
   }
 
   inline void commandEsc(uint8_t id, uint16_t pwm){
-    Serial.print(id, DEC);
-    Serial.print(" ");
-    Serial.print(pwm, DEC);
-    //motor[id].writeMicroseconds(pwm);
+    _motor[id].writeMicroseconds(pwm);
   }
 };
 
@@ -273,7 +309,11 @@ public:
     X(0.0f), Y(0.0f), Z(0.0f), _lastUpdateTime(0){}
 
   void Init(){
+    while(!_gyroscope.begin(L3G4200D_SCALE_250DPS, L3G4200D_DATARATE_800HZ_110)){
+      delay(500);
+    }
     _gyroscope.calibrate(100);
+    _gyroscope.setThreshold(0);
   }
 
   void Reset(){
@@ -317,7 +357,7 @@ Main Controller
 #define PID_YAW_RATE_INTEGRATION_LIMIT     500.0f
 
 
-#define RC_LIMITS_WAIT 3000 // Время ожидания калибровки
+#define RC_LIMITS_WAIT 1000 // Время ожидания калибровки
 #define MIN_RC_DIFF 500 // Минимально допустимая разница.
 
 #define MAX_ANGLE 0.5235f //(PI/6.0) - Максимальный угол отклонения от нуля.
@@ -326,15 +366,19 @@ Main Controller
 // Вспомогательный тип - пара значений мин макс для джойстика - нужно для определения диапазона джойстика.
 class RcAxisLimits{
 public:
-  RcAxisLimits():Min(0),Max(0), Center(0), Scale(0){}
+  RcAxisLimits():Min(0),Max(0), Center(0), Scale(0), Distance(0) {}
 
-  void Update(uint16_t value){
-    Min = min(value, Min);
-    Max = max(value, Max);
+  bool Update(uint16_t value){
+    uint16_t min = min(value, Min);
+    uint16_t max = max(value, Max);
+    bool changed = min != Min || max != Max;
+    Max = max;
+    Min = min;
     Center = (Min + Max) / 2;
-    uint16_t div = Max - Min;
-    if (div != 0)
-      Scale = 2.0f*MAX_ANGLE / (div);
+    Distance = Max - Min;
+    if (Distance != 0)
+      Scale = 2.0f*MAX_ANGLE / (Distance);
+    return changed;
   }
 
   inline float Rescale(uint16_t value){
@@ -344,6 +388,7 @@ public:
   uint16_t Min;
   uint16_t Max;
   uint16_t Center;
+  uint16_t Distance;
   float Scale; // Преобразование к углу по формуле: Rad = (RC - Center)*Scale
 };
 
@@ -354,6 +399,7 @@ class Controller{
   RadioLink _link;
   Stabilizer _stabilizer;
   RcAxisLimits _yawLimit, _pitchLimit, _rollLimit, _throttleLimit;
+  LedInfo _info;
   long long _lastUpdateTime;
 public:
 
@@ -361,28 +407,47 @@ public:
     _roll(PID_ROLL_RATE_KP, PID_ROLL_RATE_KI, PID_ROLL_RATE_KD, PID_ROLL_RATE_INTEGRATION_LIMIT),
     _pitch(PID_PITCH_RATE_KP, PID_PITCH_RATE_KI, PID_PITCH_RATE_KD, PID_PITCH_RATE_INTEGRATION_LIMIT),
     _yaw(PID_YAW_RATE_KP, PID_YAW_RATE_KI, PID_YAW_RATE_KD, PID_YAW_RATE_INTEGRATION_LIMIT),
-    _lastUpdateTime(0)
+    _lastUpdateTime(0),
+    _motors(_info)
   {}
 
   void Init(){
+    _info.Init();
     // Init motors
     _motors.Init();
+    _info.RGBW(true, true, true, false);
     // Init nRF2400
     _link.Init();
     // Wait first packet
-    while (_link.Update()) {}
+    while (!_link.Update()) {
+      delay(250);
+    }
+    _info.RGBW(true, true, false, false);
     // Calibrate RC sticks limits.
     long long startMillis = millis();
+    Packet& refPacket = _link.packet.data;
     do{  
       _link.Update();
-      Packet& refPacket = _link.packet.data;
-      _throttleLimit.Update(refPacket.THR);
-      _yawLimit.Update(refPacket.YAW);
-      _rollLimit.Update(refPacket.ROL);
-      _pitchLimit.Update(refPacket.PTC);
-    } while(millis() - startMillis < RC_LIMITS_WAIT);
+      bool changed = _throttleLimit.Update(refPacket.THR);
+      changed |= _yawLimit.Update(refPacket.YAW);
+      changed |= _rollLimit.Update(refPacket.ROL);
+      changed |= _pitchLimit.Update(refPacket.PTC);
+      if (changed){
+        startMillis = millis();
+      }
+    } while(millis() - startMillis < RC_LIMITS_WAIT ||
+              _throttleLimit.Distance < MIN_RC_DIFF || 
+              _yawLimit.Distance < MIN_RC_DIFF ||
+              _pitchLimit.Distance < MIN_RC_DIFF ||
+              _rollLimit.Distance < MIN_RC_DIFF);
+    _info.RGBW(true, false, false, false);
+    do{
+      _link.Update();
+    }while (refPacket.THR > _throttleLimit.Min);
+    _info.RGBW(false, true, true, false);
     // Ждем инициализации системы стабилизации...
     _stabilizer.Init();
+    _info.RGBW(false, false, false, false);
     _lastUpdateTime = micros();
   }
 
@@ -410,7 +475,7 @@ public:
 
   // рескейл от радиан к -255 +255
   uint16_t scaleBack(float value){
-    return SCALE_BACK * value;
+    return min(-255, max(255, SCALE_BACK * value));
   }
 
 };
