@@ -50,8 +50,6 @@ union PacketSerializer{
 PID helper objects
 ***********************************************************************/
 
-#define DEFAULT_PID_INTEGRATION_LIMIT  5000.0
-
 class PidObject{
   float _desired;      //< set point
   float _error;        //< error
@@ -77,7 +75,7 @@ public:
     _ki(ki),
     _kd(kd),
     _iLimit(intLimit),
-    _iLimitLow(-DEFAULT_PID_INTEGRATION_LIMIT)
+    _iLimitLow(-intLimit)
   { }
 
   /**
@@ -138,14 +136,14 @@ Led information display
 ***********************************************************************/
 
 class LedInfo{
- long long _r, _g, _b, _w;
+ long long _r, _g, _b;
 public:
-  LedInfo():_r(3),_g(2),_b(4), _w(A6){}
+  LedInfo():_r(3),_g(2),_b(4){}
   void Init(){
     pinMode(_r, OUTPUT);
     pinMode(_g, OUTPUT);
     pinMode(_b, OUTPUT);
-    pinMode(_w, OUTPUT);
+    pinMode(A6, OUTPUT);
   }
   void R(bool on){
     digitalWrite(_r, on?HIGH:LOW);
@@ -157,7 +155,7 @@ public:
     digitalWrite(_b, on?HIGH:LOW);
   }
   void W(bool on){
-    digitalWrite(_w, on?HIGH:LOW);
+    digitalWrite(A6, on?HIGH:LOW);
   }
   void RGBW(bool r, bool g, bool b, bool w){
     R(r); G(g); B(b); W(w);
@@ -168,8 +166,9 @@ public:
 Motor controller
 ***********************************************************************/
 
-#define MAX_SIGNAL 2000
-#define MIN_SIGNAL 700
+#define MAX_SIGNAL 1800
+#define MIN_SIGNAL 880
+#define OFF_SIGNAL 750
 
 // Управление моторами - включает калибровку ESC
 class Motors{
@@ -180,10 +179,10 @@ public:
   Motors(LedInfo& info):_info(info){}
 
   void Init(){
-    _motor[0].attach(6);
-    _motor[1].attach(5);
-    _motor[2].attach(10);
-    _motor[3].attach(9);
+    _motor[0].attach(10);
+    _motor[1].attach(9);
+    _motor[2].attach(6);
+    _motor[3].attach(5);
     _info.R(true);
     calibrateESC();
     _info.R(false);
@@ -195,7 +194,7 @@ public:
       _info.B(true);
       _info.W(false);
       for(int i=0;i<4;++i)
-        commandEsc(i, MIN_SIGNAL);
+        commandEsc(i, OFF_SIGNAL);
       return;
     }else{
       _info.B(false);
@@ -217,14 +216,14 @@ private:
     // Посылаем максимальный сигнал и минимальный - это описано в инструкции.
     for(int i=0; i<4; ++i)
       commandEsc(i, MAX_SIGNAL);
-    delay(4000);
+    delay(3000);
     for(int i=0; i<4; ++i)
       commandEsc(i, MIN_SIGNAL);
     delay(3000);    
   }
 
   inline void commandEsc(uint8_t id, uint16_t pwm){
-    _motor[id].writeMicroseconds(pwm);
+    _motor[id].write(pwm);
   }
 };
 
@@ -295,18 +294,109 @@ public:
 Gyro stabilizer - most simplest one
 ***********************************************************************/
 
+class Kalman {
+public:
+    Kalman() {
+        /* We will set the variables like so, these can also be tuned by the user */
+        Q_angle = 0.001;
+        Q_bias = 0.003;
+        R_measure = 0.03;
+
+        angle = 0; // Reset the angle
+        bias = 0; // Reset bias
+
+        P[0][0] = 0; // Since we assume that the bias is 0 and we know the starting angle (use setAngle), the error covariance matrix is set like so - see: http://en.wikipedia.org/wiki/Kalman_filter#Example_application.2C_technical
+        P[0][1] = 0;
+        P[1][0] = 0;
+        P[1][1] = 0;
+    };
+    // The angle should be in degrees and the rate should be in degrees per second and the delta time in seconds
+    float Update(float newAngle, float newRate, float dt) {
+        // KasBot V2  -  Kalman filter module - http://www.x-firm.com/?page_id=145
+        // Modified by Kristian Lauszus
+        // See my blog post for more information: http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it
+
+        // Discrete Kalman filter time update equations - Time Update ("Predict")
+        // Update xhat - Project the state ahead
+        /* Step 1 */
+        rate = newRate - bias;
+        angle += dt * rate;
+
+        // Update estimation error covariance - Project the error covariance ahead
+        /* Step 2 */
+        P[0][0] += dt * (dt*P[1][1] - P[0][1] - P[1][0] + Q_angle);
+        P[0][1] -= dt * P[1][1];
+        P[1][0] -= dt * P[1][1];
+        P[1][1] += Q_bias * dt;
+
+        // Discrete Kalman filter measurement update equations - Measurement Update ("Correct")
+        // Calculate Kalman gain - Compute the Kalman gain
+        /* Step 4 */
+        S = P[0][0] + R_measure;
+        /* Step 5 */
+        K[0] = P[0][0] / S;
+        K[1] = P[1][0] / S;
+
+        // Calculate angle and bias - Update estimate with measurement zk (newAngle)
+        /* Step 3 */
+        y = newAngle - angle;
+        /* Step 6 */
+        angle += K[0] * y;
+        bias += K[1] * y;
+
+        // Calculate estimation error covariance - Update the error covariance
+        /* Step 7 */
+        P[0][0] -= K[0] * P[0][0];
+        P[0][1] -= K[0] * P[0][1];
+        P[1][0] -= K[1] * P[0][0];
+        P[1][1] -= K[1] * P[0][1];
+
+        return angle;
+    };
+    void setAngle(float newAngle) { angle = newAngle; }; // Used to set angle, this should be set as the starting angle
+    float getRate() { return rate; }; // Return the unbiased rate
+
+    /* These are used to tune the Kalman filter */
+    void setQangle(float newQ_angle) { Q_angle = newQ_angle; };
+    void setQbias(float newQ_bias) { Q_bias = newQ_bias; };
+    void setRmeasure(float newR_measure) { R_measure = newR_measure; };
+
+    float getQangle() const { return Q_angle; };
+    float getQbias() const { return Q_bias; };
+    float getRmeasure() const { return R_measure; };
+
+private:
+    /* Kalman filter variables */
+    float Q_angle; // Process noise variance for the accelerometer
+    float Q_bias; // Process noise variance for the gyro bias
+    float R_measure; // Measurement noise variance - this is actually the variance of the measurement noise
+
+    float angle; // The angle calculated by the Kalman filter - part of the 2x1 state vector
+    float bias; // The gyro bias calculated by the Kalman filter - part of the 2x1 state vector
+    float rate; // Unbiased rate calculated from the rate and the calculated bias - you have to call getAngle to update the rate
+
+    float P[2][2]; // Error covariance matrix - This is a 2x2 matrix
+    float K[2]; // Kalman gain - This is a 2x1 vector
+    float y; // Angle difference
+    float S; // Estimate error
+};
+
+
+#define GRAD2RAD(grad) 0.03490658503988659153847381536977f * (grad)
+
+// Реализация стабилизации движения - вычисления позиции устройства в пространстве.
 class Stabilizer
 {
   L3G4200D _gyroscope;
   unsigned long _lastUpdateTime;
 public:
 
-  float X;
-  float Y;
-  float Z;
+  float Yaw;
+  float Pitch;
+  float Roll;
 
   Stabilizer():
-    X(0.0f), Y(0.0f), Z(0.0f), _lastUpdateTime(0){}
+    Yaw(0.0f), Pitch(0.0f), Roll(0.0f), _lastUpdateTime(0){}
 
   void Init(){
     while(!_gyroscope.begin(L3G4200D_SCALE_250DPS, L3G4200D_DATARATE_800HZ_110)){
@@ -317,13 +407,13 @@ public:
   }
 
   void Reset(){
-    X = Y = Z = 0.0f;
+    Yaw = Pitch = Roll = 0.0f;
   }
 
   void Update(){
-    Vector norm = _gyroscope.readNormalize();
-    unsigned long t = millis();
-    float dt = (t - _lastUpdateTime) / 1000.0f;
+    const Vector norm = _gyroscope.readNormalize();
+    const unsigned long t = micros();
+    const float dt = (t - _lastUpdateTime) / 1000000.0f;
     if (_lastUpdateTime == 0){
       _lastUpdateTime = t;
       return;
@@ -331,9 +421,9 @@ public:
     _lastUpdateTime = t;
     
     // Calculate Pitch, Roll and Yaw
-    X = X + norm.XAxis * dt;
-    Y = Y + norm.YAxis * dt;
-    Z = Z + norm.ZAxis * dt;
+    Yaw = Yaw - GRAD2RAD(norm.XAxis) * dt;
+    Pitch = Pitch + GRAD2RAD(norm.ZAxis) * dt;
+    Roll = Roll + GRAD2RAD(norm.ZAxis) * dt;
   }
 };
 
@@ -341,55 +431,57 @@ public:
 Main Controller
 ***********************************************************************/
 
-#define PID_ROLL_RATE_KP  5.0f
-#define PID_ROLL_RATE_KI  0.1f
-#define PID_ROLL_RATE_KD  0.1f
-#define PID_ROLL_RATE_INTEGRATION_LIMIT    100.0f
+#define PID_ROLL_RATE_KP  0.8f
+#define PID_ROLL_RATE_KI  0.01f
+#define PID_ROLL_RATE_KD  0.01f
+#define PID_ROLL_RATE_INTEGRATION_LIMIT    0.5f
 
-#define PID_PITCH_RATE_KP  5.0f
-#define PID_PITCH_RATE_KI  0.1f
-#define PID_PITCH_RATE_KD  0.1f
-#define PID_PITCH_RATE_INTEGRATION_LIMIT   100.0f
+#define PID_PITCH_RATE_KP  0.8f
+#define PID_PITCH_RATE_KI  0.01f
+#define PID_PITCH_RATE_KD  0.01f
+#define PID_PITCH_RATE_INTEGRATION_LIMIT   0.5f
 
-#define PID_YAW_RATE_KP  50.0f
-#define PID_YAW_RATE_KI  25.0f
-#define PID_YAW_RATE_KD  0.1f
-#define PID_YAW_RATE_INTEGRATION_LIMIT     500.0f
+#define PID_YAW_RATE_KP  0.4f
+#define PID_YAW_RATE_KI  0.01f
+#define PID_YAW_RATE_KD  0.01f
+#define PID_YAW_RATE_INTEGRATION_LIMIT     0.5f
 
 
 #define RC_LIMITS_WAIT 1000 // Время ожидания калибровки
 #define MIN_RC_DIFF 500 // Минимально допустимая разница.
 
-#define MAX_ANGLE 0.5235f //(PI/6.0) - Максимальный угол отклонения от нуля.
-#define SCALE_BACK 487 // 255*6/PI - Обратное масштабирование из радиан в [-255,255]
+#define MAX_ANGLE 0.52359877559829887307710723054658f //(PI/6.0) - Максимальный угол отклонения от нуля.
+#define SCALE_BACK  487.01412586119972745278431591989f// 255*6/PI - Обратное масштабирование из радиан в [-255,255]
 
 // Вспомогательный тип - пара значений мин макс для джойстика - нужно для определения диапазона джойстика.
 class RcAxisLimits{
 public:
-  RcAxisLimits():Min(0),Max(0), Center(0), Scale(0), Distance(0) {}
-
-  bool Update(uint16_t value){
-    uint16_t min = min(value, Min);
-    uint16_t max = max(value, Max);
-    bool changed = min != Min || max != Max;
-    Max = max;
-    Min = min;
+  RcAxisLimits():Min(0),Max(0),Center(0),_scale(0),_distance(0),_last(0){}
+  
+  // true - если изменились показания или макс-мин не удовлетворяют проверке.
+  bool Update(const uint16_t value){
+    Min = min(value, Min);
+    Max = max(value, Max);
+    const bool changed = abs(value - _last) > 10; // дребезг некоторый, по этому 10
+    _last = value;
     Center = (Min + Max) / 2;
-    Distance = Max - Min;
-    if (Distance != 0)
-      Scale = 2.0f*MAX_ANGLE / (Distance);
-    return changed;
+    _distance = Max - Min;
+    if (_distance != 0)
+      _scale = 2.0f*MAX_ANGLE / (_distance);
+    return changed || _distance < MIN_RC_DIFF;
   }
 
-  inline float Rescale(uint16_t value){
-    return Scale * (float)((int16_t)value - (int16_t)Center);
+  inline float Rescale(const uint16_t value) const{
+    return _scale * (float)((int16_t)value - (int16_t)Center);
   }
 
   uint16_t Min;
   uint16_t Max;
   uint16_t Center;
-  uint16_t Distance;
-  float Scale; // Преобразование к углу по формуле: Rad = (RC - Center)*Scale
+private:
+  uint16_t _distance;
+  uint16_t _last;
+  float _scale; // Преобразование к углу по формуле: Rad = (RC - Center)*Scale
 };
 
 
@@ -415,14 +507,14 @@ public:
     _info.Init();
     // Init motors
     _motors.Init();
-    _info.RGBW(true, true, true, false);
+    _info.RGBW(true, true, true, true);
     // Init nRF2400
     _link.Init();
     // Wait first packet
     while (!_link.Update()) {
       delay(250);
     }
-    _info.RGBW(true, true, false, false);
+    _info.RGBW(true, true, false, true);
     // Calibrate RC sticks limits.
     long long startMillis = millis();
     Packet& refPacket = _link.packet.data;
@@ -435,11 +527,7 @@ public:
       if (changed){
         startMillis = millis();
       }
-    } while(millis() - startMillis < RC_LIMITS_WAIT ||
-              _throttleLimit.Distance < MIN_RC_DIFF || 
-              _yawLimit.Distance < MIN_RC_DIFF ||
-              _pitchLimit.Distance < MIN_RC_DIFF ||
-              _rollLimit.Distance < MIN_RC_DIFF);
+    } while(millis() - startMillis < RC_LIMITS_WAIT);
     _info.RGBW(true, false, false, false);
     do{
       _link.Update();
@@ -452,10 +540,20 @@ public:
   }
 
   void Update(){
+    //const unsigned long t1 = micros();
     _link.Update();
     Packet& refPacket = _link.packet.data;
+    if (refPacket.THR == 0 || refPacket.BT3 != 0)
+    {
+      _stabilizer.Reset();
+      _yaw.Reset();
+      _pitch.Reset();
+      _roll.Reset();
+      _motors.Update(0, 0, 0, 0);
+      return;
+    }
     _stabilizer.Update();
-    long long mic = micros();
+    const unsigned long mic = micros();
     const float dt = (mic - _lastUpdateTime)/1000000.0f;
     const float yaw = _yawLimit.Rescale(refPacket.YAW);
     const float pitch = _pitchLimit.Rescale(refPacket.PTC);
@@ -463,19 +561,53 @@ public:
     _yaw.SetDesired(yaw);
     _pitch.SetDesired(pitch);
     _roll.SetDesired(roll);
-    const float pidYaw = _yaw.Update(-_stabilizer.X, dt, true);
-    const float pidPitch = _pitch.Update(-_stabilizer.Z, dt, true);
-    const float pidRoll = _roll.Update(-_stabilizer.Y, dt, true);
-    const uint16_t yawMotor = scaleBack(pidYaw);
-    const uint16_t pitchMotor = scaleBack(pidPitch);
-    const uint16_t rollMotor = scaleBack(pidRoll);
-
-    _motors.Update(refPacket.THR, yawMotor, rollMotor, pitchMotor);
+    const float stabYaw = _stabilizer.Yaw;
+    const float stabRoll = _stabilizer.Roll;
+    const float stabPitch = _stabilizer.Pitch;
+    const float pidYaw = _yaw.Update(stabYaw, dt, true);
+    const float pidPitch = _pitch.Update(stabPitch, dt, true);
+    const float pidRoll = _roll.Update(stabRoll, dt, true);
+    const int16_t motorYaw = scaleBack(pidYaw);
+    const int16_t motorPitch = scaleBack(pidPitch);
+    const int16_t motorRoll = scaleBack(pidRoll);
+    
+    /*const unsigned long spant = micros() - t1;
+    Serial.print("Input ");
+    Serial.print(yaw);
+    Serial.print(" ");
+    Serial.print(pitch);
+    Serial.print(" ");
+    Serial.print(roll);
+    Serial.print(" Stab ");
+    Serial.print(stabYaw);
+    Serial.print(" ");
+    Serial.print(stabPitch);
+    Serial.print(" ");
+    Serial.print(stabRoll);
+    Serial.print(" PID ");
+    Serial.print(pidYaw);
+    Serial.print(" ");
+    Serial.print(pidPitch);
+    Serial.print(" ");
+    Serial.print(pidRoll);
+    Serial.print(" Motor ");
+    Serial.print(motorYaw);
+    Serial.print(" ");
+    Serial.print(motorPitch);
+    Serial.print(" ");
+    Serial.print(motorRoll);
+    Serial.print(" dT ");
+    Serial.print(spant);
+    Serial.println(";");
+    delay(500);*/
+    
+    _motors.Update(refPacket.THR, motorYaw, motorRoll, motorPitch);
   }
 
   // рескейл от радиан к -255 +255
-  uint16_t scaleBack(float value){
-    return min(-255, max(255, SCALE_BACK * value));
+  int16_t scaleBack(float value){
+    const float conv = SCALE_BACK * value;
+    return max(-255.0f, min(255.0f, conv));
   }
 
 };
@@ -484,11 +616,9 @@ public:
 Controller TheController;
 
 void setup(){
-  Serial.begin(115200);
+  Serial.begin(9600);
   
   TheController.Init();
-  
-  Serial.println("Listening...");
 }
 
 void loop(){
