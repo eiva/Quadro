@@ -66,16 +66,8 @@ class PidObject{
   float _iLimitLow;    //< integral limit
 public:
   PidObject(const float kp, const float ki, const float kd, const float intLimit):
-    _error(0),
-    _prevError(0),
-    _integ(0),
-    _deriv(0),
-    _desired(0),
-    _kp(kp),
-    _ki(ki),
-    _kd(kd),
-    _iLimit(intLimit),
-    _iLimitLow(-intLimit)
+    _error(0), _prevError(0), _integ(0), _deriv(0), _desired(0), _kp(kp),
+    _ki(ki), _kd(kd), _iLimit(intLimit), _iLimitLow(-intLimit)
   { }
 
   /**
@@ -166,7 +158,7 @@ public:
 Motor controller
 ***********************************************************************/
 
-#define MAX_SIGNAL 1800
+#define MAX_SIGNAL 1500 // out of 1800 due to protection form full throttle.
 #define MIN_SIGNAL 880
 #define OFF_SIGNAL 750
 
@@ -233,56 +225,30 @@ nRF
 class RadioLink{
 public:
   void Init(){
-    /*
-    * Set the SPI Driver.
-    */
-
+    // Set the SPI Driver.
     Mirf.spi = &MirfHardwareSpi;
     
-    /*
-     * Setup pins / SPI.
-     */
-     
+    // Setup pins / SPI.
     Mirf.init();
     
-    /*
-     * Configure reciving address.
-     */
+    // Configure reciving address.
      
     byte addr[]={0xDB,0xDB,0xDB,0xDB,0xDB};
     Mirf.setRADDR(addr);
     
-    /*
-     * Set the payload length to sizeof(unsigned long) the
-     * return type of millis().
-     *
-     * NB: payload on client and server must be the same.
-     */
-     
-    Mirf.payload = 6;
+    
+    // Set the payload length to sizeof(unsigned long) the
+    Mirf.payload = 6; // size of (PacketSerializer)
     Mirf.channel = 10; // any
-    /*
-     * Write channel and payload config then power up reciver.
-     */
-     
+    // Write channel and payload config then power up reciver.
     Mirf.config();
   }
 
   bool Update(){
-    if(/*!Mirf.isSending() &&*/ Mirf.dataReady()){ // TODO: Attantion critical change.
-    
-      /*
-       * Get load the packet into the buffer.
-       */
-       
-      Mirf.getData(packet.serialized);
-      
-      /*
-       * Wait untill sending has finished
-       *
-       * NB: isSending returns the chip to receving after returning true.
-       */
-       return true; // Data Readed
+    if(Mirf.dataReady()){
+        // Get load the packet into the buffer.
+        Mirf.getData(packet.serialized);
+	    return true; // Data Readed
     }
     return false;
   }
@@ -301,15 +267,20 @@ public:
         Q_angle = 0.001;
         Q_bias = 0.003;
         R_measure = 0.03;
+        Reset();
+    };
 
-        angle = 0; // Reset the angle
+    // Reset all filter values (not parameters) to it initials.
+    void Reset(){
+    	angle = 0; // Reset the angle
         bias = 0; // Reset bias
 
         P[0][0] = 0; // Since we assume that the bias is 0 and we know the starting angle (use setAngle), the error covariance matrix is set like so - see: http://en.wikipedia.org/wiki/Kalman_filter#Example_application.2C_technical
         P[0][1] = 0;
         P[1][0] = 0;
         P[1][1] = 0;
-    };
+    }
+
     // The angle should be in degrees and the rate should be in degrees per second and the delta time in seconds
     float Update(float newAngle, float newRate, float dt) {
         // KasBot V2  -  Kalman filter module - http://www.x-firm.com/?page_id=145
@@ -353,17 +324,17 @@ public:
 
         return angle;
     };
-    void setAngle(float newAngle) { angle = newAngle; }; // Used to set angle, this should be set as the starting angle
-    float getRate() { return rate; }; // Return the unbiased rate
+    void SetAngle(float newAngle) { angle = newAngle; }; // Used to set angle, this should be set as the starting angle
+    float GetRate() const { return rate; }; // Return the unbiased rate
 
     /* These are used to tune the Kalman filter */
-    void setQangle(float newQ_angle) { Q_angle = newQ_angle; };
-    void setQbias(float newQ_bias) { Q_bias = newQ_bias; };
-    void setRmeasure(float newR_measure) { R_measure = newR_measure; };
+    void SetQangle(float newQ_angle) { Q_angle = newQ_angle; };
+    void SetQbias(float newQ_bias) { Q_bias = newQ_bias; };
+    void SetRmeasure(float newR_measure) { R_measure = newR_measure; };
 
-    float getQangle() const { return Q_angle; };
-    float getQbias() const { return Q_bias; };
-    float getRmeasure() const { return R_measure; };
+    float GetQangle() const { return Q_angle; };
+    float GetQbias() const { return Q_bias; };
+    float GetRmeasure() const { return R_measure; };
 
 private:
     /* Kalman filter variables */
@@ -389,6 +360,9 @@ class Stabilizer
 {
   L3G4200D _gyroscope;
   unsigned long _lastUpdateTime;
+  Kalman _yawFilter;
+  Kalman _pitchFilter;
+  Kalman _rollFilter;
 public:
 
   float Yaw;
@@ -408,6 +382,9 @@ public:
 
   void Reset(){
     Yaw = Pitch = Roll = 0.0f;
+    _yawFilter.Reset();
+    _pitchFilter.Reset();
+    _rollFilter.Reset();
   }
 
   void Update(){
