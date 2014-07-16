@@ -18,7 +18,9 @@
 #include <nRF24L01.h>
 #include <MirfHardwareSpiDriver.h>
 #include <L3G4200D.h>
-#include <Servo.h> 
+#include <Servo.h>
+#include <I2Cdev.h>
+#include <ADXL345.h>
  
 #define bool boolean
 
@@ -352,25 +354,45 @@ private:
     float S; // Estimate error
 };
 
+// Complimentary filter realization.
+class Complimentary{
+	float _a, _b; // Alpha, Beta parameters.
+	float _estimated; // Current estimated value.
+public:
+	// Init complimentary filter using Alpha, Beta parameters.
+	Complimentary(float a, float b): _a(a), _b(b), _estimated(0.0f){}
 
-#define GRAD2RAD(grad) 0.03490658503988659153847381536977f * (grad)
+	// Update estimation using current IMU values for gyro rate and accelereometer values.
+	float Update(float gyro, float accel, float dt){
+		_estimated = _a * (_estimated + gyro * dt) + _b * accel;
+		return _estimated;
+	}
+
+	// Reset current estimation to zero.
+	void Reset() { _estimated = 0.0f; }
+};
+
+#define COMP_APLHA 0.5f//0.7f // Alpha parameter for complimentary filter
+#define COMP_BETA 0.5f//0.3f // Beta parameter for complimentary filter
+#define GRAD2RAD(grad) 0.01745329251994329576923690768489f * (grad) // Convert graduses to radians
 
 // Реализация стабилизации движения - вычисления позиции устройства в пространстве.
 class Stabilizer
 {
-  L3G4200D _gyroscope;
-  unsigned long _lastUpdateTime;
-  Kalman _yawFilter;
-  Kalman _pitchFilter;
-  Kalman _rollFilter;
+  L3G4200D _gyroscope; // Gyroscope HAL
+  ADXL345 _accel; // Accelereometer HAL
+  unsigned long _lastUpdateTime; // Used for calculate dT
+  Complimentary _pitchFilter; // Pitch estimation filter
+  Complimentary _rollFilter; // Yaw estimation filter
 public:
 
-  float Yaw;
-  float Pitch;
-  float Roll;
+  float Yaw; // Current estimated values for Yaw
+  float Pitch; // Current estimated values for Pitch
+  float Roll; // Current estimated values for Roll
 
   Stabilizer():
-    Yaw(0.0f), Pitch(0.0f), Roll(0.0f), _lastUpdateTime(0){}
+    Yaw(0.0f), Pitch(0.0f), Roll(0.0f), _lastUpdateTime(0),
+    _pitchFilter(COMP_APLHA, COMP_BETA), _rollFilter(COMP_APLHA, COMP_BETA){}
 
   void Init(){
     while(!_gyroscope.begin(L3G4200D_SCALE_250DPS, L3G4200D_DATARATE_800HZ_110)){
@@ -378,29 +400,50 @@ public:
     }
     _gyroscope.calibrate(100);
     _gyroscope.setThreshold(0);
+    _accel.setRange(ADXL345_RANGE_8G);
+    _accel.setFullResolution(1);
+    // ATTANTION: Due to my accel have huge estimation offset - need to be recalibrated
+    _accel.setOffsetY(63);
+    _accel.setOffsetZ(-128);
   }
 
   void Reset(){
     Yaw = Pitch = Roll = 0.0f;
-    _yawFilter.Reset();
+    //_yawFilter.Reset();
     _pitchFilter.Reset();
     _rollFilter.Reset();
   }
 
   void Update(){
     const Vector norm = _gyroscope.readNormalize();
+    
+    int16_t ax, ay, az;
+    _accel.getAcceleration(&ax, &ay, &az);
+    // ATTANTION: Works only for buggy ADX345 accelereometer with more than 4G offset.
+    const float fx = (ax)                 /335.0f;
+    const float fy = (ay-9.0f)  *1.101974f/335.0f;
+    const float fz = (az-649.0f)*1.187943f/335.0f;
+    const float fx2 = fx * fx;
+    const float aPitch = atan2(fy, sqrt(fx2 + fz * fz)) - 0.03;
+    const float aRoll  = atan2(fz, sqrt(fx2 + fy * fy)) - 0.01;
+
+    const float gYaw   = - GRAD2RAD(norm.XAxis);
+    const float gPitch =   GRAD2RAD(norm.ZAxis);
+    const float gRoll  = - GRAD2RAD(norm.YAxis);
+
     const unsigned long t = micros();
     const float dt = (t - _lastUpdateTime) / 1000000.0f;
+
     if (_lastUpdateTime == 0){
-      _lastUpdateTime = t;
-      return;
+       _lastUpdateTime = t;
+       return;
     }
     _lastUpdateTime = t;
     
     // Calculate Pitch, Roll and Yaw
-    Yaw = Yaw - GRAD2RAD(norm.XAxis) * dt;
-    Pitch = Pitch + GRAD2RAD(norm.ZAxis) * dt;
-    Roll = Roll + GRAD2RAD(norm.ZAxis) * dt;
+    Yaw = Yaw  + gYaw * dt; // TODO: Correct using magnetometer.
+    Pitch = _pitchFilter.Update(gPitch, aPitch, dt);
+    Roll = _rollFilter.Update(gRoll, aRoll, dt);
   }
 };
 
@@ -590,14 +633,26 @@ public:
 };
 
 // Quadro controller
-Controller TheController;
+//Controller TheController;
+Stabilizer TheStab;
 
 void setup(){
   Serial.begin(9600);
   
-  TheController.Init();
+  //TheController.Init();
+  TheStab.Init();
 }
 
 void loop(){
-  TheController.Update();
+  //TheController.Update();
+	TheStab.Update();
+	const float stabYaw = TheStab.Yaw;
+    const float stabPitch = TheStab.Pitch;
+    const float stabRoll = TheStab.Roll;
+    Serial.print("YPR ");
+    Serial.print(stabYaw);
+    Serial.print(" ");
+    Serial.print(stabPitch);
+    Serial.print(" ");
+    Serial.println(stabRoll);
 }
