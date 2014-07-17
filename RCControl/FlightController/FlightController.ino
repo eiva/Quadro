@@ -20,12 +20,13 @@
 #include <L3G4200D.h>
 #include <Servo.h>
 #include <I2Cdev.h>
+#include <EEPROM.h>
 #include <ADXL345.h>
  
 #define bool boolean
 
 /**********************************************************************
-RF serialization
+RF serialization and EEPROM data
 ***********************************************************************/
 
 #pragma pack(push,1)
@@ -41,12 +42,52 @@ struct Packet{
   uint8_t REST:5;
 };
 
+#define EEPROM_DATA_VERSION 1
+struct EepromData{
+  uint16_t ThrMin:10;
+  uint16_t ThrMax:10;
+  uint16_t YawMin:10;
+  uint16_t YawMax:10;
+  uint16_t PitchMin:10;
+  uint16_t PitchMax:10;
+  uint16_t RollMin:10;
+  uint16_t RollMax:10;
+};
+
+
 #pragma pack(pop)
 
-union PacketSerializer{
-  Packet data;
-  uint8_t serialized[6];
+class EepromReader{
+
+  union EepromSerializer{
+    EepromData data;
+    uint8_t serialized[sizeof(EepromData)];
+  };
+
+  EepromSerializer _buffer;
+public:
+  EepromReader(): Data(_buffer.data){}
+  EepromData& Data;
+  bool Load(){
+    if (EEPROM.read(0) != EEPROM_DATA_VERSION) return false;
+    const int start = 1;
+    for (int i = 0; i < sizeof(EepromData); ++i){
+      _buffer.serialized[i] = EEPROM.read(start + i);
+    }
+    return true;
+  }
+  void Reset(){
+    EEPROM.write(0, 255);
+  }
+  void Store(){
+    const int start = 1;
+    EEPROM.write(0, EEPROM_DATA_VERSION);
+    for (int i = 0; i < sizeof(EepromData); ++i){
+      EEPROM.write(start +i, _buffer.serialized[i]);
+    }
+  }
 };
+
 
 /**********************************************************************
 PID helper objects
@@ -130,14 +171,14 @@ Led information display
 ***********************************************************************/
 
 class LedInfo{
- long long _r, _g, _b;
+ uint8_t _r, _g, _b, _w;
 public:
-  LedInfo():_r(3),_g(2),_b(4){}
+  LedInfo():_r(3),_g(2),_b(4), _w(A3){}
   void Init(){
     pinMode(_r, OUTPUT);
     pinMode(_g, OUTPUT);
     pinMode(_b, OUTPUT);
-    pinMode(A6, OUTPUT);
+    pinMode(_w, OUTPUT);
   }
   void R(bool on){
     digitalWrite(_r, on?HIGH:LOW);
@@ -149,7 +190,7 @@ public:
     digitalWrite(_b, on?HIGH:LOW);
   }
   void W(bool on){
-    digitalWrite(A6, on?HIGH:LOW);
+    digitalWrite(_w, on?HIGH:LOW);
   }
   void RGBW(bool r, bool g, bool b, bool w){
     R(r); G(g); B(b); W(w);
@@ -160,7 +201,7 @@ public:
 Motor controller
 ***********************************************************************/
 
-#define MAX_SIGNAL 1500 // out of 1800 due to protection form full throttle.
+#define MAX_SIGNAL 1700 // out of 1800 due to protection form full throttle.
 #define MIN_SIGNAL 880
 #define OFF_SIGNAL 750
 
@@ -199,10 +240,27 @@ public:
     roll = L(roll, 255);
     pitch = L(pitch, 255);
     #define MIXPWM(r,p,y) map(255 + thr + roll * r + pitch* p +  yaw * y, 0, 8*255, MIN_SIGNAL, MAX_SIGNAL)
-    commandEsc(0, MIXPWM(-1,+1,-1));
-    commandEsc(1, MIXPWM(-1,-1,+1));
-    commandEsc(2, MIXPWM(+1,+1,+1));
-    commandEsc(3, MIXPWM(+1,-1,-1));
+    const uint16_t m0 = MIXPWM(-1,+1,-1);
+    const uint16_t m1 = MIXPWM(-1,-1,+1);
+    const uint16_t m2 = MIXPWM(+1,+1,+1);
+    const uint16_t m3 = MIXPWM(+1,-1,-1);
+    commandEsc(0, m0);
+    commandEsc(1, m1);
+    commandEsc(2, m2);
+    commandEsc(3, m3);
+    /*Serial.print(" THR: ");
+   	Serial.print(thr);
+    Serial.print(" [PWM: ");
+   	Serial.print(m0);
+   	Serial.print(" ");
+   	Serial.print(m1);
+   	Serial.print(" ");
+   	Serial.print(m2);
+   	Serial.print(" ");
+   	Serial.print(m3);
+   	Serial.print(" ");
+   	Serial.println("]");
+   	delay(500);*/
   }
 private:
   // Калибровка контроллеров скорости.
@@ -212,7 +270,7 @@ private:
       commandEsc(i, MAX_SIGNAL);
     delay(3000);
     for(int i=0; i<4; ++i)
-      commandEsc(i, MIN_SIGNAL);
+      commandEsc(i, OFF_SIGNAL);
     delay(3000);    
   }
 
@@ -225,7 +283,15 @@ private:
 nRF
 ***********************************************************************/
 class RadioLink{
+	union PacketSerializer{
+		Packet data;
+		uint8_t serialized[6];
+	};
+	PacketSerializer _buffer;
 public:
+  RadioLink():Data(_buffer.data){}
+
+  // Init nRF MCU
   void Init(){
     // Set the SPI Driver.
     Mirf.spi = &MirfHardwareSpi;
@@ -246,22 +312,24 @@ public:
     Mirf.config();
   }
 
+  // Read data from nRF: if no data returns false
   bool Update(){
     if(Mirf.dataReady()){
         // Get load the packet into the buffer.
-        Mirf.getData(packet.serialized);
+        Mirf.getData(_buffer.serialized);
 	    return true; // Data Readed
     }
     return false;
   }
   // RF message
-  PacketSerializer packet; // TODO: Move to controller.
+  Packet& Data; // TODO: Move to controller.
 };
 
 /**********************************************************************
 Gyro stabilizer - most simplest one
 ***********************************************************************/
 
+// TODO: Not used yet Kalman filter for axis.
 class Kalman {
 public:
     Kalman() {
@@ -372,8 +440,8 @@ public:
 	void Reset() { _estimated = 0.0f; }
 };
 
-#define COMP_APLHA 0.5f//0.7f // Alpha parameter for complimentary filter
-#define COMP_BETA 0.5f//0.3f // Beta parameter for complimentary filter
+#define COMP_APLHA 1.0f//0.7f // Alpha parameter for complimentary filter for Gyro
+#define COMP_BETA 0.0f//0.3f // Beta parameter for complimentary filter for Acc
 #define GRAD2RAD(grad) 0.01745329251994329576923690768489f * (grad) // Convert graduses to radians
 
 // Реализация стабилизации движения - вычисления позиции устройства в пространстве.
@@ -398,6 +466,7 @@ public:
     while(!_gyroscope.begin(L3G4200D_SCALE_250DPS, L3G4200D_DATARATE_800HZ_110)){
       delay(500);
     }
+    delay(100);
     _gyroscope.calibrate(100);
     _gyroscope.setThreshold(0);
     _accel.setRange(ADXL345_RANGE_8G);
@@ -405,6 +474,7 @@ public:
     // ATTANTION: Due to my accel have huge estimation offset - need to be recalibrated
     _accel.setOffsetY(63);
     _accel.setOffsetZ(-128);
+    delay(100);
   }
 
   void Reset(){
@@ -420,12 +490,13 @@ public:
     int16_t ax, ay, az;
     _accel.getAcceleration(&ax, &ay, &az);
     // ATTANTION: Works only for buggy ADX345 accelereometer with more than 4G offset.
-    const float fx = (ax)                 /335.0f;
-    const float fy = (ay-9.0f)  *1.101974f/335.0f;
-    const float fz = (az-649.0f)*1.187943f/335.0f;
+    const float scale = 306.5f;
+    const float fx = -(ax + 72.5f + 2.0f)   * 0.977671  / scale;
+    const float fy = -(ay - 179.5f + 10.0f) * 0.977671  / scale;
+    const float fz = -(az - 510.5f + 12.0f) * 1.08881f  / scale;
     const float fx2 = fx * fx;
-    const float aPitch = atan2(fy, sqrt(fx2 + fz * fz)) - 0.03;
-    const float aRoll  = atan2(fz, sqrt(fx2 + fy * fy)) - 0.01;
+    const float aPitch = atan2(fy, sqrt(fx2 + fz * fz));
+    const float aRoll  = atan2(fz, sqrt(fx2 + fy * fy));
 
     const float gYaw   = - GRAD2RAD(norm.XAxis);
     const float gPitch =   GRAD2RAD(norm.ZAxis);
@@ -537,7 +608,7 @@ public:
     _info.RGBW(true, true, false, true);
     // Calibrate RC sticks limits.
     long long startMillis = millis();
-    Packet& refPacket = _link.packet.data;
+    Packet& refPacket = _link.Data;
     do{  
       _link.Update();
       bool changed = _throttleLimit.Update(refPacket.THR);
@@ -560,9 +631,9 @@ public:
   }
 
   void Update(){
-    //const unsigned long t1 = micros();
+    //const unsigned long t1 = micros(); // Profile
     _link.Update();
-    Packet& refPacket = _link.packet.data;
+    Packet& refPacket = _link.Data;
     if (refPacket.THR == 0 || refPacket.BT3 != 0)
     {
       _stabilizer.Reset();
@@ -618,8 +689,8 @@ public:
     Serial.print(motorRoll);
     Serial.print(" dT ");
     Serial.print(spant);
-    Serial.println(";");
-    delay(500);*/
+    Serial.print(";");*/
+    //delay(500);
     
     _motors.Update(refPacket.THR, motorYaw, motorRoll, motorPitch);
   }
@@ -633,19 +704,19 @@ public:
 };
 
 // Quadro controller
-//Controller TheController;
-Stabilizer TheStab;
+Controller TheController;
+//Stabilizer TheStab;
 
 void setup(){
   Serial.begin(9600);
   
-  //TheController.Init();
-  TheStab.Init();
+  TheController.Init();
+  //TheStab.Init();
 }
 
 void loop(){
-  //TheController.Update();
-	TheStab.Update();
+    TheController.Update();
+	/*TheStab.Update();
 	const float stabYaw = TheStab.Yaw;
     const float stabPitch = TheStab.Pitch;
     const float stabRoll = TheStab.Roll;
@@ -654,5 +725,5 @@ void loop(){
     Serial.print(" ");
     Serial.print(stabPitch);
     Serial.print(" ");
-    Serial.println(stabRoll);
+    Serial.println(stabRoll);*/
 }

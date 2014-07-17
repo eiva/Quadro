@@ -67,7 +67,7 @@ void setup() {
     Serial.println(accel.testConnection() ? "ADXL345 connection successful" : "ADXL345 connection failed");
 
     // configure LED for output
-    pinMode(LED_PIN, OUTPUT);
+    
     accel.setRange(ADXL345_RANGE_8G);
     accel.setFullResolution(1);
     accel.setOffsetY(63);
@@ -75,16 +75,18 @@ void setup() {
 }
 
 float xmin=32700, xmax=-32700, ymin=32700, ymax=-32700, zmin=32700, zmax=-32700;
+//int xmin=32700, xmax=-32700, ymin=32700, ymax=-32700, zmin=32700, zmax=-32700;
 
 void loop() {
     // read raw accel measurements from device
     accel.getAcceleration(&ax, &ay, &az);
+    const float scale = 306.5f;
+    float fx = -(ax + 72.5f + 2)  * 0.977671  / scale;
+    float fy = -(ay - 179.5f + 10) * 0.977671  / scale;
+    float fz = -(az - 510.5f + 12) * 1.08881f  / scale;
 
-    float fx = (ax)                 /335.0f;
-    float fy = (ay-9.0f)  *1.101974f/335.0f;
-    float fz = (az-649.0f)*1.187943f/335.0f;
     
-    xmin = min(xmin, fx);
+    /*xmin = min(xmin, fx);
     xmax = max(xmax, fx);
     
     ymin = min(ymin, fy);
@@ -94,16 +96,15 @@ void loop() {
     zmax = max(zmax, fz);
     
     // display tab-separated accel x/y/z values
-    /*Serial.print("accel:\t");
+    Serial.print("accel:\t");
     Serial.print("X:[ "); Serial.print(xmin);Serial.print(" "); Serial.print(xmax); Serial.print(" : "); Serial.print(fx);Serial.print("]\t");
-    Serial.print("Z:[ "); Serial.print(ymin);Serial.print(" "); Serial.print(ymax); Serial.print(" : "); Serial.print(fy);Serial.print("]\t");
+    Serial.print("Y:[ "); Serial.print(ymin);Serial.print(" "); Serial.print(ymax); Serial.print(" : "); Serial.print(fy);Serial.print("]\t");
     Serial.print("Z:[ "); Serial.print(zmin);Serial.print(" "); Serial.print(zmax); Serial.print(" : "); Serial.print(fz);Serial.println("];");
     */
-    float pitch = atan2(fy,sqrt(fx*fx + fz*fz))-0.03;
-    float roll = atan2(fz,sqrt(fx*fx + fy*fy))-0.01;
+    
+    float pitch = atan2(fy,sqrt(fx*fx + fz*fz));
+    float roll = atan2(fz,sqrt(fx*fx + fy*fy));
 
     Serial.print("[ "); Serial.print(pitch);Serial.print(" "); Serial.print(roll); Serial.println("];");
-    // blink LED to indicate activity
-    blinkState = !blinkState;
-    digitalWrite(LED_PIN, blinkState);
+    
 }
