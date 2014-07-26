@@ -1,5 +1,6 @@
 /**
- * An Mirf example which copies back the data it recives.
+ * Flight Controller based on nRF2400.
+ * All side libraries provided by respected autors: see headers.
  *
  * Pins:
  * Hardware SPI:
@@ -14,14 +15,14 @@
  */
 #include <Wire.h>
 #include <SPI.h>
-#include <Mirf.h>
-#include <nRF24L01.h>
-#include <MirfHardwareSpiDriver.h>
-#include <L3G4200D.h>
+#include "Mirf.h"
+#include "nRF24L01.h"
+#include "MirfHardwareSpiDriver.h"
+#include "L3G4200D.h"
 #include <Servo.h>
-#include <I2Cdev.h>
+#include "I2Cdev.h"
 #include <EEPROM.h>
-#include <ADXL345.h>
+#include "ADXL345.h"
  
 #define bool boolean
 
