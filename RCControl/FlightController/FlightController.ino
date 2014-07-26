@@ -270,7 +270,7 @@ private:
       commandEsc(i, MAX_SIGNAL);
     delay(3000);
     for(int i=0; i<4; ++i)
-      commandEsc(i, OFF_SIGNAL);
+      commandEsc(i, MIN_SIGNAL);
     delay(3000);    
   }
 
@@ -485,9 +485,9 @@ public:
   }
 
   void Update(){
-    const Vector norm = _gyroscope.readNormalize();
     
-    int16_t ax, ay, az;
+    
+    /*int16_t ax, ay, az;
     _accel.getAcceleration(&ax, &ay, &az);
     // ATTANTION: Works only for buggy ADX345 accelereometer with more than 4G offset.
     const float scale = 306.5f;
@@ -496,8 +496,11 @@ public:
     const float fz = -(az - 510.5f + 12.0f) * 1.08881f  / scale;
     const float fx2 = fx * fx;
     const float aPitch = atan2(fy, sqrt(fx2 + fz * fz));
-    const float aRoll  = atan2(fz, sqrt(fx2 + fy * fy));
+    const float aRoll  = atan2(fz, sqrt(fx2 + fy * fy));*/
+    const float aPitch = 0;
+    const float aRoll  = 0;
 
+	const Vector norm = _gyroscope.readNormalize();
     const float gYaw   = - GRAD2RAD(norm.XAxis);
     const float gPitch =   GRAD2RAD(norm.ZAxis);
     const float gRoll  = - GRAD2RAD(norm.YAxis);

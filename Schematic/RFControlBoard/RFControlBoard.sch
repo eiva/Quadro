@@ -13045,9 +13045,9 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 </classes>
 <parts>
 <part name="U1" library="ATMEGA328" deviceset="ATMEGA328P-PU" device=""/>
-<part name="Q1" library="crystal" deviceset="CRYSTAL" device="HC49S"/>
-<part name="C1" library="capacitor-wima" deviceset="C" device="2,5-3"/>
-<part name="C2" library="capacitor-wima" deviceset="C" device="2,5-3"/>
+<part name="Q1" library="crystal" deviceset="CRYSTAL" device="HC49S" value="8MHz"/>
+<part name="C1" library="capacitor-wima" deviceset="C" device="2,5-3" value="24pF"/>
+<part name="C2" library="capacitor-wima" deviceset="C" device="2,5-3" value="24pF"/>
 <part name="THR" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="YAW" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="PTC" library="pinhead" deviceset="PINHD-1X3" device=""/>
@@ -13066,7 +13066,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="IC1" library="linear" deviceset="LM320LZ-XX" device=""/>
-<part name="C3" library="rcl" deviceset="CPOL-EU" device="E2.5-6"/>
+<part name="C3" library="rcl" deviceset="CPOL-EU" device="E2.5-6" value="100m"/>
 <part name="ISP" library="pinhead" deviceset="PINHD-2X3" device=""/>
 <part name="R1" library="rcl" deviceset="R-EU_" device="0207/10" value="10K"/>
 <part name="R2" library="rcl" deviceset="R-EU_" device="0207/10" value="10K"/>
