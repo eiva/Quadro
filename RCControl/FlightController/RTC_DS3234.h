@@ -4,7 +4,7 @@
 #ifndef __RTC_DS3234_H__
 #define __RTC_DS3234_H__
 
-#include <RTClib.h>
+#include "RTClib.h"
 
 // RTC based on the DS3234 chip connected via SPI and the SPI library
 class RTC_DS3234

@@ -4,7 +4,7 @@
 #ifndef __RTC_DS1307_H__
 #define __RTC_DS1307_H__
 
-#include <RTClib.h>
+#include "RTClib.h"
 
 // RTC based on the DS1307 chip connected via I2C and the Wire library
 class RTC_DS1307

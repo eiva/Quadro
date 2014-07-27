@@ -23,6 +23,11 @@
 #include "I2Cdev.h"
 #include <EEPROM.h>
 #include "ADXL345.h"
+#include "Complimentary.h"
+#include "Kalman.h"
+#include "EepromReader.h"
+#include "PidObject.h"
+#include "LedInfo.h"
  
 #define bool boolean
 
@@ -43,160 +48,12 @@ struct Packet{
   uint8_t REST:5;
 };
 
-#define EEPROM_DATA_VERSION 1
-struct EepromData{
-  uint16_t ThrMin:10;
-  uint16_t ThrMax:10;
-  uint16_t YawMin:10;
-  uint16_t YawMax:10;
-  uint16_t PitchMin:10;
-  uint16_t PitchMax:10;
-  uint16_t RollMin:10;
-  uint16_t RollMax:10;
-};
-
-
 #pragma pack(pop)
 
-class EepromReader{
-
-  union EepromSerializer{
-    EepromData data;
-    uint8_t serialized[sizeof(EepromData)];
-  };
-
-  EepromSerializer _buffer;
-public:
-  EepromReader(): Data(_buffer.data){}
-  EepromData& Data;
-  bool Load(){
-    if (EEPROM.read(0) != EEPROM_DATA_VERSION) return false;
-    const int start = 1;
-    for (int i = 0; i < sizeof(EepromData); ++i){
-      _buffer.serialized[i] = EEPROM.read(start + i);
-    }
-    return true;
-  }
-  void Reset(){
-    EEPROM.write(0, 255);
-  }
-  void Store(){
-    const int start = 1;
-    EEPROM.write(0, EEPROM_DATA_VERSION);
-    for (int i = 0; i < sizeof(EepromData); ++i){
-      EEPROM.write(start +i, _buffer.serialized[i]);
-    }
-  }
-};
 
 
-/**********************************************************************
-PID helper objects
-***********************************************************************/
 
-class PidObject{
-  float _desired;      //< set point
-  float _error;        //< error
-  float _prevError;    //< previous error
-  float _integ;        //< integral
-  float _deriv;        //< derivative
-  float _kp;           //< proportional gain
-  float _ki;           //< integral gain
-  float _kd;           //< derivative gain
-  float _outP;         //< proportional output (debugging)
-  float _outI;         //< integral output (debugging)
-  float _outD;         //< derivative output (debugging)
-  float _iLimit;       //< integral limit
-  float _iLimitLow;    //< integral limit
-public:
-  PidObject(const float kp, const float ki, const float kd, const float intLimit):
-    _error(0), _prevError(0), _integ(0), _deriv(0), _desired(0), _kp(kp),
-    _ki(ki), _kd(kd), _iLimit(intLimit), _iLimitLow(-intLimit)
-  { }
 
-  /**
-  * Reset the PID error values
-  */
-  void Reset(){
-    _error     = 0;
-    _prevError = 0;
-    _integ     = 0;
-    _deriv     = 0;
-  }
-
- /**
-  * Set a new set point for the PID to track.
-  *
-  * @param[in] desired The new desired value
-  */
-  void SetDesired(float desired){
-    _desired = desired;
-  }
-
-  /**
-   * Update the PID parameters.
-   *
-   * @param[in] pid         A pointer to the pid object.
-   * @param[in] measured    The measured value
-   * @param[in] updateError Set to TRUE if error should be calculated.
-   *                        Set to False if pidSetError() has been used.
-   * @return PID algorithm output
-   */
-  float Update(const float measured, const float dt, const bool updateError){
-
-    if (updateError)
-      _error = _desired - measured;
-
-    _integ += _error * dt;
-    if (_integ > _iLimit)
-      _integ = _iLimit;
-    else if (_integ < _iLimitLow)
-      _integ = _iLimitLow;
-
-    _deriv = (_error - _prevError) / dt;
-
-    _outP = _kp * _error;
-    _outI = _ki * _integ;
-    _outD = _kd * _deriv;
-
-    float output = _outP + _outI + _outD;
-
-    _prevError = _error;
-
-    return output;
-  }
-};
-
-/**********************************************************************
-Led information display
-***********************************************************************/
-
-class LedInfo{
- uint8_t _r, _g, _b, _w;
-public:
-  LedInfo():_r(3),_g(2),_b(4), _w(A3){}
-  void Init(){
-    pinMode(_r, OUTPUT);
-    pinMode(_g, OUTPUT);
-    pinMode(_b, OUTPUT);
-    pinMode(_w, OUTPUT);
-  }
-  void R(bool on){
-    digitalWrite(_r, on?HIGH:LOW);
-  }
-  void G(bool on){
-    digitalWrite(_g, on?HIGH:LOW);
-  }
-  void B(bool on){
-    digitalWrite(_b, on?HIGH:LOW);
-  }
-  void W(bool on){
-    digitalWrite(_w, on?HIGH:LOW);
-  }
-  void RGBW(bool r, bool g, bool b, bool w){
-    R(r); G(g); B(b); W(w);
-  }
-};
 
 /**********************************************************************
 Motor controller
@@ -330,116 +187,6 @@ public:
 Gyro stabilizer - most simplest one
 ***********************************************************************/
 
-// TODO: Not used yet Kalman filter for axis.
-class Kalman {
-public:
-    Kalman() {
-        /* We will set the variables like so, these can also be tuned by the user */
-        Q_angle = 0.001;
-        Q_bias = 0.003;
-        R_measure = 0.03;
-        Reset();
-    };
-
-    // Reset all filter values (not parameters) to it initials.
-    void Reset(){
-    	angle = 0; // Reset the angle
-        bias = 0; // Reset bias
-
-        P[0][0] = 0; // Since we assume that the bias is 0 and we know the starting angle (use setAngle), the error covariance matrix is set like so - see: http://en.wikipedia.org/wiki/Kalman_filter#Example_application.2C_technical
-        P[0][1] = 0;
-        P[1][0] = 0;
-        P[1][1] = 0;
-    }
-
-    // The angle should be in degrees and the rate should be in degrees per second and the delta time in seconds
-    float Update(float newAngle, float newRate, float dt) {
-        // KasBot V2  -  Kalman filter module - http://www.x-firm.com/?page_id=145
-        // Modified by Kristian Lauszus
-        // See my blog post for more information: http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it
-
-        // Discrete Kalman filter time update equations - Time Update ("Predict")
-        // Update xhat - Project the state ahead
-        /* Step 1 */
-        rate = newRate - bias;
-        angle += dt * rate;
-
-        // Update estimation error covariance - Project the error covariance ahead
-        /* Step 2 */
-        P[0][0] += dt * (dt*P[1][1] - P[0][1] - P[1][0] + Q_angle);
-        P[0][1] -= dt * P[1][1];
-        P[1][0] -= dt * P[1][1];
-        P[1][1] += Q_bias * dt;
-
-        // Discrete Kalman filter measurement update equations - Measurement Update ("Correct")
-        // Calculate Kalman gain - Compute the Kalman gain
-        /* Step 4 */
-        S = P[0][0] + R_measure;
-        /* Step 5 */
-        K[0] = P[0][0] / S;
-        K[1] = P[1][0] / S;
-
-        // Calculate angle and bias - Update estimate with measurement zk (newAngle)
-        /* Step 3 */
-        y = newAngle - angle;
-        /* Step 6 */
-        angle += K[0] * y;
-        bias += K[1] * y;
-
-        // Calculate estimation error covariance - Update the error covariance
-        /* Step 7 */
-        P[0][0] -= K[0] * P[0][0];
-        P[0][1] -= K[0] * P[0][1];
-        P[1][0] -= K[1] * P[0][0];
-        P[1][1] -= K[1] * P[0][1];
-
-        return angle;
-    };
-    void SetAngle(float newAngle) { angle = newAngle; }; // Used to set angle, this should be set as the starting angle
-    float GetRate() const { return rate; }; // Return the unbiased rate
-
-    /* These are used to tune the Kalman filter */
-    void SetQangle(float newQ_angle) { Q_angle = newQ_angle; };
-    void SetQbias(float newQ_bias) { Q_bias = newQ_bias; };
-    void SetRmeasure(float newR_measure) { R_measure = newR_measure; };
-
-    float GetQangle() const { return Q_angle; };
-    float GetQbias() const { return Q_bias; };
-    float GetRmeasure() const { return R_measure; };
-
-private:
-    /* Kalman filter variables */
-    float Q_angle; // Process noise variance for the accelerometer
-    float Q_bias; // Process noise variance for the gyro bias
-    float R_measure; // Measurement noise variance - this is actually the variance of the measurement noise
-
-    float angle; // The angle calculated by the Kalman filter - part of the 2x1 state vector
-    float bias; // The gyro bias calculated by the Kalman filter - part of the 2x1 state vector
-    float rate; // Unbiased rate calculated from the rate and the calculated bias - you have to call getAngle to update the rate
-
-    float P[2][2]; // Error covariance matrix - This is a 2x2 matrix
-    float K[2]; // Kalman gain - This is a 2x1 vector
-    float y; // Angle difference
-    float S; // Estimate error
-};
-
-// Complimentary filter realization.
-class Complimentary{
-	float _a, _b; // Alpha, Beta parameters.
-	float _estimated; // Current estimated value.
-public:
-	// Init complimentary filter using Alpha, Beta parameters.
-	Complimentary(float a, float b): _a(a), _b(b), _estimated(0.0f){}
-
-	// Update estimation using current IMU values for gyro rate and accelereometer values.
-	float Update(float gyro, float accel, float dt){
-		_estimated = _a * (_estimated + gyro * dt) + _b * accel;
-		return _estimated;
-	}
-
-	// Reset current estimation to zero.
-	void Reset() { _estimated = 0.0f; }
-};
 
 #define COMP_APLHA 1.0f//0.7f // Alpha parameter for complimentary filter for Gyro
 #define COMP_BETA 0.0f//0.3f // Beta parameter for complimentary filter for Acc
