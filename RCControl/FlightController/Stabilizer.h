@@ -1,7 +1,7 @@
 /**********************************************************************
 Gyro stabilizer - most simplest one
 ***********************************************************************/
-
+#include "OpenIMU.h"
 
 #define COMP_APLHA 1.0f//0.7f // Alpha parameter for complimentary filter for Gyro
 #define COMP_BETA 0.0f//0.3f // Beta parameter for complimentary filter for Acc

@@ -2,6 +2,7 @@
 // See: http://www.x-io.co.uk/open-source-imu-and-ahrs-algorithms/
 //This code is provided under the GNU General Public Licence
 //12/19/2012
+#include <math.h>
 #include "openIMU.h"
 
 openIMU::openIMU(float *gyroX, float *gyroY, float *gyroZ, float *accX, float *accY, float *accZ, float *scAccX, float *scAccY,float *scAccZ, float *magX, float *magY, float *magZ, float *rawAlt ,float *G_Dt){

@@ -10,6 +10,7 @@
 #include <SPI.h>
 #include <Servo.h>
 #include <EEPROM.h>
+#include <SD.h>
 
 #define bool boolean
 
@@ -28,6 +29,7 @@
 #include "RadioLink.h"
 #include "Stabilizer.h"
 #include "RcAxisLimits.h"
+#include "BlackBox.h"
 #include "Controller.h"
 
 

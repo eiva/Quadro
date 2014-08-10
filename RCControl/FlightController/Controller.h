@@ -27,6 +27,7 @@ class Controller{
   RcAxisLimits _yawLimit, _pitchLimit, _rollLimit, _throttleLimit;
   LedInfo _info;
   long long _lastUpdateTime;
+  BlackBox _blackBox;
 public:
 
   Controller():
@@ -38,6 +39,7 @@ public:
   {}
 
   void Init(){
+    _blackBox.Init();
     _info.Init();
     // Init motors
     _motors.Init();
@@ -62,6 +64,9 @@ public:
         startMillis = millis();
       }
     } while(millis() - startMillis < RC_LIMITS_WAIT);
+
+    _blackBox.Log(String("LT: " + _throttleLimit.Info() + "Y: " + _yawLimit.Info() + "R: " + _rollLimit.Info() + "P: " + _pitchLimit.Info() +"\n"));
+    
     _info.RGBW(true, false, false, false);
     do{
       _link.Update();
@@ -92,6 +97,7 @@ public:
     const float yaw = _yawLimit.Rescale(refPacket.YAW);
     const float pitch = _pitchLimit.Rescale(refPacket.PTC);
     const float roll = _rollLimit.Rescale(refPacket.ROL);
+    const float throttle = map(refPacket.THR, _throttleLimit.Min, _throttleLimit.Max, 0, 1024);
     _yaw.SetDesired(yaw);
     _pitch.SetDesired(pitch);
     _roll.SetDesired(roll);
@@ -104,7 +110,7 @@ public:
     const int16_t motorYaw = scaleBack(pidYaw);
     const int16_t motorPitch = scaleBack(pidPitch);
     const int16_t motorRoll = scaleBack(pidRoll);
-    
+    _blackBox.Log(ftos(dt) + ", " + ftos(throttle) + ", " + ftos(yaw)+ ", " + ftos(pitch)+ ", " + ftos(roll) + ", " + ftos(stabYaw) + ", " + ftos(stabPitch) + ", " + ftos(stabRoll) + "\n");
     /*const unsigned long spant = micros() - t1;
     Serial.print("Input ");
     Serial.print(yaw);
@@ -135,7 +141,7 @@ public:
     Serial.print(";");*/
     //delay(500);
     
-    _motors.Update(refPacket.THR, motorYaw, motorRoll, motorPitch);
+    _motors.Update(throttle, motorYaw, motorRoll, motorPitch);
   }
 
   // рескейл от радиан к -255 +255

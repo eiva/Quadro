@@ -27,6 +27,10 @@ public:
     return _scale * (float)((int16_t)value - (int16_t)Center);
   }
 
+  inline String Info() const{
+    return String(Min) + " " + String(Max);
+  }
+
   uint16_t Min;
   uint16_t Max;
   uint16_t Center;
