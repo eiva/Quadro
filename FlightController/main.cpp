@@ -6,12 +6,12 @@
 #include "Utils.h"
 #include "Port.h"
 #include "LedInfo.h"
+#include "Motors.h"
 
 /*
  * Notepad
  * SystemCoreClock = 72000000
  */
-
 
 int main(){
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -21,18 +21,30 @@ int main(){
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	SysTick_Config(SystemCoreClock/1000);
 
+
+	Motors m;
 	LedInfo leds;
 
+	int d = 1;
+	int step = 5;
+	int max = 1800;
+	int min = 0;
+	int r = min;
+	leds.W(true);
 	while(true){
 
-		leds.RGBW(true, false, false, false);
-		Delay(1000);
-		leds.RGBW(false, true, false, false);
-		Delay(1000);
-		leds.RGBW(false, false, true, false);
-		Delay(1000);
-		leds.RGBW(false, false, false, true);
-		Delay(1000);
+		m.SetRatio(r, r, max, min);
+		Delay(10);
+
+		r += d;
+		if (r >= max - 1){
+			d = -step;
+			leds.RGBW(true, false, false, false);
+		}
+		if (r <= min + 1){
+			d = step;
+			leds.RGBW(false, true, false, false);
+		}
 	}
 }
 

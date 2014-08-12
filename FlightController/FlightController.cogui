@@ -14,31 +14,25 @@
 <part id="1"/>
 <part id="2"/>
 <part id="3"/>
-<part id="4"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
 <editor id="org.coocox.welcome.ui.WelcomePage" name="" partName="welcome" title="welcome" tooltip="" workbook="DefaultEditorWorkbook">
-<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">
-<org.coocox.welcome.ui.WelcomePage/>
+<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">&#x0A;<org.coocox.welcome.ui.WelcomePage/>
 </input>
 </editor>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="Z:/GitHub/Quadro/FlightController/main.cpp" title="main.cpp" tooltip="Z:/GitHub/Quadro/FlightController/main.cpp" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/main.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="593" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_rcc.c" partName="stm32f10x_rcc.c" path="Z:/GitHub/Quadro/FlightController/stm_lib/src/stm32f10x_rcc.c" title="stm32f10x_rcc.c" tooltip="Z:/GitHub/Quadro/FlightController/stm_lib/src/stm32f10x_rcc.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/stm_lib/src/stm32f10x_rcc.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="22" selectionOffset="37882" selectionTopPixel="18304"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="705" selectionTopPixel="347"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="Utils.h" partName="Utils.h" path="Z:/GitHub/Quadro/FlightController/Utils.h" title="Utils.h" tooltip="Z:/GitHub/Quadro/FlightController/Utils.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/Utils.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="292" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="812" selectionTopPixel="0"/>
 </editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="core_cm3.h" partName="core_cm3.h" path="Z:/GitHub/Quadro/FlightController/cmsis/core_cm3.h" title="core_cm3.h" tooltip="Z:/GitHub/Quadro/FlightController/cmsis/core_cm3.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/cmsis/core_cm3.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="29" selectionOffset="98919" selectionTopPixel="26784"/>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Motors.h" partName="Motors.h" path="Z:/GitHub/Quadro/FlightController/Motors.h" title="Motors.h" tooltip="Z:/GitHub/Quadro/FlightController/Motors.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/Motors.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="867" selectionTopPixel="674"/>
 </editor>
 </editors>
 <views>
@@ -47,9 +41,10 @@
 <expanded>
 <element path="/FlightController"/>
 <element path="/FlightController/cmsis"/>
+<element path="/FlightController/syscalls"/>
 </expanded>
 <selection>
-<element path="/FlightController/cmsis/core_cm3.h"/>
+<element path="/FlightController/Motors.h"/>
 </selection>
 </viewState>
 </view>
@@ -58,6 +53,11 @@
 </view>
 <view id="org.coocox.codebugger.trace.ui.traceview" partName="Semihosting">
 <viewState/>
+</view>
+<view id="org.coocox.builder.ui.exampleView" partName="GPIO Examples">
+<viewState>
+<Examples ComponentId="444" Title="GPIO"/>
+</viewState>
 </view>
 <view id="org.eclipse.debug.ui.DebugView" partName="Debug">
 <viewState/>
@@ -118,6 +118,7 @@
 <view id="org.coocox.component.ui.Help"/>
 <view id="org.eclipse.ui.views.ContentOutline"/>
 <view id="org.eclipse.ui.console.ConsoleView"/>
+<view id="org.coocox.builder.ui.exampleView"/>
 <fastViewBars/>
 <layout>
 <mainWindow>
@@ -143,8 +144,15 @@
 </presentation>
 </folder>
 </info>
-<info part="org.coocox.builder.ui.exampleView" ratio="0.22" ratioLeft="407" ratioRight="1443" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1bac4e4"/>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@b95af4" ratio="0.7193347" ratioLeft="1038" ratioRight="405" relationship="2" relative="org.coocox.builder.ui.exampleView">
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@99fe0a" ratio="0.22" ratioLeft="407" ratioRight="1443" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1bac4e4">
+<folder activePageID="org.coocox.builder.ui.exampleView" appearance="2" expanded="2">
+<page content="org.coocox.builder.ui.exampleView" label="GPIO Examples"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@b95af4" ratio="0.7193347" ratioLeft="1038" ratioRight="405" relationship="2" relative="org.eclipse.ui.internal.ViewStack@99fe0a">
 <folder activePageID="org.coocox.component.ui.Help" appearance="2" expanded="2">
 <page content="org.coocox.component.ui.Help" label="Help"/>
 <page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
@@ -157,7 +165,7 @@
 </presentation>
 </folder>
 </info>
-<info part="org.eclipse.ui.editorss" ratio="0.44954127" ratioLeft="441" ratioRight="540" relationship="4" relative="org.coocox.builder.ui.exampleView"/>
+<info part="org.eclipse.ui.editorss" ratio="0.275" ratioLeft="187" ratioRight="493" relationship="4" relative="org.eclipse.ui.internal.ViewStack@99fe0a"/>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@d48e0a" ratio="0.36901122" ratioLeft="362" ratioRight="619" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1bac4e4">
 <folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">
 <page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
@@ -211,8 +219,8 @@
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
 <hide_toolbar_item_id id="org.coocox.builder.ui.build"/>
 <hide_toolbar_item_id id="org.coocox.welcome.ui.action.welcome"/>
-<hide_toolbar_item_id id="org.coocox.component.ui.ShowRepositoryAction"/>
 <hide_toolbar_item_id id="org.coocox.codebugger.configuration.coideProgramDownloadAction"/>
+<hide_toolbar_item_id id="org.coocox.component.ui.ShowRepositoryAction"/>
 <view id="org.coocox.builder.ui.views.ProjectView"/>
 <view id="org.eclipse.debug.ui.VariableView"/>
 <view id="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser"/>
@@ -301,161 +309,159 @@
 <editors>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/main.cpp"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/cmsis_boot/startup/startup_stm32f10x_md.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/cmsis/core_cm3.h"/>
-<editor factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage">
-<org.coocox.welcome.ui.WelcomePage/>
-</editor>
-<editor factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor">
-<org.coocox.builder.ui.editors.ConfigEditor/>
-</editor>
-<editor factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory" id="org.coocox.builder.ui.editors.repository.RepositoryBrowser">
-<subPage/>
-</editor>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/stm_lib/src/misc.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/cmsis_boot/stm32f10x.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/stm_lib/src/stm32f10x_rcc.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/cmsis_boot/system_stm32f10x.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/stm_lib/src/stm32f10x_tim.c"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/Utils.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/Motors.h"/>
 </editors>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="482" y="0"/>
+<item historyLabel="startup_stm32f10x_md.c" index="1">
+<position info="not_deleted" x="10032" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="579" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="597" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="612" y="0"/>
+<position info="not_deleted" x="279" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
 <position/>
 </item>
 <item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="245" y="0"/>
-</item>
-<item historyLabel="welcome" index="3"/>
-<item historyLabel="Configuration" index="4"/>
-<item historyLabel="welcome" index="3"/>
-<item historyLabel="Repository" index="5"/>
-<item historyLabel="welcome" index="3"/>
-<item historyLabel="main.cpp" index="0">
 <position/>
-</item>
-<item historyLabel="misc.c" index="6">
-<position info="not_deleted" x="6574" y="23"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="273" y="0"/>
 </item>
 <item historyLabel="startup_stm32f10x_md.c" index="1">
 <position info="not_deleted" x="10032" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="260" y="0"/>
+<position info="not_deleted" x="279" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
 <position/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="260" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="316" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="579" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="597" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="612" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position/>
-</item>
-<item historyLabel="core_cm3.h" index="2">
-<position info="not_deleted" x="96423" y="0"/>
-</item>
-<item historyLabel="stm32f10x.h" index="7">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="core_cm3.h" index="2">
-<position info="not_deleted" x="96423" y="0"/>
 </item>
 <item historyLabel="startup_stm32f10x_md.c" index="1">
-<position info="not_deleted" x="11497" y="0"/>
+<position info="not_deleted" x="10032" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="483" y="0"/>
-</item>
-<item historyLabel="stm32f10x_rcc.c" index="8">
-<position info="not_deleted" x="37882" y="22"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="851" y="0"/>
-</item>
-<item historyLabel="core_cm3.h" index="2">
-<position info="not_deleted" x="1142" y="10"/>
+<position info="not_deleted" x="279" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
 <position/>
 </item>
-<item historyLabel="core_cm3.h" index="2">
-<position info="not_deleted" x="1142" y="10"/>
+<item historyLabel="stm32f10x_tim.c" index="2">
+<position/>
 </item>
-<item historyLabel="system_stm32f10x.c" index="9">
-<position info="not_deleted" x="467" y="0"/>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="stm32f10x_tim.c" index="2">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
 </item>
 <item historyLabel="startup_stm32f10x_md.c" index="1">
-<position info="not_deleted" x="11391" y="0"/>
-</item>
-<item historyLabel="system_stm32f10x.c" index="9">
-<position info="not_deleted" x="2824" y="0"/>
-</item>
-<item historyLabel="core_cm3.h" index="2">
-<position info="not_deleted" x="1142" y="10"/>
+<position info="not_deleted" x="10032" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="849" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="10">
-<position info="not_deleted" x="327" y="0"/>
-</item>
-<item historyLabel="stm32f10x_rcc.c" index="8">
-<position info="not_deleted" x="37882" y="22"/>
-</item>
-<item historyLabel="core_cm3.h" index="2">
-<position info="not_deleted" x="1121" y="41"/>
-</item>
-<item historyLabel="Utils.h" index="10">
-<position info="not_deleted" x="327" y="0"/>
-</item>
-<item historyLabel="core_cm3.h" index="2">
-<position info="not_deleted" x="98919" y="29"/>
-</item>
-<item historyLabel="Utils.h" index="10">
-<position info="not_deleted" x="292" y="0"/>
+<position info="not_deleted" x="279" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="851" y="0"/>
+<position info="not_deleted" x="610" y="0"/>
 </item>
-<item historyLabel="Utils.h" index="10">
-<position info="not_deleted" x="292" y="0"/>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="600" y="0"/>
 </item>
-<item historyLabel="Utils.h" index="10">
-<position info="not_deleted" x="292" y="0"/>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="stm32f10x_tim.c" index="2">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="startup_stm32f10x_md.c" index="1">
+<position info="not_deleted" x="10032" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="stm32f10x_tim.c" index="2">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="stm32f10x_tim.c" index="2">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="stm32f10x_tim.c" index="2">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="stm32f10x_tim.c" index="2">
+<position info="not_deleted" x="8167" y="11"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="Utils.h" index="3">
+<position info="not_deleted" x="201" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="Utils.h" index="3">
+<position info="not_deleted" x="812" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="704" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="2865" y="0"/>
+</item>
+<item historyLabel="Utils.h" index="3">
+<position info="not_deleted" x="812" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position/>
+</item>
+<item historyLabel="Motors.h" index="4">
+<position info="not_deleted" x="2627" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="247" y="0"/>
+</item>
+<item historyLabel="Motors.h" index="4">
+<position info="not_deleted" x="2054" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="126" y="0"/>
+</item>
+<item historyLabel="Motors.h" index="4">
+<position info="not_deleted" x="293" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="226" y="0"/>
+</item>
+<item historyLabel="Motors.h" index="4">
+<position info="not_deleted" x="867" y="0"/>
 </item>
 <item active="true" historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="851" y="0"/>
+<position info="not_deleted" x="226" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -464,56 +470,51 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="core_cm3.h" tooltip="FlightController/cmsis/core_cm3.h">
-<persistable path="/FlightController/cmsis/core_cm3.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Motors.h" tooltip="FlightController/Motors.h">
+<persistable path="/FlightController/Motors.h"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Utils.h" tooltip="FlightController/Utils.h">
 <persistable path="/FlightController/Utils.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_rcc.c" tooltip="FlightController/stm_lib/src/stm32f10x_rcc.c">
-<persistable path="/FlightController/stm_lib/src/stm32f10x_rcc.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x.h" tooltip="FlightController/cmsis_boot/stm32f10x.h">
-<persistable path="/FlightController/cmsis_boot/stm32f10x.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="misc.c" tooltip="FlightController/stm_lib/src/misc.c">
-<persistable path="/FlightController/stm_lib/src/misc.c"/>
-</file>
-<file factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory" id="org.coocox.builder.ui.editors.repository.RepositoryBrowser" name="Repository" tooltip="Repository">
-<persistable>
-<subPage/>
-</persistable>
-</file>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor" name="" tooltip="">
-<persistable>
-<org.coocox.builder.ui.editors.ConfigEditor/>
-</persistable>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="system_stm32f10x.c" tooltip="FlightController/cmsis_boot/system_stm32f10x.c">
-<persistable path="/FlightController/cmsis_boot/system_stm32f10x.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_tim.c" tooltip="FlightController/stm_lib/src/stm32f10x_tim.c">
+<persistable path="/FlightController/stm_lib/src/stm32f10x_tim.c"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="startup_stm32f10x_md.c" tooltip="FlightController/cmsis_boot/startup/startup_stm32f10x_md.c">
 <persistable path="/FlightController/cmsis_boot/startup/startup_stm32f10x_md.c"/>
 </file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x.h" tooltip="FlightController/cmsis_boot/stm32f10x.h">
+<persistable path="/FlightController/cmsis_boot/stm32f10x.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_rcc.h" tooltip="FlightController/stm_lib/inc/stm32f10x_rcc.h">
+<persistable path="/FlightController/stm_lib/inc/stm32f10x_rcc.h"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_tim.h" tooltip="FlightController/stm_lib/inc/stm32f10x_tim.h">
 <persistable path="/FlightController/stm_lib/inc/stm32f10x_tim.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_gpio.h" tooltip="FlightController/stm_lib/inc/stm32f10x_gpio.h">
-<persistable path="/FlightController/stm_lib/inc/stm32f10x_gpio.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="LedInfo.h" tooltip="FlightController/LedInfo.h">
-<persistable path="/FlightController/LedInfo.h"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Port.h" tooltip="FlightController/Port.h">
 <persistable path="/FlightController/Port.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" tooltip="FlightController/main.cpp">
-<persistable path="/FlightController/main.cpp"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_gpio.h" tooltip="FlightController/stm_lib/inc/stm32f10x_gpio.h">
+<persistable path="/FlightController/stm_lib/inc/stm32f10x_gpio.h"/>
 </file>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage" name="" tooltip="">
-<persistable>
-<org.coocox.welcome.ui.WelcomePage/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_gpio.c" tooltip="FlightController/stm_lib/src/stm32f10x_gpio.c">
+<persistable path="/FlightController/stm_lib/src/stm32f10x_gpio.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="LedInfo.h" tooltip="FlightController/LedInfo.h">
+<persistable path="/FlightController/LedInfo.h"/>
+</file>
+<file factoryID="org.coocox.component.ui.editors.repository.RepositoryElementFactory" id="org.coocox.builder.ui.editors.repository.RepositoryBrowser" name="Repository" tooltip="Repository">
+<persistable>&#x0A;<subPage/>
 </persistable>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="core_cm3.h" tooltip="FlightController/cmsis/core_cm3.h">
+<persistable path="/FlightController/cmsis/core_cm3.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_rcc.c" tooltip="FlightController/stm_lib/src/stm32f10x_rcc.c">
+<persistable path="/FlightController/stm_lib/src/stm32f10x_rcc.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="misc.c" tooltip="FlightController/stm_lib/src/misc.c">
+<persistable path="/FlightController/stm_lib/src/misc.c"/>
 </file>
 </mruList>
 </workbench>

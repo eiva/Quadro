@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <breakpoints>
 <breakpoint enabled="true" persistant="true" registered="true">
+<resource path="/FlightController/stm_lib/src/stm32f10x_tim.c" type="1"/>
+<marker lineNumber="2297" type="org.eclipse.cdt.debug.core.cLineBreakpointMarker">
+<attrib name="message" value="Line breakpoint: stm32f10x_tim.c [line: 2297]"/>
+<attrib name="org.eclipse.cdt.debug.core.condition" value=""/>
+<attrib name="org.eclipse.debug.core.id" value="org.eclipse.cdt.debug.core"/>
+<attrib name="org.eclipse.cdt.debug.core.installCount" value="0"/>
+<attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="Z:\GitHub\Quadro\FlightController\stm_lib\src\stm32f10x_tim.c"/>
+<attrib name="org.eclipse.cdt.debug.core.breakpointType" value="0"/>
+<attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
+<attrib name="workingset_name" value=""/>
+<attrib name="workingset_id" value="org.eclipse.debug.ui.breakpointWorkingSet"/>
+</marker>
+</breakpoint>
+<breakpoint enabled="true" persistant="true" registered="true">
 <resource path="/FlightController/main.cpp" type="1"/>
-<marker lineNumber="17" type="org.eclipse.cdt.debug.core.cLineBreakpointMarker">
-<attrib name="message" value="Line breakpoint: main.cpp [line: 18]"/>
+<marker lineNumber="24" type="org.eclipse.cdt.debug.core.cLineBreakpointMarker">
+<attrib name="message" value="Line breakpoint: main.cpp [line: 108]"/>
 <attrib name="org.eclipse.cdt.debug.core.condition" value=""/>
 <attrib name="org.eclipse.debug.core.id" value="org.eclipse.cdt.debug.core"/>
 <attrib name="org.eclipse.cdt.debug.core.installCount" value="0"/>

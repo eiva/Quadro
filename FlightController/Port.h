@@ -8,6 +8,7 @@ public:
 		_gpioPort(gpioPort)
 	{
 		GPIO_InitTypeDef port;
+		GPIO_StructInit(&port);
 		port.GPIO_Pin = portNumber;
 		port.GPIO_Mode = GPIO_Mode_Out_PP;
 		port.GPIO_Speed = GPIO_Speed_2MHz;
