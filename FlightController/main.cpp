@@ -10,62 +10,32 @@
 #include "LedInfo.h"
 #include "Motors.h"
 #include "ADCPort.h"
+#include "SpiInterface.h"
 /*
- * Notepad
+ * Notepad:
  * SystemCoreClock = 72000000
  */
 
-class SpiInterface{
-	SPI_TypeDef* _spi;
+class Nrf24{
+	SpiInterface& _spi;
+	Port _csn;
+	Port _ce;
 public:
-	SpiInterface(SPI_TypeDef* spi, GPIO_TypeDef* gpioPort, uint16_t miso, uint16_t mosi, uint16_t sck):
-		_spi(spi)
+	Nrf24(SpiInterface &spi, Port& csn, Port& ce):
+		_spi(spi),
+		_csn(csn),
+		_ce(ce)
 	{
-		GPIO_InitTypeDef port;
-		GPIO_StructInit(&port);
-		port.GPIO_Speed = GPIO_Speed_50MHz;
-
-		// Setup SPI GPIO ports
-		port.GPIO_Pin = sck | mosi;
-		port.GPIO_Mode = GPIO_Mode_AF_PP;
-		GPIO_Init(gpioPort,&port);
-
-		port.GPIO_Pin = miso;
-		port.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-		GPIO_Init(gpioPort,&port);
-
-		// Init SPI port.
-		SPI_InitTypeDef SPI;
-		SPI_StructInit(&SPI);
-		SPI.SPI_Mode = SPI_Mode_Master;
-		SPI.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
-		SPI.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-
-		// Set SPI to Mode 0
-		SPI.SPI_CPOL = SPI_CPOL_Low;
-		SPI.SPI_CPHA = SPI_CPHA_1Edge;
-		SPI.SPI_CRCPolynomial = 7;
-		SPI.SPI_DataSize = SPI_DataSize_8b;
-		SPI.SPI_FirstBit = SPI_FirstBit_MSB;
-		SPI.SPI_NSS = SPI_NSS_Soft;
-		SPI_Init(_spi,&SPI);
-
-		// NSS must be set to '1' due to NSS_Soft settings (otherwise it will be Multimaster mode).
-		SPI_NSSInternalSoftwareConfig(_spi,SPI_NSSInternalSoft_Set);
-
-		SPI_Cmd(_spi,ENABLE);
+		CSN_H();
+		CE_L();
 	}
-
-	// Send/Receive data via SPI
-	// input:
-	//  data - byte to send
-	//  output: received byte from nRF24L01
-	uint8_t ReadWrite(uint8_t data){
-		while (SPI_I2S_GetFlagStatus(_spi, SPI_I2S_FLAG_TXE) == RESET); // Wait while DR register is not empty
-		SPI_I2S_SendData(_spi,data); // Send byte to SPI
-		while (SPI_I2S_GetFlagStatus(_spi, SPI_I2S_FLAG_RXNE) == RESET); // Wait to receive byte
-		return SPI_I2S_ReceiveData(_spi); // Read byte from SPI bus
-	}
+private:
+	// Chip Enable Activates RX or TX mode
+	void inline CE_L(){_ce.Low();}
+	void inline CE_H(){_ce.High();}
+	// SPI Chip Select
+	void inline CSN_L(){_csn.Low();}
+	void inline CSN_H(){_csn.High();}
 };
 
 
@@ -79,11 +49,14 @@ int main(){
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	SysTick_Config(SystemCoreClock/1000);
 
-
+	SpiInterface spi(SPI1,GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
+	Port csn(GPIOA, GPIO_Pin_4);
+	Port ce(GPIOA, GPIO_Pin_8);
+	Nrf24 nrf(spi, csn, ce);
 	ADCPort adc(GPIOB, GPIO_Pin_0, ADC_Channel_8);
 	Motors motor;
-
 	LedInfo leds;
+
 	while(true){
 		Delay(50);
 
