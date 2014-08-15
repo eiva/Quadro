@@ -1,3 +1,7 @@
+#pragma once
+
+#include <stm32f10x_spi.h>
+
 class SpiInterface{
 	SPI_TypeDef* _spi;
 public:

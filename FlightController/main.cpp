@@ -11,32 +11,12 @@
 #include "Motors.h"
 #include "ADCPort.h"
 #include "SpiInterface.h"
+#include "Nrg24.h"
 /*
  * Notepad:
  * SystemCoreClock = 72000000
  */
 
-class Nrf24{
-	SpiInterface& _spi;
-	Port _csn;
-	Port _ce;
-public:
-	Nrf24(SpiInterface &spi, Port& csn, Port& ce):
-		_spi(spi),
-		_csn(csn),
-		_ce(ce)
-	{
-		CSN_H();
-		CE_L();
-	}
-private:
-	// Chip Enable Activates RX or TX mode
-	void inline CE_L(){_ce.Low();}
-	void inline CE_H(){_ce.High();}
-	// SPI Chip Select
-	void inline CSN_L(){_csn.Low();}
-	void inline CSN_H(){_csn.High();}
-};
 
 
 int main(){
@@ -44,18 +24,30 @@ int main(){
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	SysTick_Config(SystemCoreClock/1000);
 
 	SpiInterface spi(SPI1,GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
 	Port csn(GPIOA, GPIO_Pin_4);
 	Port ce(GPIOA, GPIO_Pin_8);
-	Nrf24 nrf(spi, csn, ce);
-	ADCPort adc(GPIOB, GPIO_Pin_0, ADC_Channel_8);
-	Motors motor;
 	LedInfo leds;
+	leds.W(true);
+	Nrf24 nrf(spi, csn, ce);
+	uint8_t check = nrf.Check();
+	leds.W(false);
+	if (check == 0)
+	{
+		leds.G(true);
+	}
+	else {
+		leds.R(true);
+	}
+	while(true){}
+	/*ADCPort adc(GPIOB, GPIO_Pin_0, ADC_Channel_8);
+	Motors motor;
+
 
 	while(true){
 		Delay(50);
@@ -72,7 +64,7 @@ int main(){
 		}else{
 			leds.RGBW(false, false, false, true);
 		}
-	}
+	}*/
 /*
 	int d = 1;
 	int step = 5;
