@@ -98,13 +98,13 @@
     <File name="stm_lib/src/stm32f10x_rcc.c" path="stm_lib/src/stm32f10x_rcc.c" type="1"/>
     <File name="semihosting" path="" type="2"/>
     <File name="RF" path="" type="2"/>
-    <File name="semihosting/sh_cmd.s" path="semihosting/sh_cmd.s" type="1"/>
     <File name="stm_lib/src/stm32f10x_tim.c" path="stm_lib/src/stm32f10x_tim.c" type="1"/>
+    <File name="semihosting/sh_cmd.s" path="semihosting/sh_cmd.s" type="1"/>
     <File name="stm_lib/inc/stm32f10x_pwr.h" path="stm_lib/inc/stm32f10x_pwr.h" type="1"/>
     <File name="cmsis_boot/startup" path="" type="2"/>
     <File name="cmsis/core_cmFunc.h" path="cmsis/core_cmFunc.h" type="1"/>
-    <File name="semihosting/semihosting.c" path="semihosting/semihosting.c" type="1"/>
     <File name="RF/nRF14L01.c" path="RF/nRF14L01.c" type="1"/>
+    <File name="semihosting/semihosting.c" path="semihosting/semihosting.c" type="1"/>
     <File name="stm_lib/src/misc.c" path="stm_lib/src/misc.c" type="1"/>
     <File name="stm_lib/src/stm32f10x_spi.c" path="stm_lib/src/stm32f10x_spi.c" type="1"/>
     <File name="cmsis_boot/stm32f10x.h" path="cmsis_boot/stm32f10x.h" type="1"/>
@@ -124,13 +124,13 @@
     <File name="RF/nRF24L01.h" path="RF/nRF24L01.h" type="1"/>
     <File name="stm_lib/inc/stm32f10x_rtc.h" path="stm_lib/inc/stm32f10x_rtc.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_i2c.c" path="stm_lib/src/stm32f10x_i2c.c" type="1"/>
-    <File name="semihosting/semihosting.h" path="semihosting/semihosting.h" type="1"/>
     <File name="stdio/printf.c" path="stdio/printf.c" type="1"/>
+    <File name="semihosting/semihosting.h" path="semihosting/semihosting.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_pwr.c" path="stm_lib/src/stm32f10x_pwr.c" type="1"/>
     <File name="stm_lib/src/stm32f10x_gpio.c" path="stm_lib/src/stm32f10x_gpio.c" type="1"/>
     <File name="stm_lib/inc" path="" type="2"/>
-    <File name="stm_lib/src/stm32f10x_rtc.c" path="stm_lib/src/stm32f10x_rtc.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_gpio.h" path="stm_lib/inc/stm32f10x_gpio.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_rtc.c" path="stm_lib/src/stm32f10x_rtc.c" type="1"/>
     <File name="program.cpp" path="program.cpp" type="1"/>
   </Files>
 </Project>

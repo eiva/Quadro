@@ -8,12 +8,12 @@
 #define SPI_GPIO_PORT GPIOA
 
 // nRF24L01 CE (Chip Enable) pin
-#define nRF24_CE_PORT     GPIOB
-#define nRF24_CE_PIN      GPIO_Pin_11    // PB11
+#define nRF24_CE_PORT     GPIOA
+#define nRF24_CE_PIN      GPIO_Pin_8    // PB11
 
 // nRF24L01 IRQ pin
-#define nRF24_IRQ_PORT    GPIOB
-#define nRF24_IRQ_PIN     GPIO_Pin_10    // PB10
+#define nRF24_IRQ_PORT    GPIOA
+#define nRF24_IRQ_PIN     GPIO_Pin_12    // PB10
 
 
 /* Some constants */

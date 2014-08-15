@@ -42,7 +42,7 @@ int main(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC,ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
-	EXTI_InitTypeDef EXTIInit;
+	/*EXTI_InitTypeDef EXTIInit;
 	EXTI_StructInit(&EXTIInit);
 	EXTIInit.EXTI_Line = EXTI_Line10;             // EXTI will be on line 10
 	EXTIInit.EXTI_LineCmd = ENABLE;               // EXTI1 enabled
@@ -59,22 +59,22 @@ int main(void)
 	NVIC_Init(&NVICInit);
 
 	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource10);
-
+	*/
 	GPIO_InitTypeDef PORT;
 	GPIO_StructInit(&PORT);
-	PORT.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_8;
+	PORT.GPIO_Pin = GPIO_Pin_15 | GPIO_Pin_14 | GPIO_Pin_13 | GPIO_Pin_12;
 	PORT.GPIO_Mode = GPIO_Mode_Out_PP;
 	PORT.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOC,&PORT);
+	GPIO_Init(GPIOB,&PORT);
 
 	nRF24_init();
 
 	if (nRF24_Check() != 0) {
-		GPIOC->ODR ^= GPIO_Pin_9; // Toggle LED
-		GPIOC->ODR ^= GPIO_Pin_8; // Toggle LED
+		GPIOB->ODR ^= GPIO_Pin_15; // Toggle LED
+		GPIOB->ODR ^= GPIO_Pin_14; // Toggle LED
 		while(1);
 	}
-
+	while(1);
 	nRF24_RXMode(RX_PAYLOAD);
 	nRF24_ClearIRQFlags();
 	unsigned char i,v;
