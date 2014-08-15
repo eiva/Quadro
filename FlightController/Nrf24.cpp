@@ -115,7 +115,7 @@ uint8_t Nrf24::Check(void) {
 		CSN_L();
 		status = _spi.ReadWrite(reg);
 		for (i = 0; i < count; i++) pBuf[i] = _spi.ReadWrite(0);
-		CSN_L();
+		CSN_H();
 
 		return status;
 	}

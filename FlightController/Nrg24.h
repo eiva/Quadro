@@ -2,8 +2,8 @@
 
 class Nrf24{
 	SpiInterface& _spi;
-	Port _csn;
-	Port _ce;
+	Port& _csn;
+	Port& _ce;
 public:
 	Nrf24(SpiInterface &spi, Port& csn, Port& ce):
 		_spi(spi),

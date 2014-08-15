@@ -29,11 +29,11 @@ int main(){
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	SysTick_Config(SystemCoreClock/1000);
 
-	SpiInterface spi(SPI1,GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
 	Port csn(GPIOA, GPIO_Pin_4);
 	Port ce(GPIOA, GPIO_Pin_8);
 	LedInfo leds;
 	leds.W(true);
+	SpiInterface spi(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
 	Nrf24 nrf(spi, csn, ce);
 	uint8_t check = nrf.Check();
 	leds.W(false);

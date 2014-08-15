@@ -49,7 +49,7 @@ public:
 	//  output: received byte from nRF24L01
 	uint8_t ReadWrite(uint8_t data){
 		while (SPI_I2S_GetFlagStatus(_spi, SPI_I2S_FLAG_TXE) == RESET); // Wait while DR register is not empty
-		SPI_I2S_SendData(_spi,data); // Send byte to SPI
+		SPI_I2S_SendData(_spi, data); // Send byte to SPI
 		while (SPI_I2S_GetFlagStatus(_spi, SPI_I2S_FLAG_RXNE) == RESET); // Wait to receive byte
 		return SPI_I2S_ReceiveData(_spi); // Read byte from SPI bus
 	}
