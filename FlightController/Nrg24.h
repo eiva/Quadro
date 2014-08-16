@@ -1,24 +1,44 @@
 #pragma once
 
+/* Some constants */
+#define nRF24_RX_ADDR_WIDTH        5    // nRF24 RX address width
+#define nRF24_TX_ADDR_WIDTH        5    // nRF24 TX address width
+
 class Nrf24{
-	SpiInterface& _spi;
-	Port& _csn;
-	Port& _ce;
+	SpiInterface _spi;
+	Port _csn;
+	Port _ce;
+	uint8_t nRF24_RX_addr[nRF24_RX_ADDR_WIDTH];
+	//uint8_t nRF24_TX_addr[nRF24_TX_ADDR_WIDTH];
 public:
-	Nrf24(SpiInterface &spi, Port& csn, Port& ce):
-		_spi(spi),
-		_csn(csn),
-		_ce(ce)
-	{
-		CSN_H();
-		CE_L();
-	}
+	Nrf24(SpiInterface &spi, Port& csn, Port& ce);
+
+	void SetRxAddress(uint8_t rxAddr[nRF24_RX_ADDR_WIDTH]);
 
 	// Check if nRF24L01 present (send byte sequence, read it back and compare)
 	// return:
-	//   0 - looks like an nRF24L01 is online
-	//   1 - received sequence differs from original
-	uint8_t Check(void);
+	//   true - looks like an nRF24L01 is online
+	//   false - received sequence differs from original
+	bool Check();
+
+	// Put nRF24L01 in RX mode
+	void RXMode(uint8_t RX_PAYLOAD);
+
+	// Check if data is available for reading
+	// return:
+	//   false -> no data
+	//   true -> RX_DR is set or some bytes present in FIFO
+	bool IsDataReady();
+
+	// Read current packet from FIFO.
+	// returns:
+	//   true -> if data read.
+	//   false -> if something goes wrong.
+	bool RXPacket(uint8_t* pBuf, uint8_t RX_PAYLOAD);
+
+	// Clear all IRQ flags
+	void ClearIRQFlags();
+
 private:
 	// Write new value to register
 	// input:

@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stm32f10x.h>
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_spi.h>
@@ -56,21 +57,110 @@
 #define RF_TRANSMIT_MODE 0x0F
 
 
+Nrf24::Nrf24(SpiInterface &spi, Port& csn, Port& ce):
+	_spi(spi),
+	_csn(csn),
+	_ce(ce)
+{
+	CSN_H();
+	CE_L();
+}
+
+void Nrf24::SetRxAddress(uint8_t rxAddr[nRF24_RX_ADDR_WIDTH]){
+	memcpy(nRF24_RX_addr, rxAddr, nRF24_RX_ADDR_WIDTH);
+}
+
 // Check if nRF24L01 present (send byte sequence, read it back and compare)
 // return:
 //   0 - looks like an nRF24L01 is online
 //   1 - received sequence differs from original
-uint8_t Nrf24::Check(void) {
+bool Nrf24::Check() {
 	uint8_t txbuf[5] = { 0xA9,0xA9,0xA9,0xA9,0xA9 };
 	uint8_t rxbuf[5];
 	uint8_t i;
 
 	WriteBuf(nRF24_CMD_WREG | nRF24_REG_TX_ADDR,txbuf,5); // Write fake TX address
     ReadBuf(nRF24_REG_TX_ADDR,rxbuf,5); // Try to read TX_ADDR register
-    for (i = 0; i < 5; i++) if (rxbuf[i] != txbuf[i]) return 1;
+    for (i = 0; i < 5; i++) if (rxbuf[i] != txbuf[i]) return false;
 
-    return 0;
+    return true;
 }
+
+// Put nRF24L01 in RX mode
+void Nrf24::RXMode(uint8_t RX_PAYLOAD) {
+	CE_L();
+
+	WriteBuf(nRF24_CMD_WREG | nRF24_REG_RX_ADDR_P1, nRF24_RX_addr, nRF24_RX_ADDR_WIDTH); // Set static RX address
+
+	RWReg(nRF24_CMD_WREG | nRF24_REG_EN_RXADDR,0x03);//0x01); // Enable data pipe 0
+
+	//nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,0x6E); // Set frequency channel 110 (2.510MHz)
+	RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,RF_CHANNEL); // Set frequency channel 110 (2.510MHz)
+
+	RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P0,RX_PAYLOAD); // Set RX payload length (10 bytes)
+	RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P1,RX_PAYLOAD); // Set RX payload length (10 bytes)
+
+	//nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RF_SETUP, RF_TRANSMIT_MODE);//0x06); // Setup: 1Mbps, 0dBm, LNA off
+	RWReg(nRF24_CMD_WREG | nRF24_REG_CONFIG, 0x0B); // Config: CRC on (1 bytes), Power UP, RX/TX ctl = PRX
+
+	CE_H();
+
+	RWReg(nRF24_CMD_WREG | nRF24_REG_STATUS, (1 << 5) | (1 << 4));
+
+	CSN_L();
+	_spi.ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
+	CSN_H();
+}
+
+// Check if data is available for reading
+// return:
+//   false -> no data
+//   true -> RX_DR is set or some bytes present in FIFO
+bool Nrf24::IsDataReady() {
+    uint8_t status;
+
+    status = ReadReg(nRF24_REG_STATUS);
+    if (status & nRF24_MASK_RX_DR) return 1;
+
+    // Checking RX_DR isn't good enough, there's can be some data in FIFO
+    status = ReadReg(nRF24_REG_FIFO_STATUS);
+
+    return (status & nRF24_FIFO_RX_EMPTY) ? false : true;
+}
+
+bool Nrf24::RXPacket(uint8_t* pBuf, uint8_t RX_PAYLOAD) {
+	uint8_t status;
+
+	status = ReadReg(nRF24_REG_STATUS); // Read status register
+    if (status & nRF24_MASK_RX_DR) {
+    	//if ((status & 0x0E) == 0) {
+    		// pipe 0
+    		ReadBuf(nRF24_CMD_R_RX_PAYLOAD,pBuf,RX_PAYLOAD); // read received payload from RX FIFO buffer
+    	//}
+    	CSN_L();
+		_spi.ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
+		CSN_H();
+		RWReg(nRF24_CMD_WREG | nRF24_REG_STATUS,status | 0x70); // Clear RX_DR, TX_DS, MAX_RT flags
+	    //return nRF24_MASK_RX_DR;
+	    return true;
+    }
+
+    // Some banana happens
+    CSN_L();
+    _spi.ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
+    CSN_H();
+	RWReg(nRF24_CMD_WREG | nRF24_REG_STATUS,status | 0x70); // Clear RX_DR, TX_DS, MAX_RT flags
+    return false;
+}
+
+// Clear all IRQ flags
+void Nrf24::ClearIRQFlags() {
+	uint8_t status;
+
+    status = ReadReg(nRF24_REG_STATUS);
+	RWReg(nRF24_CMD_WREG | nRF24_REG_STATUS,status | 0x70); // Clear RX_DR, TX_DS, MAX_RT flags
+}
+
 
 	// Write new value to register
 	// input:

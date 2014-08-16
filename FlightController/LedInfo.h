@@ -8,7 +8,7 @@ public:
 	  _g(GPIOB, GPIO_Pin_14),
 	  _b(GPIOB, GPIO_Pin_13),
 	  _w(GPIOB, GPIO_Pin_12){}
-  void Init(){}
+
   void R(bool on){
     _r.State(on);
   }
@@ -23,5 +23,8 @@ public:
   }
   void RGBW(bool r, bool g, bool b, bool w){
     R(r); G(g); B(b); W(w);
+  }
+  void Off(){
+	  R(false); G(false); B(false); W(false);
   }
 };
