@@ -73,7 +73,7 @@ public:
 		for (uint8_t i = 0; i < sizeof(Packet); ++i) _serializer.serialized[i] = 0x00;
 
 		bool status = _nrf.RXPacket(_serializer.serialized, sizeof(Packet));
-		if (!status) return false;
+		//if (!status) return false;
 		Throttle =  _serializer.data.THR;
 		Yaw =  _serializer.data.YAW;
 		Pitch =  _serializer.data.PTC;

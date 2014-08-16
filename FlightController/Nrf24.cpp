@@ -87,18 +87,18 @@ bool Nrf24::Check() {
 }
 
 // Put nRF24L01 in RX mode
-void Nrf24::RXMode(uint8_t RX_PAYLOAD) {
+void Nrf24::RXMode(uint8_t payload) {
 	CE_L();
 
 	WriteBuf(nRF24_CMD_WREG | nRF24_REG_RX_ADDR_P1, nRF24_RX_addr, nRF24_RX_ADDR_WIDTH); // Set static RX address
 
-	RWReg(nRF24_CMD_WREG | nRF24_REG_EN_RXADDR,0x03);//0x01); // Enable data pipe 0
+	//RWReg(nRF24_CMD_WREG | nRF24_REG_EN_RXADDR,0x03);//0x01); // Enable data pipe 0
 
 	//nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,0x6E); // Set frequency channel 110 (2.510MHz)
-	RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,RF_CHANNEL); // Set frequency channel 110 (2.510MHz)
+	//RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,RF_CHANNEL); // Set frequency channel 110 (2.510MHz)
 
-	RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P0,RX_PAYLOAD); // Set RX payload length (10 bytes)
-	RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P1,RX_PAYLOAD); // Set RX payload length (10 bytes)
+	RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P0, payload); // Set RX payload length (10 bytes)
+	RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P1, payload); // Set RX payload length (10 bytes)
 
 	//nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RF_SETUP, RF_TRANSMIT_MODE);//0x06); // Setup: 1Mbps, 0dBm, LNA off
 	RWReg(nRF24_CMD_WREG | nRF24_REG_CONFIG, 0x0B); // Config: CRC on (1 bytes), Power UP, RX/TX ctl = PRX
