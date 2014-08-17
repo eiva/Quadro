@@ -12,78 +12,14 @@
 #include "ADCPort.h"
 #include "SpiInterface.h"
 #include "Nrg24.h"
+#include "RadioLink.h"
 /*
  * Notepad:
  * SystemCoreClock = 72000000
  */
-#pragma pack(push,1)
 
-struct Packet
-{
-  uint16_t THR:10;
-  uint16_t YAW:10;
-  uint16_t PTC:10;
-  uint16_t ROL:10;
-  uint8_t BT1:1;
-  uint8_t BT2:1;
-  uint8_t BT3:1;
-  uint8_t REST:5;
-};
 
-#pragma pack(pop)
 
-class RadioChannel{
-	union PacketSerializer
-	{
-	  Packet data;
-	  uint8_t serialized[6];
-	};
-
-	Port _csn;
-	Port _ce;
-	Nrf24 _nrf;
-	LedInfo _leds;
-	PacketSerializer _serializer;
-public:
-	RadioChannel(SpiInterface& spi, LedInfo& leds):
-		_csn(GPIOA, GPIO_Pin_4),
-		_ce(GPIOA, GPIO_Pin_8),
-		_leds(leds),
-		_nrf(spi, _csn, _ce)
-	{
-		_leds.RGBW(false, false, false, true);
-		if( sizeof(Packet) != 6){
-			// Failed!
-			while(true);
-		}
-
-		uint8_t rxAddr[nRF24_RX_ADDR_WIDTH]={0xDB,0xDB,0xDB,0xDB,0xDB};
-		_nrf.SetRxAddress(rxAddr);
-
-		bool check = _nrf.Check();
-		if (!check){
-			_leds.R(true);
-		}
-		_nrf.RXMode(sizeof(Packet), 10); // Channel 10.
-		_leds.Off();
-	}
-
-	bool Update(){
-		if (!_nrf.IsDataReady()) return false;
-		for (uint8_t i = 0; i < sizeof(Packet); ++i) _serializer.serialized[i] = 0x00;
-
-		bool status = _nrf.RXPacket(_serializer.serialized, sizeof(Packet));
-		//if (!status) return false;
-		Throttle =  _serializer.data.THR;
-		Yaw =  _serializer.data.YAW;
-		Pitch =  _serializer.data.PTC;
-		Roll =  _serializer.data.ROL;
-		_nrf.ClearIRQFlags();
-		return true;
-	}
-
-	uint16_t Throttle, Yaw, Pitch, Roll;
-};
 
 int main(){
 
@@ -98,8 +34,10 @@ int main(){
 
 	LedInfo leds;
 
+	/*
+	 *  Radio link test.
 	SpiInterface spi(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
-	RadioChannel channel(spi, leds);
+	RadioLink channel(spi, leds);
 	leds.G(true);
 	Motors motor;
 
@@ -119,9 +57,11 @@ int main(){
 			leds.R(true);
 		}
 	}
-	/*ADCPort adc(GPIOB, GPIO_Pin_0, ADC_Channel_8);
+	*/
 
-
+	/*
+	 * ADC Test
+	ADCPort adc(GPIOB, GPIO_Pin_0, ADC_Channel_8);
 
 	while(true){
 		Delay(50);
@@ -139,7 +79,8 @@ int main(){
 			leds.RGBW(false, false, false, true);
 		}
 	}*/
-/*
+	/*
+	 * Servo test
 	int d = 1;
 	int step = 5;
 	int max = 1800;
