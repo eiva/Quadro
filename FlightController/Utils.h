@@ -22,17 +22,14 @@ long map(long x, long in_min, long in_max, long out_min, long out_max){
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
 
-static __IO uint32_t TimingDelay;
  //Функция временной задержки
-void Delay(__IO uint32_t nTime){
-	TimingDelay = nTime;
-	while(TimingDelay != 0);
-}
+void Delay(volatile uint32_t nTime);
 
-extern "C" void SysTick_Handler(void){
-	if (TimingDelay != 0x00)
-		TimingDelay--;
- }
+// Time in milliseconds since MCU starts.
+uint32_t Millis();
+
+// Time in microseconds since MCU starts.
+uint32_t Micros();
 
 #ifdef __cplusplus
 }
