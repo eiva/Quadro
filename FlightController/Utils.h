@@ -9,9 +9,7 @@
 #define DEG_TO_RAD 0.017453292519943295769236907684886
 #define RAD_TO_DEG 57.295779513082320876798154814105
 
-long map(long x, long in_min, long in_max, long out_min, long out_max){
-	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
+long map(long x, long in_min, long in_max, long out_min, long out_max);
 
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))

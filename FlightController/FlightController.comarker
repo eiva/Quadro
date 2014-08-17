@@ -16,8 +16,8 @@
 <attrib name="registered" value="true"/>
 <attrib name="path" value="/FlightController/stm_lib/src/stm32f10x_tim.c"/>
 <attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="Z:\GitHub\Quadro\FlightController\stm_lib\src\stm32f10x_tim.c"/>
-<attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
 <attrib name="org.eclipse.debug.core.enabled" value="true"/>
+<attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
 </marker>
 </breakpoint>
 <breakpoint enabled="true" persistant="true" registered="true">
@@ -36,8 +36,8 @@
 <attrib name="registered" value="true"/>
 <attrib name="path" value="/FlightController/main.cpp"/>
 <attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="Z:\GitHub\Quadro\FlightController\main.cpp"/>
-<attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
 <attrib name="org.eclipse.debug.core.enabled" value="true"/>
+<attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
 </marker>
 </breakpoint>
 <breakpoint enabled="true" persistant="true" registered="true">
@@ -56,8 +56,8 @@
 <attrib name="registered" value="true"/>
 <attrib name="path" value="/FlightController/main.cpp"/>
 <attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="Z:\GitHub\Quadro\FlightController\main.cpp"/>
-<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 <attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 </marker>
 </breakpoint>
 <breakpoint enabled="true" persistant="true" registered="true">
@@ -76,8 +76,8 @@
 <attrib name="registered" value="true"/>
 <attrib name="path" value="/FlightController/Nrf24.cpp"/>
 <attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="Z:\GitHub\Quadro\FlightController\Nrf24.cpp"/>
-<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 <attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 </marker>
 </breakpoint>
 </breakpoints>

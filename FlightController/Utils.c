@@ -25,7 +25,7 @@ uint32_t Millis(){
  * @brief Returns the current value of the SysTick counter.
  */
 static inline uint32_t systick_get_count(void) {
-    return SYSTICK_BASE->CNT;
+    return SysTick->VAL;
 }
 
 /**
@@ -53,4 +53,8 @@ void SysTick_Handler(void){
 	++UptimeMillis;
 	if (TimingDelay != 0x00)
 		--TimingDelay;
- }
+}
+
+long map(long x, long in_min, long in_max, long out_min, long out_max){
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
