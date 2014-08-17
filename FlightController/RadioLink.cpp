@@ -14,13 +14,13 @@
 
 
 
-	RadioLink::RadioLink(SpiInterface& spi, LedInfo& leds):
+	RadioLink::RadioLink(SpiInterface* spi, LedInfo* leds):
 		_csn(GPIOA, GPIO_Pin_4),
 		_ce(GPIOA, GPIO_Pin_8),
 		_leds(leds),
-		_nrf(spi, _csn, _ce)
+		_nrf(spi, &_csn, &_ce)
 	{
-		_leds.RGBW(false, false, false, true);
+		_leds->RGBW(false, false, false, true);
 		if( sizeof(Packet) != 6){
 			// Failed!
 			while(true);
@@ -31,10 +31,10 @@
 
 		bool check = _nrf.Check();
 		if (!check){
-			_leds.R(true);
+			_leds->R(true);
 		}
 		_nrf.RXMode(sizeof(Packet), 10); // Channel 10.
-		_leds.Off();
+		_leds->Off();
 	}
 
 	bool RadioLink::Update(){

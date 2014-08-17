@@ -27,10 +27,10 @@ class RadioLink{
 	Port _csn;
 	Port _ce;
 	Nrf24 _nrf;
-	LedInfo _leds;
+	LedInfo *_leds;
 	PacketSerializer _serializer;
 public:
-	RadioLink(SpiInterface& spi, LedInfo& leds);
+	RadioLink(SpiInterface* spi, LedInfo* leds);
 	bool Update();
 
 	uint16_t Throttle, Yaw, Pitch, Roll;

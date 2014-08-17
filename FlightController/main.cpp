@@ -18,9 +18,57 @@
  * Notepad:
  * SystemCoreClock = 72000000
  */
+class Sensor{
+public:
+	Vector3 Readings;
+	virtual bool Update() = 0;
+};
 
+// 6 DOF processor
+// Just stub for now.
+class SensorProcessor{
+	Sensor *_accel;
+	Sensor *_gyro;
+public:
+	float Pitch;
+	float Roll;
 
+	SensorProcessor():Pitch(0),Roll(0){}
 
+	bool Update(){
+		return true;
+	}
+};
+
+class Commander{
+	RadioLink *_radio;
+public:
+	float Throttle; // [0-100]%
+	float Pitch, Roll; // +-[0-?] 30degrees; absolute position.
+	float YawRate; // rate of yaw: degrees per second;
+	bool Update(){
+		return true;
+	}
+};
+
+class Stabilizer{
+	SensorProcessor *_sensorProcessor;
+	Commander *_commander;
+public:
+	Stabilizer(){}
+
+	bool Update(){
+		return false;
+	}
+};
+
+class Controller{
+	Stabilizer *_stabilizer;
+	Motors *_motors;
+public:
+	Controller(){}
+
+};
 
 int main(){
 
