@@ -13,6 +13,7 @@
 #include "SpiInterface.h"
 #include "Nrg24.h"
 #include "RadioLink.h"
+#include "Vector.h"
 /*
  * Notepad:
  * SystemCoreClock = 72000000

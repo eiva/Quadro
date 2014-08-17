@@ -17,21 +17,18 @@
 <part id="4"/>
 <part id="5"/>
 <part id="6"/>
-<part id="7"/>
-<part id="8"/>
-<part id="9"/>
-<part id="10"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
 <editor id="org.coocox.welcome.ui.WelcomePage" name="" partName="welcome" title="welcome" tooltip="" workbook="DefaultEditorWorkbook">
-<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">&#x0A;<org.coocox.welcome.ui.WelcomePage/>
+<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">
+<org.coocox.welcome.ui.WelcomePage/>
 </input>
 </editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="Z:/GitHub/Quadro/FlightController/main.cpp" title="main.cpp" tooltip="Z:/GitHub/Quadro/FlightController/main.cpp" workbook="DefaultEditorWorkbook">
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="Z:/GitHub/Quadro/FlightController/main.cpp" title="main.cpp" tooltip="Z:/GitHub/Quadro/FlightController/main.cpp" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/main.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="22" selectionOffset="0" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="395" selectionTopPixel="0"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="Sd2Card.h" partName="Sd2Card.h" path="Z:/GitHub/Quadro/FlightController/SD/Sd2Card.h" title="Sd2Card.h" tooltip="Z:/GitHub/Quadro/FlightController/SD/Sd2Card.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/SD/Sd2Card.h"/>
@@ -41,33 +38,17 @@
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/SD/Sd2Card.cpp"/>
 <editorState selectionHorizontalPixel="0" selectionLength="248" selectionOffset="813" selectionTopPixel="0"/>
 </editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="SdFile.cpp" partName="SdFile.cpp" path="Z:/GitHub/Quadro/FlightController/SD/SdFile.cpp" title="SdFile.cpp" tooltip="Z:/GitHub/Quadro/FlightController/SD/SdFile.cpp" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/SD/SdFile.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1055" selectionTopPixel="136"/>
-</editor>
-<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="Utils.h" partName="Utils.h" path="Z:/GitHub/Quadro/FlightController/Utils.h" title="Utils.h" tooltip="Z:/GitHub/Quadro/FlightController/Utils.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/Utils.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="993" selectionTopPixel="0"/>
-</editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="Utils.c" partName="Utils.c" path="Z:/GitHub/Quadro/FlightController/Utils.c" title="Utils.c" tooltip="Z:/GitHub/Quadro/FlightController/Utils.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/Utils.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="454" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1273" selectionTopPixel="390"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="SdFatUtil.h" partName="SdFatUtil.h" path="Z:/GitHub/Quadro/FlightController/SD/SdFatUtil.h" title="SdFatUtil.h" tooltip="Z:/GitHub/Quadro/FlightController/SD/SdFatUtil.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/SD/SdFatUtil.h"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1719" selectionTopPixel="748"/>
 </editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="SdFat.h" partName="SdFat.h" path="Z:/GitHub/Quadro/FlightController/SD/SdFat.h" title="SdFat.h" tooltip="Z:/GitHub/Quadro/FlightController/SD/SdFat.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/SD/SdFat.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="5048" selectionTopPixel="1778"/>
-</editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="SdVolume.cpp" partName="SdVolume.cpp" path="Z:/GitHub/Quadro/FlightController/SD/SdVolume.cpp" title="SdVolume.cpp" tooltip="Z:/GitHub/Quadro/FlightController/SD/SdVolume.cpp" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/SD/SdVolume.cpp"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1055" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="File.cpp" partName="File.cpp" path="Z:/GitHub/Quadro/FlightController/SD/File.cpp" title="File.cpp" tooltip="Z:/GitHub/Quadro/FlightController/SD/File.cpp" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlightController/SD/File.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="339" selectionTopPixel="1350"/>
 </editor>
 </editors>
 <views>
@@ -75,10 +56,9 @@
 <viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="0">
 <expanded>
 <element path="/FlightController"/>
-<element path="/FlightController/SD"/>
 </expanded>
 <selection>
-<element path="/FlightController/SD/File.cpp"/>
+<element path="/FlightController/Vector.h"/>
 </selection>
 </viewState>
 </view>
@@ -117,7 +97,7 @@
 </view>
 </views>
 <perspectives activePart="org.eclipse.cdt.ui.editor.CEditor" activePerspective="org.coocox.builder.perspective.CoBuilder">
-<perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
+<perspective editorAreaTrimState="1" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.coocox.builder.ui.PerspectiveCoBuilder" id="org.coocox.builder.perspective.CoBuilder" label="CooCox CoBuilder"/>
 <alwaysOnActionSet id="org.coocox.component.ui.actionSet"/>
 <alwaysOnActionSet id="org.coocox.welcome.ui.actionSet"/>
@@ -146,20 +126,35 @@
 <hide_toolbar_item_id id="org.eclipse.cdt.debug.internal.ui.actions.ToggleInstructionStepModeAction"/>
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
 <hide_toolbar_item_id id="org.eclipse.debug.ui.commands.TerminateAndRelaunch"/>
-<view id="org.coocox.component.ui.ComponentView"/>
-<view id="org.coocox.builder.ui.views.ProjectView"/>
-<view id="org.coocox.component.ui.Help"/>
-<view id="org.eclipse.ui.views.ContentOutline"/>
-<view id="org.eclipse.ui.console.ConsoleView"/>
-<fastViewBars/>
+<fastViewBars>
+<fastViewBar fastViewLocation="1024" id="org.eclipse.ui.internal.ViewStack@156f56f" orientation="256" selectedTabId="org.eclipse.ui.console.ConsoleView" style="1">
+<fastViews>
+<view id="org.eclipse.ui.console.ConsoleView" ratio="0.2998933"/>
+</fastViews>
+</fastViewBar>
+<fastViewBar fastViewLocation="131072" id="org.eclipse.ui.internal.ViewStack@b95af4" orientation="512" selectedTabId="org.eclipse.ui.views.ContentOutline" style="1">
+<fastViews>
+<view id="org.coocox.component.ui.Help" ratio="0.3"/>
+<view id="org.eclipse.ui.views.ContentOutline" ratio="0.3"/>
+</fastViews>
+</fastViewBar>
+<fastViewBar fastViewLocation="1024" id="org.eclipse.ui.internal.ViewStack@d48e0a" orientation="512" selectedTabId="org.coocox.builder.ui.views.ProjectView" style="1">
+<fastViews>
+<view id="org.coocox.builder.ui.views.ProjectView" ratio="0.3"/>
+</fastViews>
+</fastViewBar>
+<fastViewBar fastViewLocation="16384" id="org.eclipse.ui.internal.ViewStack@1bac4e4" orientation="256" selectedTabId="org.coocox.component.ui.ComponentView" style="1">
+<fastViews>
+<view id="org.coocox.component.ui.ComponentView" ratio="0.3"/>
+</fastViews>
+</fastViewBar>
+</fastViewBars>
 <layout>
 <mainWindow>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@1bac4e4">
-<folder activePageID="org.coocox.component.ui.ComponentView" appearance="2" expanded="2">
-<page content="org.coocox.component.ui.ComponentView" label="Components"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
-</presentation>
+<folder appearance="2" expanded="0">
+<page content="org.coocox.component.ui.ComponentView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
 </folder>
 </info>
 <info folder="true" part="stickyFolderRight" ratio="0.74972975" ratioLeft="1387" ratioRight="463" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1bac4e4">
@@ -168,12 +163,10 @@
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@156f56f" ratio="0.69928646" ratioLeft="686" ratioRight="295" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1bac4e4">
-<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
-<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
-</presentation>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@156f56f" ratio="0.70858896" ratioLeft="693" ratioRight="285" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1bac4e4">
+<folder appearance="2" expanded="0">
+<page content="org.eclipse.ui.console.ConsoleView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
 </folder>
 </info>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@99fe0a" ratio="0.22" ratioLeft="407" ratioRight="1443" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1bac4e4">
@@ -183,25 +176,20 @@
 </folder>
 </info>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@b95af4" ratio="0.7193347" ratioLeft="1038" ratioRight="405" relationship="2" relative="org.eclipse.ui.internal.ViewStack@99fe0a">
-<folder activePageID="org.eclipse.ui.views.ContentOutline" appearance="2" expanded="2">
-<page content="org.coocox.component.ui.Help" label="Help"/>
-<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
+<folder appearance="2" expanded="0">
+<page content="org.coocox.component.ui.Help" label="LabelNotFound"/>
+<page content="org.eclipse.ui.views.ContentOutline" label="LabelNotFound"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
 <page content="org.coocox.coassistant.view.CoAssistantView" label="LabelNotFound"/>
 <page content="org.coocox.builder.ui.MoreExampleView" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
-<part id="1"/>
-</presentation>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
 </folder>
 </info>
 <info part="org.eclipse.ui.editorss" ratio="0.275" ratioLeft="187" ratioRight="493" relationship="4" relative="org.eclipse.ui.internal.ViewStack@99fe0a"/>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@d48e0a" ratio="0.36901122" ratioLeft="362" ratioRight="619" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1bac4e4">
-<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">
-<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
-</presentation>
+<folder appearance="2" expanded="0">
+<page content="org.coocox.builder.ui.views.ProjectView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
 </folder>
 </info>
 </mainWindow>
@@ -313,166 +301,167 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/main.cpp"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/SD/Sd2Card.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/SD/Sd2Card.cpp"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/Utils.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/Utils.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/SD/SdFatUtil.h"/>
+<editor factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage">
+<org.coocox.welcome.ui.WelcomePage/>
+</editor>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/SD/SdFat.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/SD/SdFile.cpp"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/SD/SdVolume.cpp"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/Print.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/Print.cpp"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/SD/File.cpp"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/Utils.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/cmsis_boot/stm32f10x.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/main.cpp"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/cmsis/core_cm3.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlightController/Vector.h"/>
 </editors>
-<item historyLabel="Sd2Card.h" index="1">
-<position info="not_deleted" x="7019" y="22"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="1369" y="6"/>
-</item>
-<item historyLabel="Sd2Card.h" index="1">
-<position info="not_deleted" x="7019" y="22"/>
-</item>
-<item historyLabel="Sd2Card.h" index="1">
-<position info="not_deleted" x="7062" y="0"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="18361" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="1347" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="814" y="201"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="41" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="1015" y="0"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="395" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="814" y="0"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="1323" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="814" y="0"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="1247" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="814" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="939" y="6"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="1247" y="0"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="529" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="939" y="6"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="1013" y="0"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="532" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="0" y="22"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="600" y="0"/>
-</item>
-<item historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="1013" y="0"/>
-</item>
-<item historyLabel="Utils.c" index="4">
-<position info="not_deleted" x="454" y="0"/>
-</item>
-<item historyLabel="Sd2Card.h" index="1">
-<position info="not_deleted" x="4374" y="21"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="1061" y="0"/>
-</item>
-<item historyLabel="Sd2Card.h" index="1">
-<position info="not_deleted" x="5033" y="0"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="1061" y="0"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="6051" y="0"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="6845" y="57"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="6997" y="0"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="6845" y="57"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="7620" y="0"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="13191" y="27"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="13292" y="0"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="13503" y="27"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="13743" y="0"/>
-</item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="13503" y="27"/>
-</item>
-<item historyLabel="SdFatUtil.h" index="5">
-<position info="not_deleted" x="1719" y="0"/>
-</item>
-<item historyLabel="SdFat.h" index="6">
-<position info="not_deleted" x="995" y="0"/>
-</item>
-<item historyLabel="SdFile.cpp" index="7">
+<item historyLabel="Print.h" index="3">
 <position/>
 </item>
-<item historyLabel="Sd2Card.cpp" index="2">
-<position info="not_deleted" x="813" y="248"/>
+<item historyLabel="SdFat.h" index="2">
+<position info="not_deleted" x="4959" y="0"/>
 </item>
-<item historyLabel="SdFile.cpp" index="7">
-<position info="not_deleted" x="1055" y="0"/>
-</item>
-<item historyLabel="SdVolume.cpp" index="8">
-<position info="not_deleted" x="1055" y="0"/>
-</item>
-<item historyLabel="SdFile.cpp" index="7">
-<position info="not_deleted" x="1055" y="0"/>
-</item>
-<item historyLabel="File.cpp" index="9">
+<item historyLabel="File.cpp" index="5">
 <position info="not_deleted" x="339" y="0"/>
 </item>
-<item historyLabel="SdFat.h" index="6">
-<position info="not_deleted" x="5048" y="0"/>
+<item historyLabel="SdFat.h" index="2">
+<position info="not_deleted" x="2641" y="0"/>
 </item>
-<item active="true" historyLabel="Utils.h" index="3">
-<position info="not_deleted" x="1013" y="0"/>
+<item historyLabel="File.cpp" index="5">
+<position info="not_deleted" x="1459" y="8"/>
+</item>
+<item historyLabel="Print.h" index="3">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="Print.h" index="3">
+<position info="not_deleted" x="1185" y="0"/>
+</item>
+<item historyLabel="Print.h" index="3">
+<position info="not_deleted" x="445" y="42"/>
+</item>
+<item historyLabel="Print.h" index="3">
+<position info="not_deleted" x="523" y="0"/>
+</item>
+<item historyLabel="Print.h" index="3">
+<position/>
+</item>
+<item historyLabel="Print.h" index="3">
+<position info="not_deleted" x="523" y="0"/>
+</item>
+<item historyLabel="Print.cpp" index="4">
+<position info="not_deleted" x="1793" y="0"/>
+</item>
+<item historyLabel="SdFat.h" index="2">
+<position info="not_deleted" x="10927" y="0"/>
+</item>
+<item historyLabel="Print.cpp" index="4">
+<position info="not_deleted" x="1793" y="0"/>
+</item>
+<item historyLabel="Print.h" index="3">
+<position info="not_deleted" x="523" y="0"/>
+</item>
+<item historyLabel="welcome" index="1"/>
+<item historyLabel="Utils.c" index="6">
+<position info="not_deleted" x="454" y="0"/>
+</item>
+<item historyLabel="Utils.c" index="6">
+<position info="not_deleted" x="14" y="0"/>
+</item>
+<item historyLabel="stm32f10x.h" index="7">
+<position info="not_deleted" x="947" y="0"/>
+</item>
+<item historyLabel="Utils.c" index="6">
+<position info="not_deleted" x="14" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="8">
+<position info="not_deleted" x="856" y="0"/>
+</item>
+<item historyLabel="core_cm3.h" index="9">
+<position info="not_deleted" x="96130" y="7"/>
+</item>
+<item historyLabel="Utils.c" index="6">
+<position/>
+</item>
+<item historyLabel="core_cm3.h" index="9">
+<position info="not_deleted" x="83858" y="7"/>
+</item>
+<item historyLabel="core_cm3.h" index="9">
+<position info="not_deleted" x="83888" y="0"/>
+</item>
+<item historyLabel="core_cm3.h" index="9">
+<position info="not_deleted" x="34374" y="3"/>
+</item>
+<item historyLabel="Utils.c" index="6">
+<position info="not_deleted" x="765" y="0"/>
+</item>
+<item historyLabel="core_cm3.h" index="9">
+<position info="not_deleted" x="34374" y="3"/>
+</item>
+<item historyLabel="Utils.c" index="6">
+<position info="not_deleted" x="670" y="0"/>
+</item>
+<item historyLabel="core_cm3.h" index="9">
+<position info="not_deleted" x="83858" y="7"/>
+</item>
+<item historyLabel="core_cm3.h" index="9">
+<position info="not_deleted" x="83907" y="0"/>
+</item>
+<item historyLabel="core_cm3.h" index="9">
+<position info="not_deleted" x="83286" y="12"/>
+</item>
+<item historyLabel="Utils.c" index="6">
+<position info="not_deleted" x="536" y="0"/>
+</item>
+<item historyLabel="Utils.h" index="0">
+<position info="not_deleted" x="376" y="0"/>
+</item>
+<item historyLabel="Utils.c" index="6">
+<position info="not_deleted" x="1492" y="0"/>
+</item>
+<item historyLabel="Utils.h" index="0">
+<position info="not_deleted" x="305" y="70"/>
+</item>
+<item historyLabel="Utils.c" index="6">
+<position info="not_deleted" x="1341" y="0"/>
+</item>
+<item historyLabel="Utils.h" index="0">
+<position info="not_deleted" x="736" y="0"/>
+</item>
+<item historyLabel="Utils.c" index="6">
+<position info="not_deleted" x="1273" y="0"/>
+</item>
+<item historyLabel="Vector.h" index="10">
+<position info="not_deleted" x="5950" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="8">
+<position info="not_deleted" x="856" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="8">
+<position info="not_deleted" x="378" y="0"/>
+</item>
+<item historyLabel="Vector.h" index="10">
+<position info="not_deleted" x="5950" y="0"/>
+</item>
+<item historyLabel="Vector.h" index="10">
+<position info="not_deleted" x="247" y="0"/>
+</item>
+<item historyLabel="Vector.h" index="10">
+<position info="not_deleted" x="259" y="0"/>
+</item>
+<item historyLabel="Vector.h" index="10">
+<position info="not_deleted" x="5950" y="0"/>
+</item>
+<item historyLabel="Vector.h" index="10">
+<position info="not_deleted" x="6054" y="0"/>
+</item>
+<item historyLabel="Vector.h" index="10">
+<position info="not_deleted" x="3604" y="0"/>
+</item>
+<item historyLabel="Vector.h" index="10">
+<position info="not_deleted" x="156" y="0"/>
+</item>
+<item active="true" historyLabel="main.cpp" index="8">
+<position info="not_deleted" x="378" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -481,6 +470,24 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Vector.h" tooltip="FlightController/Vector.h">
+<persistable path="/FlightController/Vector.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Utils.h" tooltip="FlightController/Utils.h">
+<persistable path="/FlightController/Utils.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="core_cm3.h" tooltip="FlightController/cmsis/core_cm3.h">
+<persistable path="/FlightController/cmsis/core_cm3.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x.h" tooltip="FlightController/cmsis_boot/stm32f10x.h">
+<persistable path="/FlightController/cmsis_boot/stm32f10x.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Print.cpp" tooltip="FlightController/Print.cpp">
+<persistable path="/FlightController/Print.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Print.h" tooltip="FlightController/Print.h">
+<persistable path="/FlightController/Print.h"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="File.cpp" tooltip="FlightController/SD/File.cpp">
 <persistable path="/FlightController/SD/File.cpp"/>
 </file>
@@ -496,9 +503,6 @@
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Utils.c" tooltip="FlightController/Utils.c">
 <persistable path="/FlightController/Utils.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Utils.h" tooltip="FlightController/Utils.h">
-<persistable path="/FlightController/Utils.h"/>
-</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Nrg24.h" tooltip="FlightController/Nrg24.h">
 <persistable path="/FlightController/Nrg24.h"/>
 </file>
@@ -510,21 +514,6 @@
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Sd2Card_config.h" tooltip="FlightController/SD/Sd2Card_config.h">
 <persistable path="/FlightController/SD/Sd2Card_config.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Sd2Card.h" tooltip="FlightController/SD/Sd2Card.h">
-<persistable path="/FlightController/SD/Sd2Card.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Sd2PinMap.h" tooltip="FlightController/SD/Sd2PinMap.h">
-<persistable path="/FlightController/SD/Sd2PinMap.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="SdFatmainpage.h" tooltip="FlightController/SD/SdFatmainpage.h">
-<persistable path="/FlightController/SD/SdFatmainpage.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="SdInfo.h" tooltip="FlightController/SD/SdInfo.h">
-<persistable path="/FlightController/SD/SdInfo.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="FatStructs.h" tooltip="FlightController/SD/FatStructs.h">
-<persistable path="/FlightController/SD/FatStructs.h"/>
 </file>
 </mruList>
 </workbench>
