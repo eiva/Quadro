@@ -64,7 +64,7 @@ public:
 		if (!check){
 			_leds.R(true);
 		}
-		_nrf.RXMode(sizeof(Packet));
+		_nrf.RXMode(sizeof(Packet), 10); // Channel 10.
 		_leds.Off();
 	}
 
@@ -92,29 +92,35 @@ int main(){
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
 	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	SysTick_Config(SystemCoreClock/1000);
-
 
 	LedInfo leds;
 
 	SpiInterface spi(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
-	RadioChannel chennel(spi, leds);
+	RadioChannel channel(spi, leds);
 	leds.G(true);
-
-
-
-
+	Motors motor;
 
 	while(true){
-		if (chennel.Update())
+		if (channel.Update())
 		{
+			int val1 = map(channel.Throttle,0,1024,0,1800);
+			int val2 = map(channel.Yaw,0,1024,0,1800);
+			int val3 = map(channel.Pitch,0,1024,0,1800);
+			int val4 = map(channel.Roll,0,1024,0,1800);
+			motor.SetRatio(val1, val2, val3, val4);
 			leds.B(true);
+			leds.R(false);
+		}
+		else
+		{
+			leds.R(true);
 		}
 	}
 	/*ADCPort adc(GPIOB, GPIO_Pin_0, ADC_Channel_8);
-	Motors motor;
+
 
 
 	while(true){

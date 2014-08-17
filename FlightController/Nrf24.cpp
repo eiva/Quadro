@@ -53,7 +53,6 @@
 
 // Settings
 
-#define RF_CHANNEL 0x01 // Channel #1
 #define RF_TRANSMIT_MODE 0x0F
 
 
@@ -87,7 +86,7 @@ bool Nrf24::Check() {
 }
 
 // Put nRF24L01 in RX mode
-void Nrf24::RXMode(uint8_t payload) {
+void Nrf24::RXMode(uint8_t payload, uint8_t channel) {
 	CE_L();
 
 	WriteBuf(nRF24_CMD_WREG | nRF24_REG_RX_ADDR_P1, nRF24_RX_addr, nRF24_RX_ADDR_WIDTH); // Set static RX address
@@ -95,7 +94,7 @@ void Nrf24::RXMode(uint8_t payload) {
 	//RWReg(nRF24_CMD_WREG | nRF24_REG_EN_RXADDR,0x03);//0x01); // Enable data pipe 0
 
 	//nRF24_RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,0x6E); // Set frequency channel 110 (2.510MHz)
-	//RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH,RF_CHANNEL); // Set frequency channel 110 (2.510MHz)
+	RWReg(nRF24_CMD_WREG | nRF24_REG_RF_CH, channel); // Set frequency channel
 
 	RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P0, payload); // Set RX payload length (10 bytes)
 	RWReg(nRF24_CMD_WREG | nRF24_REG_RX_PW_P1, payload); // Set RX payload length (10 bytes)

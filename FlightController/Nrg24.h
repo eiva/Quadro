@@ -22,7 +22,7 @@ public:
 	bool Check();
 
 	// Put nRF24L01 in RX mode
-	void RXMode(uint8_t RX_PAYLOAD);
+	void RXMode(uint8_t payloadSize, uint8_t channel);
 
 	// Check if data is available for reading
 	// return:
@@ -34,7 +34,7 @@ public:
 	// returns:
 	//   true -> if data read.
 	//   false -> if something goes wrong.
-	bool RXPacket(uint8_t* pBuf, uint8_t RX_PAYLOAD);
+	bool RXPacket(uint8_t* pBuf, uint8_t payloadSize);
 
 	// Clear all IRQ flags
 	void ClearIRQFlags();
