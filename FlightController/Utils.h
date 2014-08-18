@@ -9,6 +9,8 @@
 #define DEG_TO_RAD 0.017453292519943295769236907684886
 #define RAD_TO_DEG 57.295779513082320876798154814105
 
+#define mapDeg(val, in_Amp, deg_Amp) (((float) val - in_Amp/2.0f) * (deg_Amp / (in_Amp / 2.0f)) * DEG_TO_RAD)
+
 long map(long x, long in_min, long in_max, long out_min, long out_max);
 
 #define min(a,b) ((a)<(b)?(a):(b))
