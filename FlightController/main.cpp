@@ -11,10 +11,12 @@
 #include "Motors.h"
 #include "ADCPort.h"
 #include "SpiInterface.h"
+#include "mpu9250.h"
 #include "Nrg24.h"
 #include "RadioLink.h"
 #include "Vector.h"
 #include "PidObject.h"
+#include "mpu9250.h"
 /*
  * Notepad:
  * SystemCoreClock = 72000000
@@ -158,27 +160,59 @@ int main(){
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+
 	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+
 	SysTick_Config(SystemCoreClock/1000);
 
 	LedInfo leds;
-	SpiInterface spi(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
-	RadioLink channel(&spi, &leds);
+	//SpiInterface spi1(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
+	SpiInterface spi2(SPI2, GPIOB, GPIO_Pin_14, GPIO_Pin_15, GPIO_Pin_13,SPI_CPOL_High,SPI_CPHA_2Edge);
+	Port port(GPIOB, GPIO_Pin_2);
+	Mpu9250 mpu(spi2, port);
+
+	while(true)
+	{
+		Delay(10);
+	if (mpu.Check())
+		leds.G(true);
+	else
+		leds.R(true);
+	}
+
+
+	/*RadioLink channel(&spi, &leds);
 	Commander commander(&channel);
 	ADCPort adc1(GPIOB, GPIO_Pin_0, ADC_Channel_8);
-	ADCPort adc2(GPIOB, GPIO_Pin_1, ADC_Channel_9);
-	SensorProcessor sensorProcessor(&adc1, &adc2);
+	//ADCPort adc2(GPIOB, GPIO_Pin_1, ADC_Channel_9);
+	SensorProcessor sensorProcessor(&adc1, &adc1);
 	Stabilizer stabilizer(&sensorProcessor, &commander);
 	Motors motor;
-	Controller controller(&stabilizer, &motor);
+	Controller controller(&stabilizer, &motor);*/
 
 	while(true){
+		leds.RGBW(true, true, true, true);
+		Delay(1000);
+		leds.Off();
+		leds.R(true);
+		Delay(1000);
+		leds.Off();
+		leds.G(true);
+		Delay(1000);
+		leds.Off();
+		leds.B(true);
+		Delay(1000);
+		leds.Off();
+		leds.W(true);
+		Delay(1000);
 		//controller.Update();
-		motor.SetRatio(adc1.Read(), adc1.Read(), adc2.Read(), adc2.Read());
+		//motor.SetRatio(adc1.Read(), adc1.Read(), adc2.Read(), adc2.Read());
 	}
 
 	/*

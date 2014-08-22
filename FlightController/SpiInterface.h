@@ -5,7 +5,8 @@
 class SpiInterface{
 	SPI_TypeDef* _spi;
 public:
-	SpiInterface(SPI_TypeDef* spi, GPIO_TypeDef* gpioPort, uint16_t miso, uint16_t mosi, uint16_t sck):
+	SpiInterface(SPI_TypeDef* spi, GPIO_TypeDef* gpioPort, uint16_t miso, uint16_t mosi, uint16_t sck,
+				 uint16_t cpol = SPI_CPOL_Low, uint16_t cpha = SPI_CPHA_1Edge):
 		_spi(spi)
 	{
 		GPIO_InitTypeDef port;
@@ -30,8 +31,8 @@ public:
 		SPI.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
 
 		// Set SPI to Mode 0
-		SPI.SPI_CPOL = SPI_CPOL_Low;
-		SPI.SPI_CPHA = SPI_CPHA_1Edge;
+		SPI.SPI_CPOL = cpol;
+		SPI.SPI_CPHA = cpha;
 		SPI.SPI_CRCPolynomial = 7;
 		SPI.SPI_DataSize = SPI_DataSize_8b;
 		SPI.SPI_FirstBit = SPI_FirstBit_MSB;
