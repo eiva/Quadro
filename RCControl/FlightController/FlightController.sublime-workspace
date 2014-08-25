@@ -36,55 +36,6 @@
 	"buffers":
 	[
 		{
-			"file": "Controller.h",
-			"settings":
-			{
-				"buffer_size": 4903,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "RcAxisLimits.h",
-			"settings":
-			{
-				"buffer_size": 1383,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "Motors.h",
-			"settings":
-			{
-				"buffer_size": 2115,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "FlightController.ino",
-			"settings":
-			{
-				"buffer_size": 1137,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Complimentary.h",
-			"settings":
-			{
-				"buffer_size": 612,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "BlackBox.h",
-			"settings":
-			{
-				"buffer_size": 1110,
-				"line_ending": "Unix",
-				"name": "// BlackBox"
-			}
-		},
-		{
 			"file": "/C/Users/Eugene/Desktop/stm32plus-3.2.0/examples/blink/blink.cpp",
 			"settings":
 			{
@@ -93,43 +44,19 @@
 			}
 		},
 		{
-			"file": "/Z/GitHub/Quadro/ControlBoard/RF/nRF24L01.h",
+			"file": "/C/Users/Eugene/AppData/Local/Temp/Temp2_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Libraries/STM32F10x_StdPeriph_Driver/inc/stm32f10x_adc.h",
 			"settings":
 			{
-				"buffer_size": 1399,
+				"buffer_size": 21336,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/Z/GitHub/Quadro/ControlBoard/RF/nRF14L01.c",
+			"file": "/Z/GitHub/Quadro/Tests/USB/cmsis_boot/stm32f10x.h",
 			"settings":
 			{
-				"buffer_size": 12562,
+				"buffer_size": 629482,
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/Z/GitHub/Quadro/ControlBoard/program.cpp",
-			"settings":
-			{
-				"buffer_size": 2659,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Users/Eugene/Desktop/crazyflie-firmware-master/drivers/src/motors.c",
-			"settings":
-			{
-				"buffer_size": 7563,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/Users/Eugene/Desktop/crazyflie-firmware-master/drivers/interface/motors.h",
-			"settings":
-			{
-				"buffer_size": 3921,
-				"line_ending": "Unix"
 			}
 		}
 	],
@@ -164,12 +91,54 @@
 	},
 	"file_history":
 	[
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Projects/Virtual_COM_Port/src/main.c",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Projects/Virtual_COM_Port/src/usb_endp.c",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Projects/Virtual_COM_Port/src/hw_config.c",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Utilities/STM32_EVAL/STM3210B_EVAL/stm3210b_eval_spi_sd.h",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Utilities/STM32_EVAL/STM3210B_EVAL/stm3210b_eval_spi_flash.h",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Utilities/STM32_EVAL/STM3210B_EVAL/stm3210b_eval_spi_flash.c",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Utilities/STM32_EVAL/STM3210B_EVAL/stm3210b_eval.c",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Projects/Virtual_COM_Port/src/system_stm32f10x.c",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Projects/Custom_HID/src/hw_config.c",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Projects/Virtual_COM_Port/src/usb_prop.c",
+		"/Z/GitHub/Quadro/RCControl/FlightController/Controller.h",
+		"/Z/GitHub/Quadro/RCControl/FlightController/RcAxisLimits.h",
+		"/Z/GitHub/Quadro/RCControl/FlightController/Motors.h",
+		"/C/Users/Eugene/Downloads/STM32_USB-FS-Device_Driver/src/usb_init.c",
+		"/C/Users/Eugene/Downloads/STM32_USB-FS-Device_Driver/src/usb_core.c",
+		"/C/Users/Eugene/Downloads/STM32_USB-FS-Device_Driver/inc/usb_def.h",
+		"/C/Users/Eugene/Downloads/STM32_USB-FS-Device_Driver/inc/usb_type.h",
+		"/C/Users/Eugene/Downloads/STM32_USB-FS-Device_Driver/inc/usb_mem.h",
+		"/C/Users/Eugene/Downloads/STM32_USB-FS-Device_Driver/inc/usb_lib.h",
+		"/Z/GitHub/Quadro/ControlBoard/RF/nRF24L01.h",
+		"/Z/GitHub/Quadro/ControlBoard/RF/nRF14L01.c",
+		"/Z/GitHub/Quadro/ControlBoard/program.cpp",
+		"/Z/GitHub/Quadro/RCControl/RcControlBoard/RcControlBoard.ino",
+		"/C/Program Files (x86)/Arduino/hardware/arduino/cores/arduino/Print.h",
+		"/C/Program Files (x86)/Arduino/hardware/arduino/cores/arduino/Print.cpp",
+		"/C/Users/Eugene/Desktop/crazyflie-firmware-master/drivers/src/motors.c",
+		"/C/Users/Eugene/Desktop/crazyflie-firmware-master/drivers/interface/motors.h",
+		"/Z/GitHub/Quadro/RCControl/FlightController/BlackBox.h",
+		"/Z/GitHub/Quadro/RCControl/FlightController/Complimentary.h",
+		"/Z/GitHub/Quadro/RCControl/FlightController/FlightController.ino",
+		"/C/Users/Eugene/Downloads/stm_lib/inc/stm32f10x_spi.h",
+		"/C/Users/Eugene/Downloads/stm_lib/src/misc.c",
+		"/Z/GitHub/Quadro/Em/TestUsb/TestUsb.ebp",
+		"/D/SteamLibrary/SteamApps/common/Metro Last Light/user.cfg",
+		"/Z/GitHub/Quadro/RCControl/FlightController/PidObject.h",
+		"/Z/GitHub/Quadro/FlightController/SD/Sd2PinMap.h",
+		"/Z/GitHub/Quadro/FlightController/SD/SdFile.cpp",
+		"/C/Program Files (x86)/Arduino/libraries/SD/SD.cpp",
+		"/C/Users/Eugene/AppData/Local/Temp/Temp1_SDCARD_Lib+Examples_MapleIDE_from_leaflabs_forum.zip/SDCARD_Lib+Examples_MapleIDE_from_leaflabs_forum/SdFat/SD.h",
+		"/C/Users/Eugene/Desktop/arduino-stm32-master/hardware/cores/stm32/wiring_pulse.c",
+		"/C/Users/Eugene/Desktop/arduino-stm32-master/hardware/cores/stm32/wiring.h",
+		"/C/Users/Eugene/Desktop/arduino-stm32-master/hardware/cores/stm32/HardwareSpi.cpp",
+		"/C/Users/Eugene/Desktop/arduino-stm32-master/hardware/cores/stm32/Spi.h",
 		"/Z/GitHub/Quadro/Temp/TestPWM/RTE/RTE_Components.h",
 		"/C/Users/Eugene/Desktop/Mirf/MirfSpiDriver.cpp",
 		"/C/Users/Eugene/Desktop/Mirf/MirfHardwareSpiDriver.cpp",
 		"/C/Users/Eugene/Desktop/STM32Cube_FW_F4_V1.3.0/Projects/STM32F4-Discovery/Examples/SPI/SPI_FullDuplex_ComIT/Src/main.c",
 		"/Z/GitHub/Quadro/Temp/TestPWM/main.cpp",
-		"/Z/GitHub/Quadro/ControlBoard/program.cpp",
 		"/Z/GitHub/Quadro/.git/config",
 		"/C/Users/Eugene/Desktop/crazyflie-firmware-master/drivers/src/adc.c",
 		"/C/Users/Eugene/AppData/Local/Temp/OneNote/15.0/NT/0/macros.h",
@@ -189,7 +158,6 @@
 		"/C/Users/Eugene/Documents/MATLAB/SensorModel_ert_rtw/SensorModel.cpp",
 		"/C/Users/Eugene/SkyDrive/ethernetweather.ino",
 		"/C/Users/Eugene/Desktop/RTClib/RTClib.h",
-		"/Z/GitHub/Quadro/RCControl/FlightController/Motors.h",
 		"/Z/GitHub/Quadro/RCControl/FlightController/openIMU.cpp",
 		"/Z/GitHub/Quadro/RCControl/FlightController/openIMU.h",
 		"/home/eiva/Development/Quadro/RCControl/FlightController/RadioLink.h",
@@ -200,7 +168,7 @@
 	],
 	"find":
 	{
-		"height": 0.0
+		"height": 34.0
 	},
 	"find_in_files":
 	{
@@ -214,6 +182,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"kP"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -231,189 +200,11 @@
 	"groups":
 	[
 		{
-			"selected": 9,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "Controller.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4903,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1620.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "RcAxisLimits.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1383,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1199,
-								1199
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "Motors.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2115,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								719,
-								724
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": -0.0,
-						"translation.y": 270.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "FlightController.ino",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1137,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								590,
-								590
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": -0.0,
-						"translation.y": 54.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "Complimentary.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 612,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "BlackBox.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1110,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								437,
-								437
-							]
-						],
-						"settings":
-						{
-							"auto_name": "// BlackBox",
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
 					"file": "/C/Users/Eugene/Desktop/stm32plus-3.2.0/examples/blink/blink.cpp",
 					"semi_transient": false,
 					"settings":
@@ -434,112 +225,55 @@
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 648.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "/Z/GitHub/Quadro/ControlBoard/RF/nRF24L01.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1399,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								469,
-								469
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": -0.0,
-						"translation.y": 0.0,
+						"translation.y": 459.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "/Z/GitHub/Quadro/ControlBoard/RF/nRF14L01.c",
+					"buffer": 1,
+					"file": "/C/Users/Eugene/AppData/Local/Temp/Temp2_stsw-stm320811.zip/STM32_USB-FS-Device_Lib_V4.0.0/Libraries/STM32F10x_StdPeriph_Driver/inc/stm32f10x_adc.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 12562,
+						"buffer_size": 21336,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8279,
-								8279
+								0,
+								0
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.tmLanguage"
 						},
-						"translation.x": -0.0,
-						"translation.y": 2754.0,
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
-					"file": "/Z/GitHub/Quadro/ControlBoard/program.cpp",
+					"buffer": 2,
+					"file": "/Z/GitHub/Quadro/Tests/USB/cmsis_boot/stm32f10x.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2659,
+						"buffer_size": 629482,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1391,
-								1391
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": -0.0,
-						"translation.y": 918.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "/C/Users/Eugene/Desktop/crazyflie-firmware-master/drivers/src/motors.c",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7563,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4102,
-								4102
+								0,
+								0
 							]
 						],
 						"settings":
@@ -549,38 +283,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1782.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "/C/Users/Eugene/Desktop/crazyflie-firmware-master/drivers/interface/motors.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3921,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2677,
-								2692
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 756.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -658,7 +364,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 223.0,
+	"side_bar_width": 92.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
