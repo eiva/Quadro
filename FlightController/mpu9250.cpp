@@ -173,34 +173,6 @@
 #define MPU6500_ZA_OFFSET_H         ((uint8_t)0x7D)
 #define MPU6500_ZA_OFFSET_L         ((uint8_t)0x7E)
 
-/* ---- AK8963 Reg In MPU9250 ----------------------------------------------- */
-
-#define AK8963_I2C_ADDR             ((uint8_t)0x18)
-#define AK8963_Device_ID            ((uint8_t)0x48)
-
-// Read-only Reg
-#define AK8963_WIA                  ((uint8_t)0x00)
-#define AK8963_INFO                 ((uint8_t)0x01)
-#define AK8963_ST1                  ((uint8_t)0x02)
-#define AK8963_HXL                  ((uint8_t)0x03)
-#define AK8963_HXH                  ((uint8_t)0x04)
-#define AK8963_HYL                  ((uint8_t)0x05)
-#define AK8963_HYH                  ((uint8_t)0x06)
-#define AK8963_HZL                  ((uint8_t)0x07)
-#define AK8963_HZH                  ((uint8_t)0x08)
-#define AK8963_ST2                  ((uint8_t)0x09)
-// Write/Read Reg
-#define AK8963_CNTL1                ((uint8_t)0x0A)
-#define AK8963_CNTL2                ((uint8_t)0x0B)
-#define AK8963_ASTC                 ((uint8_t)0x0C)
-#define AK8963_TS1                  ((uint8_t)0x0D)
-#define AK8963_TS2                  ((uint8_t)0x0E)
-#define AK8963_I2CDIS               ((uint8_t)0x0F)
-// Read-only Reg ( ROM )
-#define AK8963_ASAX                 ((uint8_t)0x10)
-#define AK8963_ASAY                 ((uint8_t)0x11)
-#define AK8963_ASAZ                 ((uint8_t)0x12)
-/*====================================================================================================*/
 /*====================================================================================================*/
 Mpu9250::Mpu9250(SpiInterface& spiInterface, Port& ncsPort):
 	_spiInterface(spiInterface),_ncsPort(ncsPort){

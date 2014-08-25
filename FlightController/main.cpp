@@ -156,6 +156,8 @@ public:
 	}
 };
 
+#define Byte16(hi,lo) (((uint16_t)hi) << 8 | ((uint16_t)lo))
+
 int main(){
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -177,13 +179,24 @@ int main(){
 	Port port(GPIOB, GPIO_Pin_2);
 	Mpu9250 mpu(spi2, port);
 
-	while(true)
+	/*while(true)
 	{
 		Delay(10);
 	if (mpu.Check())
 		leds.G(true);
 	else
 		leds.R(true);
+	}*/
+
+	uint8_t ReadBuf[14];
+	while(true){
+		mpu.Read(ReadBuf);
+		uint16_t AX = Byte16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
+		uint16_t AY = Byte16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
+		uint16_t AZ = Byte16(ReadBuf[4],  ReadBuf[5]);  // Acc.Z
+		uint16_t GX = Byte16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
+		uint16_t GY = Byte16(ReadBuf[10], ReadBuf[11]); // Gyr.Y
+		uint16_t GZ = Byte16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
 	}
 
 
@@ -195,7 +208,7 @@ int main(){
 	Stabilizer stabilizer(&sensorProcessor, &commander);
 	Motors motor;
 	Controller controller(&stabilizer, &motor);*/
-
+/*
 	while(true){
 		leds.RGBW(true, true, true, true);
 		Delay(1000);
@@ -214,7 +227,7 @@ int main(){
 		//controller.Update();
 		//motor.SetRatio(adc1.Read(), adc1.Read(), adc2.Read(), adc2.Read());
 	}
-
+*/
 	/*
 	 *  Radio link test.
 	SpiInterface spi(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
