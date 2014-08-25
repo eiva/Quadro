@@ -74,7 +74,7 @@ int main(void)
 		GPIOB->ODR ^= GPIO_Pin_14; // Toggle LED
 		while(1);
 	}
-	while(1);
+
 	nRF24_RXMode(RX_PAYLOAD);
 	nRF24_ClearIRQFlags();
 	unsigned char i,v;

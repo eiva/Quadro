@@ -102,7 +102,7 @@ void nRF24_init() {
 	SPI_InitTypeDef SPI;
 	SPI_StructInit(&SPI);
 	SPI.SPI_Mode = SPI_Mode_Master;
-	SPI.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
+	SPI.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
 	SPI.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
 
 	// Set SPI to Mode 0
