@@ -47,10 +47,11 @@ void USB_Interrupts_Config(void);
 void USB_Cable_Config (FunctionalState NewState);
 void GPIO_Configuration(void);
 void EXTI_Configuration(void);
-void ADC_Configuration(void);
-void ADC30x_Configuration(void);
 void Get_SerialNum(void);
 void TimingDelay_Decrement(void);
+void RHID_Send(uint8_t report, uint8_t state);
+uint8_t RHIDCheckState(void);
+
 void Delay(__IO uint32_t nCount);
 
 #endif  /*__HW_CONFIG_H*/

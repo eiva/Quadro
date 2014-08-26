@@ -49,26 +49,49 @@ extern __IO uint8_t PrevXferComplete;
 *******************************************************************************/
 void EP1_OUT_Callback(void)
 {
-  BitAction Led_State;
+	BitAction Led_State;
 
-  /* Read received data (2 bytes) */  
-  USB_SIL_Read(EP1_OUT, Receive_Buffer);
-  
-  if (Receive_Buffer[1] == 0)
-  {
-    Led_State = Bit_RESET;
-  }
-  else 
-  {
-    Led_State = Bit_SET;
-  }
- 
- 
-  switch (Receive_Buffer[0])
-  {
-  }
- 
-  SetEPRxStatus(ENDP1, EP_RX_VALID);
+	  /* Read received data (2 bytes) */
+	  USB_SIL_Read(EP1_OUT, Receive_Buffer);
+
+	  if (Receive_Buffer[1] == 0)
+	  {
+	    Led_State = Bit_RESET;
+	  }
+	  else
+	  {
+	    Led_State = Bit_SET;
+	  }
+
+
+	  switch (Receive_Buffer[0])
+	  {
+	    /*case 1:
+	     if (Led_State != Bit_RESET)
+	     {
+	       GPIO_SetBits(LED_PORT,LED1_PIN);
+	     }
+	     else
+	     {
+	       GPIO_ResetBits(LED_PORT,LED1_PIN);
+	     }
+	     break;
+	    case 2:
+	     if (Led_State != Bit_RESET)
+	     {
+	       GPIO_SetBits(LED_PORT,LED2_PIN);
+	     }
+	     else
+	     {
+	       GPIO_ResetBits(LED_PORT,LED2_PIN);
+	     }
+	      break;
+	    case 3:
+	        Buffer[4]=Receive_Buffer[1];
+	     break;*/
+	  }
+
+	  SetEPRxStatus(ENDP1, EP_RX_VALID);
  
 }
 

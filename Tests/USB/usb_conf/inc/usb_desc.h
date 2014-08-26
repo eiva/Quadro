@@ -42,18 +42,31 @@
 #define USB_ENDPOINT_DESCRIPTOR_TYPE            0x05
 
 #define HID_DESCRIPTOR_TYPE                     0x21
+#define HID_REPORT_DESCRIPTOR_TYPE				0x22
+
 #define CUSTOMHID_SIZ_HID_DESC                  0x09
 #define CUSTOMHID_OFF_HID_DESC                  0x12
 
 #define CUSTOMHID_SIZ_DEVICE_DESC               18
 #define CUSTOMHID_SIZ_CONFIG_DESC               41
-#define CUSTOMHID_SIZ_REPORT_DESC               163
+#define CUSTOMHID_SIZ_REPORT_DESC               79//163
 #define CUSTOMHID_SIZ_STRING_LANGID             4
 #define CUSTOMHID_SIZ_STRING_VENDOR             38
 #define CUSTOMHID_SIZ_STRING_PRODUCT            32
 #define CUSTOMHID_SIZ_STRING_SERIAL             26
 
 #define STANDARD_ENDPOINT_DESC_SIZE             0x09
+
+#define DEVICE_VER_H 0x01
+#define DEVICE_VER_L 0x00
+
+//HID Maximum packet size in bytes
+#define wMaxPacketSize  0x40
+#define EP1TxCount wMaxPacketSize
+#define EP1RxCount 2
+
+#define RPT3_COUNT 0x01 //PC->STM32
+#define RPT4_COUNT 0x04 //STM32->PC
 
 /* Exported functions ------------------------------------------------------- */
 extern const uint8_t CustomHID_DeviceDescriptor[CUSTOMHID_SIZ_DEVICE_DESC];

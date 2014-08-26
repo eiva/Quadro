@@ -62,6 +62,13 @@ int main(void)
 
   while (1)
   {
+	  if (bDeviceState == CONFIGURED)
+	  {
+		  if (PrevXferComplete)
+	      {
+	          RHIDCheckState();
+	      }
+	  }
   }
 }
 

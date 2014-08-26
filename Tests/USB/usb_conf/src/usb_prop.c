@@ -225,21 +225,6 @@ void CustomHID_SetDeviceAddress (void)
 *******************************************************************************/
 void CustomHID_Status_In(void)
 {  
-  BitAction Led_State;
-  
-  if (Report_Buf[1] == 0)
-  {
-    Led_State = Bit_RESET;
-  }
-  else 
-  {
-    Led_State = Bit_SET;
-  }
-  
-  switch (Report_Buf[0])  
-  {
-    
-  }
 }
 
 /*******************************************************************************
