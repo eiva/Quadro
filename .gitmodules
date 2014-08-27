@@ -1,0 +1,3 @@
+[submodule "FlightMonitor/UsbHidLib"]
+	path = FlightMonitor/UsbHidLib
+	url = https://github.com/eiva/UsbHidLib.git/UsbHidLib
