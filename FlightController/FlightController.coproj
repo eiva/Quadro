@@ -117,10 +117,10 @@
     <File name="stm_lib/src/stm32f10x_adc.c" path="stm_lib/src/stm32f10x_adc.c" type="1"/>
     <File name="usb_lib/inc/usb_core.h" path="usb_lib/inc/usb_core.h" type="1"/>
     <File name="usb_conf/inc/platform_config.h" path="usb_conf/inc/platform_config.h" type="1"/>
-    <File name="usb_conf/src/usb_desc.c" path="usb_conf/src/usb_desc.c" type="1"/>
-    <File name="stm_lib/src/stm32f10x_usart.c" path="stm_lib/src/stm32f10x_usart.c" type="1"/>
     <File name="Port.h" path="Port.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_usart.c" path="stm_lib/src/stm32f10x_usart.c" type="1"/>
     <File name="Vector.h" path="Vector.h" type="1"/>
+    <File name="usb_conf/src/usb_desc.c" path="usb_conf/src/usb_desc.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_rtc.h" path="stm_lib/inc/stm32f10x_rtc.h" type="1"/>
     <File name="RadioLink.h" path="RadioLink.h" type="1"/>
     <File name="Utils.h" path="Utils.h" type="1"/>

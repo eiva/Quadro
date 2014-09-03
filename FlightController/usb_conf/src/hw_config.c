@@ -39,44 +39,12 @@
 MonitorUsbPacketData TheReport;
 
 ErrorStatus HSEStartUpStatus;
-uint32_t ADC_ConvertedValueX = 0;
-uint32_t ADC_ConvertedValueX_1 = 0;
-__IO uint16_t  ADC1ConvertedValue = 0, ADC1ConvertedVoltage = 0, calibration_value = 0;
 
 /* Extern variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 static void IntToUnicode (uint32_t value , uint8_t *pbuf , uint8_t len);
 /* Private functions ---------------------------------------------------------*/
 
-/*******************************************************************************
-* Function Name  : Set_System
-* Description    : Configures Main system clocks & power.
-* Input          : None.
-* Return         : None.
-*******************************************************************************/
-void Set_System(void)
-{
-  GPIO_InitTypeDef  GPIO_InitStructure;
-
-
-  /* Configure the used GPIOs*/
-
-  /*Set PA11,12 as IN - USB_DM,DP*/
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-
- /*
-  // Настройка пинов
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);
-  //GPIO_Configuration();
-   * */
-
-  EXTI_Configuration();
-}
 
 /*******************************************************************************
 * Function Name  : Set_USBClock
@@ -193,21 +161,6 @@ void EXTI_Configuration(void)
 }
 
 /*******************************************************************************
-* Function Name  : USB_Cable_Config.
-* Description    : Software Connection/Disconnection of USB Cable.
-* Input          : NewState: new state.
-* Output         : None.
-* Return         : None
-*******************************************************************************/
-void USB_Cable_Config (FunctionalState NewState)
-{
-
-}
-
-
-
-
-/*******************************************************************************
 * Function Name : RHIDCheckState.
 * Description   : Decodes the RHID state.
 * Input         : None.
@@ -217,8 +170,6 @@ void USB_Cable_Config (FunctionalState NewState)
 uint16_t btn1_prev, btn2_prev;
 extern __IO uint8_t PrevXferComplete;
 uint8_t Buffer[RPT4_COUNT+1];
-
-
 
 uint8_t RHIDCheckState(void)
 {

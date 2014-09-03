@@ -37,7 +37,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 __IO uint32_t bDeviceState = UNCONNECTED; /* USB device status */
-__IO bool fSuspendEnabled = TRUE;  /* true when suspend is possible */
+__IO BOOL fSuspendEnabled = TRUE;  /* true when suspend is possible */
 __IO uint32_t EP[8];
 
 struct
@@ -65,9 +65,6 @@ RESULT PowerOn(void)
 {
   uint16_t wRegVal;
 
-  /*** cable plugged-in ? ***/
-  USB_Cable_Config(ENABLE);
-
   /*** CNTR_PWDN = 0 ***/
   wRegVal = CNTR_FRES;
   _SetCNTR(wRegVal);
@@ -80,7 +77,7 @@ RESULT PowerOn(void)
   /*** Set interrupt mask ***/
   wInterrupt_Mask = CNTR_RESETM | CNTR_SUSPM | CNTR_WKUPM;
   _SetCNTR(wInterrupt_Mask);
-  
+
   return USB_SUCCESS;
 }
 
@@ -93,16 +90,15 @@ RESULT PowerOn(void)
 *******************************************************************************/
 RESULT PowerOff()
 {
-  /* disable all interrupts and force USB reset */
+  // disable all interrupts and force USB reset
   _SetCNTR(CNTR_FRES);
-  /* clear interrupt status register */
+  // clear interrupt status register
   _SetISTR(0);
-  /* Disable the Pull-Up*/
-  USB_Cable_Config(DISABLE);
-  /* switch-off device */
+
+  // switch-off device
   _SetCNTR(CNTR_FRES + CNTR_PDWN);
-  /* sw variables reset */
-  /* ... */
+  // sw variables reset
+
 
   return USB_SUCCESS;
 }

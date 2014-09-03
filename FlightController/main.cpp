@@ -187,6 +187,8 @@ int main(){
 
     Set_USBClock();
 
+    USB_Init();
+
 	LedInfo leds;
 	SpiInterface spi1(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
 	RadioLink channel(&spi1, &leds);
@@ -202,7 +204,7 @@ int main(){
 	else
 		leds.R(true);
 	}*/
-
+	leds.G(true);
 	uint8_t ReadBuf[14];
 	while(true){
 		//mpu.Read(ReadBuf);

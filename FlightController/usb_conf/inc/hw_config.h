@@ -30,9 +30,14 @@
 #ifndef __HW_CONFIG_H
 #define __HW_CONFIG_H
 
+
 /* Includes ------------------------------------------------------------------*/
 #include "platform_config.h"
 #include "usb_type.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* Exported types ------------------------------------------------------------*/
 #pragma pack(push,1) // Size = 36
@@ -47,10 +52,9 @@ typedef struct{
 #pragma pack(pop)
 
 extern MonitorUsbPacketData TheReport;
-/* Exported constants --------------------------------------------------------*/
-/* Exported macro ------------------------------------------------------------*/
-/* Exported define -----------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
+
+extern __IO uint8_t PrevXferComplete;
+
 void Set_System(void);
 void Set_USBClock(void);
 void Enter_LowPowerMode(void);
@@ -60,11 +64,13 @@ void USB_Cable_Config (FunctionalState NewState);
 void GPIO_Configuration(void);
 void EXTI_Configuration(void);
 void Get_SerialNum(void);
-void TimingDelay_Decrement(void);
+
 void RHID_Send(uint8_t report, uint8_t state);
 uint8_t RHIDCheckState(void);
 
-void Delay(__IO uint32_t nCount);
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /*__HW_CONFIG_H*/
 
