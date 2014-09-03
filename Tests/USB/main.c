@@ -60,8 +60,13 @@ int main(void)
 
   USB_Init();
 
+  uint16_t counter = 0;
+
   while (1)
   {
+	  TheReport.SAX = 32768;
+	  TheReport.SAY = counter;
+	  ++counter;
 	  if (bDeviceState == CONFIGURED)
 	  {
 		  if (PrevXferComplete)

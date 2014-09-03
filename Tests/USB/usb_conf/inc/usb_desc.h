@@ -66,7 +66,7 @@
 #define EP1RxCount 2
 
 #define RPT3_COUNT 0x01 //PC->STM32
-#define RPT4_COUNT 0x04 //STM32->PC
+#define RPT4_COUNT 36 //STM32->PC
 
 /* Exported functions ------------------------------------------------------- */
 extern const uint8_t CustomHID_DeviceDescriptor[CUSTOMHID_SIZ_DEVICE_DESC];

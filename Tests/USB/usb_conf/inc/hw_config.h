@@ -35,6 +35,18 @@
 #include "usb_type.h"
 
 /* Exported types ------------------------------------------------------------*/
+#pragma pack(push,1) // Size = 36
+typedef struct{
+	uint16_t SAX, SAY, SAZ;
+	uint16_t SGX, SGY, SGZ;
+	uint16_t SMX, SMY, SMZ;
+	uint16_t RIT, RIY, RIP, RIR;
+	uint16_t M1, M2, M3, M4;
+	uint16_t dT;
+} MonitorUsbPacketData;
+#pragma pack(pop)
+
+extern MonitorUsbPacketData TheReport;
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported define -----------------------------------------------------------*/

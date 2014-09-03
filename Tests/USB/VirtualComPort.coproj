@@ -81,8 +81,8 @@
   </Components>
   <Files>
     <File name="usb_config/src/usb_prop.c" path="usb_conf/src/usb_prop.c" type="1"/>
-    <File name="usb_config/inc/usb_conf.h" path="usb_conf/inc/usb_conf.h" type="1"/>
     <File name="stm_lib/inc/stm32f10x_can.h" path="stm_lib/inc/stm32f10x_can.h" type="1"/>
+    <File name="usb_config/inc/usb_conf.h" path="usb_conf/inc/usb_conf.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_dbgmcu.c" path="stm_lib/src/stm32f10x_dbgmcu.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_fsmc.h" path="stm_lib/inc/stm32f10x_fsmc.h" type="1"/>
     <File name="usb_config/inc/usb_prop.h" path="usb_conf/inc/usb_prop.h" type="1"/>
@@ -126,8 +126,8 @@
     <File name="stm_lib" path="" type="2"/>
     <File name="stm_lib/inc/stm32f10x_exti.h" path="stm_lib/inc/stm32f10x_exti.h" type="1"/>
     <File name="stm_lib/inc/stm32f10x_adc.h" path="stm_lib/inc/stm32f10x_adc.h" type="1"/>
-    <File name="cmsis_boot/system_stm32f10x.h" path="cmsis_boot/system_stm32f10x.h" type="1"/>
     <File name="usb_config/src/hw_config.c" path="usb_conf/src/hw_config.c" type="1"/>
+    <File name="cmsis_boot/system_stm32f10x.h" path="cmsis_boot/system_stm32f10x.h" type="1"/>
     <File name="usb_config/inc/usb_istr.h" path="usb_conf/inc/usb_istr.h" type="1"/>
     <File name="usb_lib/src/usb_core.c" path="usb_lib/src/usb_core.c" type="1"/>
     <File name="stm_lib/src/stm32f10x_crc.c" path="stm_lib/src/stm32f10x_crc.c" type="1"/>
@@ -152,8 +152,8 @@
     <File name="usb_lib/inc/usb_core.h" path="usb_lib/inc/usb_core.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_usart.c" path="stm_lib/src/stm32f10x_usart.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_rtc.h" path="stm_lib/inc/stm32f10x_rtc.h" type="1"/>
-    <File name="usb_config/inc/hw_config.h" path="usb_conf/inc/hw_config.h" type="1"/>
     <File name="usb_lib/inc/usb_mem.h" path="usb_lib/inc/usb_mem.h" type="1"/>
+    <File name="usb_config/inc/hw_config.h" path="usb_conf/inc/hw_config.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_pwr.c" path="stm_lib/src/stm32f10x_pwr.c" type="1"/>
     <File name="usb_lib/src/usb_init.c" path="usb_lib/src/usb_init.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_gpio.h" path="stm_lib/inc/stm32f10x_gpio.h" type="1"/>
@@ -163,8 +163,8 @@
     <File name="stm_lib/src/stm32f10x_exti.c" path="stm_lib/src/stm32f10x_exti.c" type="1"/>
     <File name="usb_lib/inc/usb_lib.h" path="usb_lib/inc/usb_lib.h" type="1"/>
     <File name="usb_config/src/usb_istr.c" path="usb_conf/src/usb_istr.c" type="1"/>
-    <File name="stm_lib/inc/stm32f10x_sdio.h" path="stm_lib/inc/stm32f10x_sdio.h" type="1"/>
     <File name="usb_config/inc/platform_config.h" path="usb_conf/inc/platform_config.h" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_sdio.h" path="stm_lib/inc/stm32f10x_sdio.h" type="1"/>
     <File name="usb_config/inc/usb_pwr.h" path="usb_conf/inc/usb_pwr.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_flash.c" path="stm_lib/src/stm32f10x_flash.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_rcc.h" path="stm_lib/inc/stm32f10x_rcc.h" type="1"/>

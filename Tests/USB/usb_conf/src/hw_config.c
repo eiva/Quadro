@@ -36,6 +36,7 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+MonitorUsbPacketData TheReport;
 
 ErrorStatus HSEStartUpStatus;
 uint32_t ADC_ConvertedValueX = 0;
@@ -216,17 +217,18 @@ void USB_Cable_Config (FunctionalState NewState)
 uint16_t btn1_prev, btn2_prev;
 extern __IO uint8_t PrevXferComplete;
 uint8_t Buffer[RPT4_COUNT+1];
-uint8_t counter = 0;
+
+
+
 uint8_t RHIDCheckState(void)
 {
-    uint16_t btn1=0, btn2=0;
-    btn1 = 1;//GPIO_ReadInputDataBit(BTN1_PORT, BTN1_PIN);
-    btn2 = 0;//GPIO_ReadInputDataBit(BTN2_PORT, BTN2_PIN);
-    Buffer[0] = 4;
-    Buffer[1] = btn1;
-    Buffer[2] = btn2;
-    Buffer[3] = 0x1 | 0x40;//(GPIO_ReadInputDataBit(LED_PORT, LED1_PIN) | GPIO_ReadInputDataBit(LED_PORT, LED2_PIN)<<1);
-    Buffer[4] = counter++;
+    Buffer[0] = 4; // Endpoint address
+    uint8_t* structPtr = (uint8_t *)(&TheReport);
+    uint8_t index;
+    for(index = 0; index < sizeof(TheReport); ++index){
+    	Buffer[1+index] = structPtr[index];
+    }
+
     /* Reset the control token to inform upper layer that a transfer is ongoing */
     PrevXferComplete = 0;
 
@@ -235,7 +237,7 @@ uint8_t RHIDCheckState(void)
     /* Enable endpoint for transmission */
     SetEPTxValid(ENDP1);
 
-    return (btn1 | btn2<<1);
+    return 0;
 }
 
 /*******************************************************************************
