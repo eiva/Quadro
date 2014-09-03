@@ -5,7 +5,13 @@
 #include <stm32f10x_adc.h>
 #include <stm32f10x_spi.h>
 #include <misc.h>
+
+#include "hw_config.h"
+#include "usb_lib.h"
+#include "usb_pwr.h"
+
 #include "Utils.h"
+
 #include "Port.h"
 #include "LedInfo.h"
 #include "Motors.h"
@@ -171,13 +177,22 @@ int main(){
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+
+	EXTI_Configuration(); // USB.
+
 	SysTick_Config(SystemCoreClock/1000);
 
+	USB_Interrupts_Config();
+
+    Set_USBClock();
+
 	LedInfo leds;
-	//SpiInterface spi1(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
-	SpiInterface spi2(SPI2, GPIOB, GPIO_Pin_14, GPIO_Pin_15, GPIO_Pin_13,SPI_CPOL_High,SPI_CPHA_2Edge);
-	Port port(GPIOB, GPIO_Pin_2);
-	Mpu9250 mpu(spi2, port);
+	SpiInterface spi1(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
+	RadioLink channel(&spi1, &leds);
+	//SpiInterface spi2(SPI2, GPIOB, GPIO_Pin_14, GPIO_Pin_15, GPIO_Pin_13,SPI_CPOL_High,SPI_CPHA_2Edge);
+	//Port port(GPIOB, GPIO_Pin_2);
+	//Mpu9250 mpu(spi2, port);
 
 	/*while(true)
 	{
@@ -190,13 +205,57 @@ int main(){
 
 	uint8_t ReadBuf[14];
 	while(true){
-		mpu.Read(ReadBuf);
-		uint16_t AX = Byte16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
+		//mpu.Read(ReadBuf);
+		/*uint16_t AX = Byte16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
 		uint16_t AY = Byte16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
 		uint16_t AZ = Byte16(ReadBuf[4],  ReadBuf[5]);  // Acc.Z
 		uint16_t GX = Byte16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
 		uint16_t GY = Byte16(ReadBuf[10], ReadBuf[11]); // Gyr.Y
 		uint16_t GZ = Byte16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
+
+		TheReport.SAX = AX;
+		TheReport.SAY = AY;
+		TheReport.SAZ = AZ;
+		TheReport.SGX = GX;
+		TheReport.SGY = GY;
+		TheReport.SGZ = GZ;
+		*/
+		if (channel.Update())
+		{
+			int val1 = map(channel.Throttle,0,1024,0,1800);
+			int val2 = map(channel.Yaw,0,1024,0,1800);
+			int val3 = map(channel.Pitch,0,1024,0,1800);
+			int val4 = map(channel.Roll,0,1024,0,1800);
+			TheReport.SAX = val1;
+			TheReport.SAY = val2;
+			TheReport.SAZ = val3;
+			TheReport.SGX = val4;
+
+			//motor.SetRatio(val1, val2, val3, val4);
+			leds.B(true);
+			leds.R(false);
+
+			if (bDeviceState == CONFIGURED)
+			{
+				leds.W(true);
+				if (PrevXferComplete)
+				{
+					RHIDCheckState();
+				}
+			}
+			else
+			{
+				leds.W(false);
+			}
+		}
+		else
+		{
+			leds.R(true);
+		}
+
+
+
+
 	}
 
 
