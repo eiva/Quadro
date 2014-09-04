@@ -3,6 +3,7 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_tim.h"
+#include "stm32f4xx_sdio.h"
 #include "system_stm32f4xx.h"
 #include "portmacro.h"
 #include "FreeRTOSConfig.h"
@@ -20,6 +21,7 @@ void vFreeRTOSInitAll()
 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE,ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 
@@ -84,6 +86,10 @@ void vFreeRTOSInitAll()
     TIM_SetCompare2(TIM1, 75);
     TIM_SetCompare3(TIM1, 120);
     TIM_SetCompare4(TIM1, 250);
+
+    /////////////////////////////////////////////////////
+    // SD card initialization
+    // GPIO
 }
 
 /*******************************************************************/
@@ -163,7 +169,7 @@ void vLedTask3 (void *pvParameters)
     vTaskDelete(NULL);
 }
 
-int main(void)
+int main_disabled(void)
 {
     vFreeRTOSInitAll();
     xTaskCreate(vLedTask0,(signed char*)"LedTask0", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
