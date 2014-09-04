@@ -57,26 +57,32 @@ void DMA2_Stream3_IRQHandler(void)//SD_SDIO_DMA_IRQHANDLER
   SD_ProcessDMAIRQ();
 }
 
-
-
 int main(void)
 {
+	SystemInit();
+	GPIO_InitTypeDef port;
 	FATFS Fatfs[_VOLUMES];
 	FIL File;
 
 	uint count_rw_ok;
 
 	uint8_t buffer[512];
-
-
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+
+    GPIO_StructInit(&port);
+    port.GPIO_Mode = GPIO_Mode_OUT;
+    port.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+    port.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOD, &port);
+
+
 
 	SD_Error Res;
 	  FRESULT FRes;
 	  //NVIC_Configuration();
 
-	  Res = SD_Init();
+
 	  /*//SD_ReadBlock(buffer,0, 512);
 	  //SD_WaitReadOperation();
 	  //while(SD_GetStatus() != SD_TRANSFER_OK);
@@ -90,10 +96,13 @@ int main(void)
 	  SD_DeInit();
 */
 
-	while (1)
-	{
+	Res = SD_Init();
+	Res = disk_initialize(0);
+	FRes = f_mount(&Fatfs, "", 1);
+	FRes = f_open(&File,"output.txt", FA_WRITE);
+	FRes = f_write(&File, buffer, 512, &count_rw_ok);
+	FRes = f_close(&File);
 
-	}
 	return 0;
 }
 

@@ -475,9 +475,6 @@ void SD_LowLevel_Init(void)
 {
   GPIO_InitTypeDef  GPIO_InitStructure;
 
-  /* GPIOC and GPIOD Periph clock enable */
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOD | SD_DETECT_GPIO_CLK, ENABLE);
-
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource8, GPIO_AF_SDIO);
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource12, GPIO_AF_SDIO);
   GPIO_PinAFConfig(GPIOD, GPIO_PinSource2, GPIO_AF_SDIO);
@@ -505,12 +502,6 @@ void SD_LowLevel_Init(void)
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
   GPIO_Init(SD_DETECT_GPIO_PORT, &GPIO_InitStructure);
-
-  /* Enable the SDIO APB2 Clock */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SDIO, ENABLE);
-
-  /* Enable the DMA2 Clock */
-  RCC_AHB1PeriphClockCmd(SD_SDIO_DMA_CLK, ENABLE);
 }
 
 /**
@@ -620,11 +611,18 @@ void SD_DeInit(void)
 SD_Error SD_Init(void)
 {
   __IO SD_Error errorstatus = SD_OK;
-
-  SDIO_DeInit();
   
+  /* GPIOC and GPIOD Periph clock enable */
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOD | SD_DETECT_GPIO_CLK, ENABLE);
+
   /* SDIO Peripheral Low Level Init */
   SD_LowLevel_Init();
+
+  /* Enable the SDIO APB2 Clock */
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SDIO, ENABLE);
+
+  /* Enable the DMA2 Clock */
+  //RCC_AHB1PeriphClockCmd(SD_SDIO_DMA_CLK, ENABLE);
 
   errorstatus = SD_PowerON();
 
@@ -751,8 +749,6 @@ uint8_t SD_Detect(void)
   */
 SD_Error SD_PowerON(void)
 {
-  RCC_APB2PeriphResetCmd(RCC_APB2Periph_SDIO, ENABLE);
-
   __IO SD_Error errorstatus = SD_OK;
   uint32_t response = 0, count = 0, validvoltage = 0;
   uint32_t SDType = SD_STD_CAPACITY;
@@ -767,7 +763,7 @@ SD_Error SD_PowerON(void)
   SDIO_InitStructure.SDIO_ClockDiv = SDIO_INIT_CLK_DIV;
   SDIO_InitStructure.SDIO_ClockEdge = SDIO_ClockEdge_Rising;
 //  SDIO_InitStructure.SDIO_ClockBypass = SDIO_ClockBypass_Enable;
-	SDIO_InitStructure.SDIO_ClockBypass = SDIO_ClockBypass_Disable;
+  SDIO_InitStructure.SDIO_ClockBypass = SDIO_ClockBypass_Disable;
   SDIO_InitStructure.SDIO_ClockPowerSave = SDIO_ClockPowerSave_Disable;
   SDIO_InitStructure.SDIO_BusWide = SDIO_BusWide_1b;
   SDIO_InitStructure.SDIO_ClockPowerSave = SDIO_ClockPowerSave_Disable;
