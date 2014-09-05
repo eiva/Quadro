@@ -99,7 +99,7 @@ int main(void)
 	Res = SD_Init();
 	Res = disk_initialize(0);
 	FRes = f_mount(&Fatfs, "", 1);
-	FRes = f_open(&File,"output.txt", FA_WRITE);
+	FRes = f_open(&File,"output.txt", FA_WRITE | FA_CREATE_NEW);
 	FRes = f_write(&File, buffer, 512, &count_rw_ok);
 	FRes = f_close(&File);
 
