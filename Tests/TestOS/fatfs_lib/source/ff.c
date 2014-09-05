@@ -2141,13 +2141,15 @@ BYTE check_fs (	/* 0:FAT boor sector, 1:Valid boor sector but not FAT, 2:Not a b
 	fs->wflag = 0; fs->winsect = 0xFFFFFFFF;	/* Invaidate window */
 	if (move_window(fs, sect) != FR_OK)			/* Load boot record */
 		return 3;
-
-	if (LD_WORD(&fs->win[BS_55AA]) != 0xAA55)	/* Check boot record signature (always placed at offset 510 even if the sector size is >512) */
+	DWORD p0 = LD_WORD(&fs->win[BS_55AA]);
+	if (p0 != 0xAA55)	/* Check boot record signature (always placed at offset 510 even if the sector size is >512) */
 		return 2;
 
-	if ((LD_DWORD(&fs->win[BS_FilSysType]) & 0xFFFFFF) == 0x544146)		/* Check "FAT" string */
+	DWORD p1 = LD_DWORD(&fs->win[BS_FilSysType]);
+	DWORD p2 = LD_DWORD(&fs->win[BS_FilSysType32]);
+	if ((p1 & 0xFFFFFF) == 0x544146)		/* Check "FAT" string */
 		return 0;
-	if ((LD_DWORD(&fs->win[BS_FilSysType32]) & 0xFFFFFF) == 0x544146)	/* Check "FAT" string */
+	if ((p2 & 0xFFFFFF) == 0x544146)	/* Check "FAT" string */
 		return 0;
 
 	return 1;

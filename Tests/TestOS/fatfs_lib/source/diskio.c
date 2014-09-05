@@ -152,6 +152,20 @@ DRESULT disk_ioctl (
         void *buff              /* Buffer to send/receive control data */
 )
 {
-        return RES_OK;
+	if (ctrl == GET_SECTOR_COUNT){
+		SD_CardInfo SDCardInfo;
+		SD_Error error = SD_GetCardInfo(&SDCardInfo);
+		if (error != SD_OK)
+		{
+			return RES_ERROR;
+		}
+		*((DWORD*)(buff)) = SDCardInfo.CardCapacity / 512;
+	}
+	else if (ctrl == GET_BLOCK_SIZE)
+	{
+		*((DWORD*)(buff)) = 512;
+	}
+
+    return RES_OK;
 }
 

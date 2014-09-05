@@ -20,9 +20,13 @@ int main(void)
 	FATFS Fatfs[_VOLUMES];
 	FIL File;
 
-	uint count_rw_ok;
+	uint index;
 
 	uint8_t buffer[512];
+	for (index = 0; index < 512; ++index)
+	{
+		buffer[index] = index;
+	}
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
@@ -52,12 +56,20 @@ int main(void)
 	  SD_DeInit();
 */
 
-	Res = SD_Init();
+	//Res = SD_Init();
+
+    //Res = SD_WriteBlock(buffer, 0, 512);
+
+	  // Read operation as described in Section B
+	//Res = SD_ReadBlock(buffer, 0, 512);
+
+
 	//Res = disk_initialize(0);
-	//FRes = f_mount(&Fatfs, "", 1);
-//	FRes = f_open(&File,"output.txt", FA_WRITE | FA_CREATE_NEW);
-//	FRes = f_write(&File, buffer, 512, &count_rw_ok);
-//	FRes = f_close(&File);
+	FRes = f_mount(&Fatfs, "", 0);
+	//FRes = f_mkfs("", 1, 512);
+	FRes = f_open(&File,"output.txt", FA_WRITE | FA_OPEN_ALWAYS);
+	FRes = f_write(&File, buffer, 512, &index);
+	FRes = f_close(&File);
 	while(1);
 	return 0;
 }

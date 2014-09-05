@@ -1234,9 +1234,9 @@ SD_Error SD_SelectDeselect(uint32_t addr)
 SD_Error SD_ReadBlock(uint8_t *readbuff, uint32_t ReadAddr, uint16_t BlockSize)
 {
   SD_Error errorstatus = SD_OK;
-#if defined (SD_POLLING_MODE) 
+
   uint32_t count = 0, *tempbuff = (uint32_t *)readbuff;
-#endif
+
 
   TransferError = SD_OK;
   TransferEnd = 0;
