@@ -12,50 +12,6 @@
 #include "ff_support.h"
 #include "ff.h"
 
-void NVIC_Configuration(void)
-{
-  NVIC_InitTypeDef NVIC_InitStructure;
-
-  /* Configure the NVIC Preemption Priority Bits */
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
-
-  NVIC_InitStructure.NVIC_IRQChannel = SDIO_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-  NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_Init(&NVIC_InitStructure);
-}
-
-//******************************************************************************
-
-/******************************************************************************/
-/*                 STM32F4xx Peripherals Interrupt Handlers                   */
-/******************************************************************************/
-/**
-  * @brief  This function handles SDIO global interrupt request.
-  * @param  None
-  * @retval None
-  */
-void SDIO_IRQHandler(void)
-{
-  /* Process All SDIO Interrupt Sources */
-  SD_ProcessIRQSrc();
-}
-
-/**
-  * @brief  This function handles DMA2 Stream3 or DMA2 Stream6 global interrupts
-  *         requests.
-  * @param  None
-  * @retval None
-  */
-void DMA2_Stream3_IRQHandler(void)//SD_SDIO_DMA_IRQHANDLER
-{
-  /* Process DMA2 Stream3 or DMA2 Stream6 Interrupt Sources */
-  SD_ProcessDMAIRQ();
-}
 
 int main(void)
 {
@@ -97,12 +53,12 @@ int main(void)
 */
 
 	Res = SD_Init();
-	Res = disk_initialize(0);
-	FRes = f_mount(&Fatfs, "", 1);
-	FRes = f_open(&File,"output.txt", FA_WRITE | FA_CREATE_NEW);
-	FRes = f_write(&File, buffer, 512, &count_rw_ok);
-	FRes = f_close(&File);
-
+	//Res = disk_initialize(0);
+	//FRes = f_mount(&Fatfs, "", 1);
+//	FRes = f_open(&File,"output.txt", FA_WRITE | FA_CREATE_NEW);
+//	FRes = f_write(&File, buffer, 512, &count_rw_ok);
+//	FRes = f_close(&File);
+	while(1);
 	return 0;
 }
 

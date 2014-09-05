@@ -105,9 +105,9 @@
     <File name="cmsis_boot" path="" type="2"/>
     <File name="cmsis_lib/include/stm32f4xx_syscfg.h" path="cmsis_lib/include/stm32f4xx_syscfg.h" type="1"/>
     <File name="fatfs_lib/include" path="" type="2"/>
-    <File name="cmsis_lib/include/stm32f4xx_crc.h" path="cmsis_lib/include/stm32f4xx_crc.h" type="1"/>
     <File name="fatfs_lib/include/rtc_support.h" path="fatfs_lib/include/rtc_support.h" type="1"/>
     <File name="cmsis_lib/include/stm32f4xx_usart.h" path="cmsis_lib/include/stm32f4xx_usart.h" type="1"/>
+    <File name="cmsis_lib/include/stm32f4xx_crc.h" path="cmsis_lib/include/stm32f4xx_crc.h" type="1"/>
     <File name="freertos/source/event_groups.c" path="freertos/source/event_groups.c" type="1"/>
     <File name="cmsis_boot/stm32f4xx.h" path="cmsis_boot/stm32f4xx.h" type="1"/>
     <File name="cmsis_boot/startup" path="" type="2"/>
@@ -120,9 +120,9 @@
     <File name="freertos/include/portable.h" path="freertos/include/portable.h" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_dbgmcu.c" path="cmsis_lib/source/stm32f4xx_dbgmcu.c" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_crc.c" path="cmsis_lib/source/stm32f4xx_crc.c" type="1"/>
-    <File name="cmsis_lib/source/misc.c" path="cmsis_lib/source/misc.c" type="1"/>
     <File name="fatfs_lib/source/ff_support.c" path="fatfs_lib/source/ff_support.c" type="1"/>
     <File name="fatfs_lib/source/ff.c" path="fatfs_lib/source/ff.c" type="1"/>
+    <File name="cmsis_lib/source/misc.c" path="cmsis_lib/source/misc.c" type="1"/>
     <File name="cmsis_lib/include/stm32f4xx_tim.h" path="cmsis_lib/include/stm32f4xx_tim.h" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_adc.c" path="cmsis_lib/source/stm32f4xx_adc.c" type="1"/>
     <File name="freertos/include/FreeRTOS.h" path="freertos/include/FreeRTOS.h" type="1"/>
