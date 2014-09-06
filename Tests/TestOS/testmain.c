@@ -22,8 +22,8 @@ int main(void)
 
 	uint index;
 
-	uint8_t buffer[512], buffer1[512];
-	for (index = 0; index < 512; ++index)
+	uint8_t buffer[512*2];
+	for (index = 0; index < 512*2; ++index)
 	{
 		buffer[index] = index;
 	}
@@ -72,36 +72,50 @@ int main(void)
 
 	  SD_DeInit();
 */
-	GPIO_SetBits(GPIOD, GPIO_Pin_13);
-	Res = SD_Init();
+	//GPIO_SetBits(GPIOD, GPIO_Pin_13);
+	/*Res = SD_Init();
 
 	for (index = 0; index < 512; ++index)
 	{
 		GPIO_SetBits(GPIOD, GPIO_Pin_12);
-		Res = SD_WriteBlock(buffer, 0, 512);
+		Res = SD_WriteBlock(buffer, index*512, 512);
 		GPIO_ResetBits(GPIOD, GPIO_Pin_12);
 		if (Res != SD_OK)
 		{
 			GPIO_SetBits(GPIOD, GPIO_Pin_15);
 		    while(1);
 		}
-	}
+	}*/
 
-    GPIO_SetBits(GPIOD, GPIO_Pin_13);
+    //GPIO_SetBits(GPIOD, GPIO_Pin_13);
 
     //SD_DeInit();
 
     // Read operation as described in Section B
 
 
-    GPIO_SetBits(GPIOD, GPIO_Pin_14);
+    //GPIO_SetBits(GPIOD, GPIO_Pin_14);
 	//Res = disk_initialize(0);
-	/*FRes = f_mount(&Fatfs, "", 0);
-	//FRes = f_mkfs("", 1, 512);
+
+	GPIO_SetBits(GPIOD, GPIO_Pin_12);
+	FRes = f_mount(&Fatfs, "", 0);
+	if (FRes != RES_OK) while(1);
+
+	GPIO_SetBits(GPIOD, GPIO_Pin_13);
 	FRes = f_open(&File,"output.txt", FA_WRITE | FA_OPEN_ALWAYS);
-	FRes = f_write(&File, buffer, 512, &index);
+	if (FRes != RES_OK) while(1);
+
+	GPIO_SetBits(GPIOD, GPIO_Pin_14);
+	FRes = f_write(&File, buffer, 512*2, &index);
+	if (FRes != RES_OK) while(1);
+
+	GPIO_SetBits(GPIOD, GPIO_Pin_15);
 	FRes = f_close(&File);
-	f_mount(NULL, "", 0);*/
+	if (FRes != RES_OK) while(1);
+
+	GPIO_ResetBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
+	f_mount(NULL, "", 0);
+
 	while(1);
 	return 0;
 }

@@ -418,11 +418,14 @@ void SD_LowLevel_DeInit(void)
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_SDIO, DISABLE);
 
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource8, GPIO_AF_MCO);
+  //GPIO_PinAFConfig(GPIOC, GPIO_PinSource9, GPIO_AF_MCO);
+  //GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_MCO);
+  //GPIO_PinAFConfig(GPIOC, GPIO_PinSource11, GPIO_AF_MCO);
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource12, GPIO_AF_MCO);
   GPIO_PinAFConfig(GPIOD, GPIO_PinSource2, GPIO_AF_MCO);
 
   /* Configure PC.08, PC.09, PC.10, PC.11 pins: D0, D1, D2, D3 pins */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;// | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(GPIOC, &GPIO_InitStructure);
@@ -448,12 +451,15 @@ void SD_LowLevel_Init(void)
   GPIO_InitTypeDef  GPIO_InitStructure;
 
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource8, GPIO_AF_SDIO);
+  //GPIO_PinAFConfig(GPIOC, GPIO_PinSource9, GPIO_AF_SDIO);
+  //GPIO_PinAFConfig(GPIOC, GPIO_PinSource10, GPIO_AF_SDIO);
+  //GPIO_PinAFConfig(GPIOC, GPIO_PinSource11, GPIO_AF_SDIO);
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource12, GPIO_AF_SDIO);
   GPIO_PinAFConfig(GPIOD, GPIO_PinSource2, GPIO_AF_SDIO);
 
   /* Configure PC.08, PC.09, PC.10, PC.11 pins: D0, D1, D2, D3 pins */
   GPIO_StructInit(&GPIO_InitStructure);
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;// | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -543,7 +549,7 @@ SD_Error SD_Init(void)
   }
 
   //---------------- Set Bus width 1b ---------------------------//
-  errorstatus = SDEnWideBus(DISABLE);
+  errorstatus = SDEnWideBus(DISABLE);//SDEnWideBus(ENABLE);
 
   if (errorstatus != SD_OK)
   {
@@ -558,8 +564,8 @@ SD_Error SD_Init(void)
   SDIO_InitStructure.SDIO_ClockDiv = SDIO_TRANSFER_CLK_DIV;
   SDIO_InitStructure.SDIO_ClockEdge = SDIO_ClockEdge_Rising;
   SDIO_InitStructure.SDIO_ClockBypass = SDIO_ClockBypass_Disable;
-  SDIO_InitStructure.SDIO_ClockPowerSave = SDIO_ClockPowerSave_Disable;
-  SDIO_InitStructure.SDIO_BusWide = SDIO_BusWide_1b;
+  SDIO_InitStructure.SDIO_ClockPowerSave = SDIO_ClockPowerSave_Enable;
+  SDIO_InitStructure.SDIO_BusWide = SDIO_BusWide_1b;//SDIO_BusWide_4b;
   SDIO_InitStructure.SDIO_HardwareFlowControl = SDIO_HardwareFlowControl_Disable;
   SDIO_Init(&SDIO_InitStructure);
 
@@ -1233,6 +1239,9 @@ SD_Error SD_SelectDeselect(uint32_t addr)
   */
 SD_Error SD_ReadBlock(uint8_t *readbuff, uint32_t ReadAddr, uint16_t BlockSize)
 {
+	// Wait previous write operation completion.
+  while(SDIO_GetFlagStatus(SDIO_FLAG_TXACT | SDIO_FLAG_TXACT | SDIO_FLAG_TXDAVL | SDIO_FLAG_TXFIFOE) != RESET);
+
   SD_Error errorstatus = SD_OK;
 
   uint32_t count = 0, *tempbuff = (uint32_t *)readbuff;
@@ -1358,6 +1367,9 @@ SD_Error SD_ReadBlock(uint8_t *readbuff, uint32_t ReadAddr, uint16_t BlockSize)
   */
 SD_Error SD_WriteBlock(uint8_t *writebuff, uint32_t WriteAddr, uint16_t BlockSize)
 {
+	// Wait previous write operation completion.
+  while(SDIO_GetFlagStatus(SDIO_FLAG_TXACT | SDIO_FLAG_TXACT | SDIO_FLAG_TXDAVL | SDIO_FLAG_TXFIFOE) != RESET);
+
   SD_Error errorstatus = SD_OK;
 
   uint32_t bytestransferred = 0, count = 0, restwords = 0;
@@ -1460,11 +1472,7 @@ SD_Error SD_WriteBlock(uint8_t *writebuff, uint32_t WriteAddr, uint16_t BlockSiz
     errorstatus = SD_START_BIT_ERR;
     return(errorstatus);
   }
-  while(SDIO_GetFlagStatus(SDIO_FLAG_TXACT | SDIO_FLAG_TXACT | SDIO_FLAG_TXDAVL | SDIO_FLAG_TXFIFOE) != RESET)
-  {
-	  errorstatus = SD_OK;
-  }
-  SDIO_ClearFlag(SDIO_STATIC_FLAGS);
+
   return(errorstatus);
 }
 
@@ -2126,6 +2134,50 @@ static SD_Error SDEnWideBus(FunctionalState NewState)
   }
 
   /*!< If wide bus operation to be enabled */
+  if (NewState == ENABLE)
+  {
+    /*!< If requested card supports wide bus operation */
+    if ((scr[1] & SD_WIDE_BUS_SUPPORT) != SD_ALLZERO)
+    {
+      /*!< Send CMD55 APP_CMD with argument as card's RCA.*/
+      SDIO_CmdInitStructure.SDIO_Argument = (uint32_t) RCA << 16;
+      SDIO_CmdInitStructure.SDIO_CmdIndex = SD_CMD_APP_CMD;
+      SDIO_CmdInitStructure.SDIO_Response = SDIO_Response_Short;
+      SDIO_CmdInitStructure.SDIO_Wait = SDIO_Wait_No;
+      SDIO_CmdInitStructure.SDIO_CPSM = SDIO_CPSM_Enable;
+      SDIO_SendCommand(&SDIO_CmdInitStructure);
+
+      errorstatus = CmdResp1Error(SD_CMD_APP_CMD);
+
+      if (errorstatus != SD_OK)
+      {
+        return(errorstatus);
+      }
+
+      /*!< Send ACMD6 APP_CMD with argument as 2 for wide bus mode */
+      SDIO_CmdInitStructure.SDIO_Argument = 0x2;
+      SDIO_CmdInitStructure.SDIO_CmdIndex = SD_CMD_APP_SD_SET_BUSWIDTH;
+      SDIO_CmdInitStructure.SDIO_Response = SDIO_Response_Short;
+      SDIO_CmdInitStructure.SDIO_Wait = SDIO_Wait_No;
+      SDIO_CmdInitStructure.SDIO_CPSM = SDIO_CPSM_Enable;
+      SDIO_SendCommand(&SDIO_CmdInitStructure);
+
+      errorstatus = CmdResp1Error(SD_CMD_APP_SD_SET_BUSWIDTH);
+
+      if (errorstatus != SD_OK)
+      {
+        return(errorstatus);
+      }
+      return(errorstatus);
+    }
+    else
+    {
+      errorstatus = SD_REQUEST_NOT_APPLICABLE;
+      return(errorstatus);
+    }
+  }   /*!< If wide bus operation to be disabled */
+  else
+  {
     /*!< If requested card supports 1 bit mode operation */
     if ((scr[1] & SD_SINGLE_BUS_SUPPORT) != SD_ALLZERO)
     {
@@ -2136,6 +2188,7 @@ static SD_Error SDEnWideBus(FunctionalState NewState)
       SDIO_CmdInitStructure.SDIO_Wait = SDIO_Wait_No;
       SDIO_CmdInitStructure.SDIO_CPSM = SDIO_CPSM_Enable;
       SDIO_SendCommand(&SDIO_CmdInitStructure);
+
 
       errorstatus = CmdResp1Error(SD_CMD_APP_CMD);
 
@@ -2166,6 +2219,7 @@ static SD_Error SDEnWideBus(FunctionalState NewState)
       errorstatus = SD_REQUEST_NOT_APPLICABLE;
       return(errorstatus);
     }
+  }
 
 }
 

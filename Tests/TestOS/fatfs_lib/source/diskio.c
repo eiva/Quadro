@@ -89,16 +89,11 @@ DRESULT disk_read (
     return RES_PARERR;
 
   //SD_ReadMultiBlocks ( buff, sector, 512, 1 );
-  SD_ReadBlock(buff, sector, BLOCK_SIZE);
-  //SD_ReadMultiBlocksFIXED ( buff, sector, 512, 1 );
-  //SD_WaitReadOperation ( );
-
-  while ( 1 )
-  {
-    state = SD_GetStatus ( );
-    if ( state == SD_TRANSFER_OK )
-      break;
-  } // while
+  SD_Error error = SD_ReadBlock(buff, sector * BLOCK_SIZE, BLOCK_SIZE);
+  if (error != SD_OK)
+    {
+  	  return RES_ERROR;
+    }
 
   return RES_OK;
 }
@@ -126,15 +121,12 @@ DRESULT disk_write (
 
 //  SD_WriteMultiBlocks ( (uint8_t *)buff, sector, 512, 1 );
   //SD_WriteMultiBlocksFIXED ( (uint8_t *)buff, sector, 512, 1 );
-  SD_WriteBlock((uint8_t *)buff, sector, BLOCK_SIZE);
-  //SD_WaitWriteOperation ( );
+  SD_Error error = SD_WriteBlock((uint8_t *)buff, sector * BLOCK_SIZE, BLOCK_SIZE);
 
-  while ( 1 )
+  if (error != SD_OK)
   {
-    state = SD_GetStatus ( );
-    if ( state == SD_TRANSFER_OK )
-      break;
-  } // while
+	  return RES_ERROR;
+  }
 
   return RES_OK;
 }
