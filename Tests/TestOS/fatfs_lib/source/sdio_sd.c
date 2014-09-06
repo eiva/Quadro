@@ -1460,7 +1460,11 @@ SD_Error SD_WriteBlock(uint8_t *writebuff, uint32_t WriteAddr, uint16_t BlockSiz
     errorstatus = SD_START_BIT_ERR;
     return(errorstatus);
   }
-
+  while(SDIO_GetFlagStatus(SDIO_FLAG_TXACT | SDIO_FLAG_TXACT | SDIO_FLAG_TXDAVL | SDIO_FLAG_TXFIFOE) != RESET)
+  {
+	  errorstatus = SD_OK;
+  }
+  SDIO_ClearFlag(SDIO_STATIC_FLAGS);
   return(errorstatus);
 }
 

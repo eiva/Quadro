@@ -22,7 +22,7 @@ int main(void)
 
 	uint index;
 
-	uint8_t buffer[512];
+	uint8_t buffer[512], buffer1[512];
 	for (index = 0; index < 512; ++index)
 	{
 		buffer[index] = index;
@@ -33,13 +33,30 @@ int main(void)
     GPIO_StructInit(&port);
     port.GPIO_Mode = GPIO_Mode_OUT;
     port.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
-    port.GPIO_Speed = GPIO_Speed_50MHz;
+    port.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(GPIOD, &port);
 
+    GPIO_StructInit(&port);
+    port.GPIO_Mode = GPIO_Mode_IN;
+    port.GPIO_Pin = GPIO_Pin_1;
+    port.GPIO_Speed = GPIO_Speed_2MHz;
+    port.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_Init(GPIOC, &port);
 
+    GPIO_SetBits(GPIOD, GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
+    while(1){
+    	if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_1) == RESET)
+    	{
+    		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_1) == RESET)
+    		{
+    			break;
+    		}
+    	}
+    }
+    GPIO_ResetBits(GPIOD, GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
 
 	SD_Error Res;
-	  FRESULT FRes;
+	FRESULT FRes;
 	  //NVIC_Configuration();
 
 
@@ -55,21 +72,36 @@ int main(void)
 
 	  SD_DeInit();
 */
+	GPIO_SetBits(GPIOD, GPIO_Pin_13);
+	Res = SD_Init();
 
-	//Res = SD_Init();
+	for (index = 0; index < 512; ++index)
+	{
+		GPIO_SetBits(GPIOD, GPIO_Pin_12);
+		Res = SD_WriteBlock(buffer, 0, 512);
+		GPIO_ResetBits(GPIOD, GPIO_Pin_12);
+		if (Res != SD_OK)
+		{
+			GPIO_SetBits(GPIOD, GPIO_Pin_15);
+		    while(1);
+		}
+	}
 
-    //Res = SD_WriteBlock(buffer, 0, 512);
+    GPIO_SetBits(GPIOD, GPIO_Pin_13);
 
-	  // Read operation as described in Section B
-	//Res = SD_ReadBlock(buffer, 0, 512);
+    //SD_DeInit();
+
+    // Read operation as described in Section B
 
 
+    GPIO_SetBits(GPIOD, GPIO_Pin_14);
 	//Res = disk_initialize(0);
-	FRes = f_mount(&Fatfs, "", 0);
+	/*FRes = f_mount(&Fatfs, "", 0);
 	//FRes = f_mkfs("", 1, 512);
 	FRes = f_open(&File,"output.txt", FA_WRITE | FA_OPEN_ALWAYS);
 	FRes = f_write(&File, buffer, 512, &index);
 	FRes = f_close(&File);
+	f_mount(NULL, "", 0);*/
 	while(1);
 	return 0;
 }
