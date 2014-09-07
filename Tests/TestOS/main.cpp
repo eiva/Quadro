@@ -3,7 +3,6 @@
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_tim.h"
-#include "stm32f4xx_sdio.h"
 #include "system_stm32f4xx.h"
 #include "portmacro.h"
 #include "FreeRTOSConfig.h"
@@ -12,6 +11,10 @@
 #include "task.h"
 #include "queue.h"
 #include "LedInfo.h"
+#include "Port.h"
+#include "SpiInterface.h"
+#include "Nrf24.h"
+#include "Button.h"
 
 /*******************************************************************/
 void vFreeRTOSInitAll()
@@ -20,11 +23,7 @@ void vFreeRTOSInitAll()
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
 
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE,ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 
     /////////////////////////////////////////////////////
     // LEDS
@@ -172,6 +171,40 @@ void vLedTask3 (void *pvParameters)
 
 int main(void)
 {
+	SystemInit();
+
+
+
+	//RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	//RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	LedInfo info;
+	info.RGBY(true, true, true, true);
+	Button button(GPIOA, GPIO_Pin_0);
+	while (!button.GetState());
+	info.Off();
+
+    //RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,  ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+
+	SpiInterface spi(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
+
+	Port csn(GPIOA, GPIO_Pin_4);
+	Port ce (GPIOA, GPIO_Pin_3);
+
+	Nrf24 nrf(spi, csn, ce);
+
+	info.B(true);
+	if (nrf.Check())
+	{
+		info.G(true);
+	}
+	else
+	{
+		info.R(true);
+	}
     /*vFreeRTOSInitAll();
     xTaskCreate(vLedTask0,(signed char*)"LedTask0", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(vLedTask1,(signed char*)"LedTask1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
@@ -182,6 +215,8 @@ int main(void)
 	while(1);
 }
 
+extern "C"
+{
 /*******************************************************************/
 void vApplicationIdleHook( void )
 {
@@ -211,4 +246,6 @@ void vApplicationStackOverflowHook( xTaskHandle pxTask, signed char *pcTaskName 
 /*******************************************************************/
 void vApplicationTickHook( void )
 {
+}
+
 }

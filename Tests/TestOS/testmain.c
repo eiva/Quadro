@@ -13,7 +13,7 @@
 #include "ff.h"
 
 
-int main(void)
+int mainTestSDIO(void)
 {
 	SystemInit();
 	GPIO_InitTypeDef port;
