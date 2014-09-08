@@ -15,6 +15,7 @@
 #include "SpiInterface.h"
 #include "Nrf24.h"
 #include "Button.h"
+#include "RadioLink.h"
 
 /*******************************************************************/
 void vFreeRTOSInitAll()
@@ -169,11 +170,9 @@ void vLedTask3 (void *pvParameters)
     vTaskDelete(NULL);
 }
 
-int maindisabled(void)
+int main(void)
 {
 	SystemInit();
-
-
 
 	//RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
@@ -187,7 +186,6 @@ int maindisabled(void)
 	info.Off();
 
     //RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,  ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 
 	SpiInterface spi(SPI1);
 
@@ -196,14 +194,22 @@ int maindisabled(void)
 
 	Nrf24 nrf(spi, csn, ce);
 
+	RadioLink radioLink(nrf, info);
+
+	while(1)
+	{
 	info.B(true);
-	if (nrf.Check())
+	if (radioLink.Update())
 	{
 		info.G(true);
+		info.R(false);
 	}
 	else
 	{
 		info.R(true);
+		info.G(false);
+	}
+	info.B(false);
 	}
     /*vFreeRTOSInitAll();
     xTaskCreate(vLedTask0,(signed char*)"LedTask0", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);

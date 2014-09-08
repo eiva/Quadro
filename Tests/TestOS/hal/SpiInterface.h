@@ -4,6 +4,7 @@
 #include "stm32f4xx_spi.h"
 #include "stm32f4xx_rcc.h"
 
+// Communication interface for SPI.
 // http://easystm32.ru/interfaces/45-spi-interface-part-2
 class SpiInterface{
 	SPI_TypeDef* _spi;
