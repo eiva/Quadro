@@ -4,8 +4,8 @@ class Port{
 	uint16_t _portNumber;
 public:
 	Port(GPIO_TypeDef* gpioPort, uint16_t portNumber):
-		_portNumber(portNumber),
-		_gpioPort(gpioPort)
+		_gpioPort(gpioPort),
+		_portNumber(portNumber)
 	{
 		GPIO_InitTypeDef port;
 		GPIO_StructInit(&port);

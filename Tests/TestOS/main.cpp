@@ -169,7 +169,7 @@ void vLedTask3 (void *pvParameters)
     vTaskDelete(NULL);
 }
 
-int main(void)
+int maindisabled(void)
 {
 	SystemInit();
 
@@ -189,7 +189,7 @@ int main(void)
     //RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,  ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 
-	SpiInterface spi(SPI1, GPIOA, GPIO_Pin_6, GPIO_Pin_7, GPIO_Pin_5);
+	SpiInterface spi(SPI1);
 
 	Port csn(GPIOA, GPIO_Pin_4);
 	Port ce (GPIOA, GPIO_Pin_3);
