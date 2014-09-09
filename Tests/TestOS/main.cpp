@@ -11,161 +11,105 @@
 #include "task.h"
 #include "queue.h"
 #include "LedInfo.h"
+#include "Motors.h"
 #include "Port.h"
 #include "SpiInterface.h"
 #include "Nrf24.h"
 #include "Button.h"
 #include "RadioLink.h"
+#include "Vector.h"
+
+QueueHandle_t TheRadioCommandsQueue;
+QueueHandle_t TheIMUDataQueue;
+QueueSetHandle_t TheStabilizerQueueSet;
+
+struct IMUData
+{
+	uint32_t Time; // Milliseconds?
+	Vector3 Gyro;
+	Vector3 Accel;
+};
 
 /*******************************************************************/
 void vFreeRTOSInitAll()
 {
-	GPIO_InitTypeDef port;
-	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-	TIM_OCInitTypeDef  TIM_OCInitStructure;
+	TheRadioCommandsQueue = xQueueCreate(1, sizeof(RadioLinkData));
 
+	TheIMUDataQueue = xQueueCreate(5, sizeof(IMUData));
 
-
-    /////////////////////////////////////////////////////
-    // LEDS
-    GPIO_StructInit(&port);
-    port.GPIO_Mode = GPIO_Mode_OUT;
-    port.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
-    port.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOD, &port);
-
-    /////////////////////////////////////////////////////
-    // PWM
-    // GPIO
-    GPIO_StructInit(&port);
-    port.GPIO_Mode = GPIO_Mode_AF;
-    port.GPIO_OType = GPIO_OType_PP;
-    port.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_11 | GPIO_Pin_13 | GPIO_Pin_14;
-    port.GPIO_Speed = GPIO_Speed_25MHz;
-    GPIO_Init(GPIOE,&port);
-
-    GPIO_PinAFConfig(GPIOE,GPIO_PinSource9,GPIO_AF_TIM1);
-    GPIO_PinAFConfig(GPIOE,GPIO_PinSource11,GPIO_AF_TIM1);
-    GPIO_PinAFConfig(GPIOE,GPIO_PinSource13,GPIO_AF_TIM1);
-    GPIO_PinAFConfig(GPIOE,GPIO_PinSource14,GPIO_AF_TIM1);
-
-    // Timer configuration
-    TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-    TIM_TimeBaseStructure.TIM_Period = 2000; // Total period = 20ms;
-    TIM_TimeBaseStructure.TIM_Prescaler =  SystemCoreClock/1000000; // 1MHz devider - timer ticks with 1MHz
-    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);
-
-    // PWM channels configuration (All identical!)
-    TIM_OCStructInit(&TIM_OCInitStructure);
-    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;
-    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-    TIM_OCInitStructure.TIM_Pulse = 0;
-    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
-    TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Set;
-
-    TIM_OC1Init(TIM1, &TIM_OCInitStructure);
-    TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
-
-    TIM_OC2Init(TIM1, &TIM_OCInitStructure);
-    TIM_OC2PreloadConfig(TIM1, TIM_OCPreload_Enable);
-
-    TIM_OC3Init(TIM1, &TIM_OCInitStructure);
-    TIM_OC3PreloadConfig(TIM1, TIM_OCPreload_Enable);
-
-    TIM_OC4Init(TIM1, &TIM_OCInitStructure);
-    TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
-
-    // Enable the timer
-    TIM_Cmd(TIM1, ENABLE);
-    // Enable the timer PWM outputs
-    TIM_CtrlPWMOutputs(TIM1, ENABLE);
-
-
-    TIM_SetCompare1(TIM1, 25);
-    TIM_SetCompare2(TIM1, 75);
-    TIM_SetCompare3(TIM1, 120);
-    TIM_SetCompare4(TIM1, 250);
-
-    /////////////////////////////////////////////////////
-    // SD card initialization
-    // GPIO
+	TheStabilizerQueueSet = xQueueCreateSet(1+5);
+	xQueueAddToSet( TheStabilizerQueueSet, TheRadioCommandsQueue );
+	xQueueAddToSet( TheStabilizerQueueSet, TheIMUDataQueue );
 }
 
 /*******************************************************************/
-void vLedTask0 (void *pvParameters)
+void vTaskRFReciever (void *pvParameters)
 {
-	uint32_t i = 100, delta = 10, step = 10;
+	RadioLink& radioLink = *((RadioLink*)pvParameters);
+	RadioLinkData data;
     while(1)
     {
-    	i += delta;
-    	TIM_SetCompare1(TIM1, i);
-    	if (i > 2000) delta = -step;
-    	if (i < 10 ) delta = +step;
-		vTaskDelay(1);
+    	if (radioLink.Update(data))
+    	{
+    		xQueueOverwrite( TheRadioCommandsQueue, &data );
+    		vTaskDelay(20 / portTICK_PERIOD_MS);
+    	}
+    	else
+    	{
+    		vTaskDelay(1 / portTICK_PERIOD_MS);
+    	}
     }
     vTaskDelete(NULL);
 }
 
-void vLedTask1 (void *pvParameters)
+void vTaskIMUReciever (void *pvParameters)
 {
-	uint32_t state;
-    while(1)
+	IMUData data;
+	while(1)
     {
-		if (state == 0)
+		// TODO: read.
+		data.Time = xTaskGetTickCount();
+		if (!xQueueSend(TheIMUDataQueue, &data, 1))
 		{
-			GPIO_SetBits(GPIOD,GPIO_Pin_13);
-			state = 1;
+			// Overflow?
 		}
-		else
-		{
-			GPIO_ResetBits(GPIOD,GPIO_Pin_13);
-			state = 0;
-		}
-		vTaskDelay(1);
+		vTaskDelay(2 / portTICK_PERIOD_MS);
     }
     vTaskDelete(NULL);
 }
 
-void vLedTask2 (void *pvParameters)
+void vTaskStabilizer (void *pvParameters)
 {
-	uint32_t state, i;
+	QueueSetMemberHandle_t xActivatedMember;
+	RadioLinkData radioData;
+	IMUData imuData;
+	Motors& motors = *((Motors*)pvParameters);
     while(1)
     {
-		if (state == 0)
-		{
-			GPIO_SetBits(GPIOD,GPIO_Pin_14);
-			state = 1;
-		}
-		else
-		{
-			GPIO_ResetBits(GPIOD,GPIO_Pin_14);
-			state = 0;
-		}
-		vTaskDelay(5);
+    	xActivatedMember = xQueueSelectFromSet(TheStabilizerQueueSet, 10 / portTICK_PERIOD_MS);
+    	if (xActivatedMember == TheRadioCommandsQueue)
+    	{
+    		xQueueReceive(TheRadioCommandsQueue, &radioData, 0 );
+    	}
+    	if (xActivatedMember == TheIMUDataQueue)
+    	{
+    		xQueueReceive(TheIMUDataQueue, &imuData, 0 );
+    	}
+    	else
+    	{
+    		// failure!
+    		continue;
+    	}
+    	// Process Data!
     }
     vTaskDelete(NULL);
 }
 
-void vLedTask3 (void *pvParameters)
+void vTaskDataLogger (void *pvParameters)
 {
-	uint32_t state, i;
     while(1)
     {
-    	taskENTER_CRITICAL();
-		if (state == 0)
-		{
-			GPIO_SetBits(GPIOD,GPIO_Pin_15);
-			state = 1;
-		}
-		else
-		{
-			GPIO_ResetBits(GPIOD,GPIO_Pin_15);
-			state = 0;
-		}
-		taskEXIT_CRITICAL();
-		taskYIELD();
+    	vTaskDelay(50 / portTICK_PERIOD_MS);
     }
     vTaskDelete(NULL);
 }
@@ -174,50 +118,35 @@ int main(void)
 {
 	SystemInit();
 
-	//RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
-	//RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-
 	LedInfo info;
 	info.RGBY(true, true, true, true);
 	Button button(GPIOA, GPIO_Pin_0);
 	while (!button.GetState());
 	info.Off();
 
-    //RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,  ENABLE);
-
-	SpiInterface spi(SPI1);
 
 	Port csn(GPIOA, GPIO_Pin_4);
+	csn.High();
 	Port ce (GPIOA, GPIO_Pin_3);
+
+	SpiInterface spi(SPI1);
 
 	Nrf24 nrf(spi, csn, ce);
 
 	RadioLink radioLink(nrf, info);
 
-	while(1)
-	{
-	info.B(true);
-	if (radioLink.Update())
-	{
-		info.G(true);
-		info.R(false);
-	}
-	else
-	{
-		info.R(true);
-		info.G(false);
-	}
-	info.B(false);
-	}
-    /*vFreeRTOSInitAll();
-    xTaskCreate(vLedTask0,(signed char*)"LedTask0", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(vLedTask1,(signed char*)"LedTask1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(vLedTask2,(signed char*)"LedTask2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(vLedTask3,(signed char*)"LedTask3", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+	Motors motors;
+
+
+	vFreeRTOSInitAll();
+    xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, &radioLink, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(vTaskIMUReciever,(char*)"IMU", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(vTaskStabilizer, (char*)"STB", configMINIMAL_STACK_SIZE, &motors, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(vTaskDataLogger, (char*)"LOG", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
-    */
+
+    // We should not be here.
+    info.RGBY(true, true, true, true);
 	while(1);
 }
 

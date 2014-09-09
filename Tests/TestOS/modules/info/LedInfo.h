@@ -1,10 +1,14 @@
 #pragma once
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_gpio.h"
+
 // Led information display
 class LedInfo{
 
 public:
   LedInfo()
 	  {
+	  	  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	  	  GPIO_InitTypeDef port;
 	  	  GPIO_StructInit(&port);
 	  	  port.GPIO_Mode = GPIO_Mode_OUT;

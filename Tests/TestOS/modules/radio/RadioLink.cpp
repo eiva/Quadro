@@ -7,8 +7,31 @@
 #include "SpiInterface.h"
 #include "Nrf24.h"
 #include "RadioLink.h"
+namespace {
+#pragma pack(push,1)
 
+struct Packet
+{
+  uint16_t THR:10;
+  uint16_t YAW:10;
+  uint16_t PTC:10;
+  uint16_t ROL:10;
+  uint8_t BT1:1;
+  uint8_t BT2:1;
+  uint8_t BT3:1;
+  uint8_t REST:5;
+};
 
+#pragma pack(pop)
+
+union PacketSerializer
+{
+  Packet data;
+  uint8_t serialized[6];
+};
+
+PacketSerializer _serializer;
+}
 
 
 	RadioLink::RadioLink(Nrf24 &nrf, LedInfo &leds):
@@ -32,16 +55,19 @@
 		_leds.Off();
 	}
 
-	bool RadioLink::Update(){
+	bool RadioLink::Update(RadioLinkData& data){
 		if (!_nrf.IsDataReady()) return false;
 		for (uint8_t i = 0; i < sizeof(Packet); ++i) _serializer.serialized[i] = 0x00;
 
 		bool status = _nrf.RXPacket(_serializer.serialized, sizeof(Packet));
-		//if (!status) return false;
-		Throttle =  _serializer.data.THR;
-		Yaw =  _serializer.data.YAW;
-		Pitch =  _serializer.data.PTC;
-		Roll =  _serializer.data.ROL;
+
+		if (!status) return false;
+
+		data.Throttle =  _serializer.data.THR;
+		data.Yaw =  _serializer.data.YAW;
+		data.Pitch =  _serializer.data.PTC;
+		data.Roll =  _serializer.data.ROL;
+
 		_nrf.ClearIRQFlags();
 		return true;
 	}
