@@ -5,13 +5,13 @@
 #define nRF24_TX_ADDR_WIDTH        5    // nRF24 TX address width
 
 class Nrf24{
-	SpiInterface &_spi;
-	Port &_csn;
-	Port &_ce;
+	SpiInterface *_spi;
+	Port *_csn;
+	Port *_ce;
 	uint8_t nRF24_RX_addr[nRF24_RX_ADDR_WIDTH];
 	//uint8_t nRF24_TX_addr[nRF24_TX_ADDR_WIDTH];
 public:
-	Nrf24(SpiInterface &spi, Port &csn, Port &ce);
+	Nrf24(SpiInterface *spi, Port *csn, Port *ce);
 
 	void SetRxAddress(uint8_t rxAddr[nRF24_RX_ADDR_WIDTH]);
 
@@ -70,9 +70,9 @@ private:
 	uint8_t WriteBuf(uint8_t reg, uint8_t *pBuf, uint8_t count);
 
 	// Chip Enable Activates RX or TX mode
-	void inline CE_L(){_ce.Low();}
-	void inline CE_H(){_ce.High();}
+	void inline CE_L(){_ce->Low();}
+	void inline CE_H(){_ce->High();}
 	// SPI Chip Select
-	void inline CSN_L(){_csn.Low();}
-	void inline CSN_H(){_csn.High();}
+	void inline CSN_L(){_csn->Low();}
+	void inline CSN_H(){_csn->High();}
 };

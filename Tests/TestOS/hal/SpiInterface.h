@@ -16,7 +16,6 @@ public:
 		_spi(spi)
 	{
 		GPIO_InitTypeDef GPIO_InitStruct;
-		SPI_InitTypeDef SPI_InitStruct;
 		GPIO_TypeDef* gpioPort;
 
 		GPIO_StructInit(&GPIO_InitStruct);

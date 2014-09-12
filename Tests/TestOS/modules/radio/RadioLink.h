@@ -7,9 +7,9 @@ struct RadioLinkData
 
 // Controls rf data link
 class RadioLink{
-	Nrf24 &_nrf;
-	LedInfo &_leds;
+	Nrf24 *_nrf;
+	LedInfo *_leds;
 public:
-	RadioLink(Nrf24 &nrf, LedInfo &leds);
+	RadioLink(Nrf24 *nrf, LedInfo *leds);
 	bool Update(RadioLinkData& data);
 };

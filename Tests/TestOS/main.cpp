@@ -30,6 +30,8 @@ struct IMUData
 	Vector3 Accel;
 };
 
+
+
 /*******************************************************************/
 void vFreeRTOSInitAll()
 {
@@ -45,18 +47,18 @@ void vFreeRTOSInitAll()
 /*******************************************************************/
 void vTaskRFReciever (void *pvParameters)
 {
-	RadioLink& radioLink = *((RadioLink*)pvParameters);
 	RadioLinkData data;
+	RadioLink *radioLink = (RadioLink*)pvParameters;
     while(1)
     {
-    	if (radioLink.Update(data))
+    	if (radioLink->Update(data))
     	{
     		xQueueOverwrite( TheRadioCommandsQueue, &data );
-    		vTaskDelay(20 / portTICK_PERIOD_MS);
+    		vTaskDelay(20);
     	}
     	else
     	{
-    		vTaskDelay(1 / portTICK_PERIOD_MS);
+    		vTaskDelay(1);
     	}
     }
     vTaskDelete(NULL);
@@ -73,7 +75,7 @@ void vTaskIMUReciever (void *pvParameters)
 		{
 			// Overflow?
 		}
-		vTaskDelay(2 / portTICK_PERIOD_MS);
+		vTaskDelay(2);
     }
     vTaskDelete(NULL);
 }
@@ -83,13 +85,14 @@ void vTaskStabilizer (void *pvParameters)
 	QueueSetMemberHandle_t xActivatedMember;
 	RadioLinkData radioData;
 	IMUData imuData;
-	Motors& motors = *((Motors*)pvParameters);
+	Motors motors;
     while(1)
     {
-    	xActivatedMember = xQueueSelectFromSet(TheStabilizerQueueSet, 10 / portTICK_PERIOD_MS);
+    	xActivatedMember = xQueueSelectFromSet(TheStabilizerQueueSet, 10);
     	if (xActivatedMember == TheRadioCommandsQueue)
     	{
     		xQueueReceive(TheRadioCommandsQueue, &radioData, 0 );
+    		motors.SetRatio(radioData.Throttle, radioData.Throttle, radioData.Throttle, radioData.Throttle);
     	}
     	if (xActivatedMember == TheIMUDataQueue)
     	{
@@ -109,7 +112,7 @@ void vTaskDataLogger (void *pvParameters)
 {
     while(1)
     {
-    	vTaskDelay(50 / portTICK_PERIOD_MS);
+    	vTaskDelay(50);
     }
     vTaskDelete(NULL);
 }
@@ -117,36 +120,36 @@ void vTaskDataLogger (void *pvParameters)
 int main(void)
 {
 	SystemInit();
-
-	LedInfo info;
-	info.RGBY(true, true, true, true);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+	LedInfo *info = new LedInfo();
+	info->RGBY(true, true, true, true);
 	Button button(GPIOA, GPIO_Pin_0);
 	while (!button.GetState());
-	info.Off();
+	info->Off();
 
 
-	Port csn(GPIOA, GPIO_Pin_4);
-	csn.High();
-	Port ce (GPIOA, GPIO_Pin_3);
+	Port* csn = new Port(GPIOA, GPIO_Pin_4);
+	csn->High();
+	Port* ce = new Port(GPIOA, GPIO_Pin_3);
 
-	SpiInterface spi(SPI1);
+	SpiInterface* spi = new SpiInterface(SPI1);
 
-	Nrf24 nrf(spi, csn, ce);
+	Nrf24* nrf = new Nrf24(spi, csn, ce);
 
-	RadioLink radioLink(nrf, info);
-
-	Motors motors;
-
+	RadioLink *radioLink = new RadioLink(nrf, info);
 
 	vFreeRTOSInitAll();
-    xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, &radioLink, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(vTaskIMUReciever,(char*)"IMU", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(vTaskStabilizer, (char*)"STB", configMINIMAL_STACK_SIZE, &motors, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(vTaskDataLogger, (char*)"LOG", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 2, NULL);
+    //xTaskCreate(vTaskIMUReciever,(char*)"IMU", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(vTaskStabilizer, (char*)"STB", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+    //xTaskCreate(vTaskDataLogger, (char*)"LOG", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
 
     // We should not be here.
-    info.RGBY(true, true, true, true);
+    info->RGBY(true, true, true, true);
 	while(1);
 }
 
@@ -181,6 +184,10 @@ void vApplicationStackOverflowHook( xTaskHandle pxTask, signed char *pcTaskName 
 /*******************************************************************/
 void vApplicationTickHook( void )
 {
+}
+
+void _exit(int status){
+	while(1);
 }
 
 }

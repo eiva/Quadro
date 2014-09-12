@@ -58,7 +58,7 @@
 #define RF_TRANSMIT_MODE 0x0F
 
 
-Nrf24::Nrf24(SpiInterface &spi, Port &csn, Port &ce):
+Nrf24::Nrf24(SpiInterface *spi, Port *csn, Port *ce):
 	_spi(spi),
 	_csn(csn),
 	_ce(ce)
@@ -109,7 +109,7 @@ void Nrf24::RXMode(uint8_t payload, uint8_t channel) {
 	RWReg(nRF24_CMD_WREG | nRF24_REG_STATUS, (1 << 5) | (1 << 4));
 
 	CSN_L();
-	_spi.ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
+	_spi->ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
 	CSN_H();
 }
 
@@ -139,7 +139,7 @@ bool Nrf24::RXPacket(uint8_t* pBuf, uint8_t RX_PAYLOAD) {
     		ReadBuf(nRF24_CMD_R_RX_PAYLOAD,pBuf,RX_PAYLOAD); // read received payload from RX FIFO buffer
     	//}
     	CSN_L();
-		_spi.ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
+		_spi->ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
 		CSN_H();
 		RWReg(nRF24_CMD_WREG | nRF24_REG_STATUS,status | 0x70); // Clear RX_DR, TX_DS, MAX_RT flags
 	    //return nRF24_MASK_RX_DR;
@@ -148,7 +148,7 @@ bool Nrf24::RXPacket(uint8_t* pBuf, uint8_t RX_PAYLOAD) {
 
     // Some banana happens
     CSN_L();
-    _spi.ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
+    _spi->ReadWrite(nRF24_CMD_FLUSH_RX); // Flush RX FIFO buffer
     CSN_H();
 	RWReg(nRF24_CMD_WREG | nRF24_REG_STATUS,status | 0x70); // Clear RX_DR, TX_DS, MAX_RT flags
     return false;
@@ -172,8 +172,8 @@ void Nrf24::ClearIRQFlags() {
 		uint8_t status;
 
 		CSN_L();
-		status = _spi.ReadWrite(reg); // Select register
-		_spi.ReadWrite(value); // Write value to register
+		status = _spi->ReadWrite(reg); // Select register
+		_spi->ReadWrite(value); // Write value to register
 		CSN_H();
 
 		return status;
@@ -187,8 +187,8 @@ void Nrf24::ClearIRQFlags() {
 		uint8_t value;
 
 		CSN_L();
-		_spi.ReadWrite(reg);
-		value = _spi.ReadWrite(0x00);
+		_spi->ReadWrite(reg);
+		value = _spi->ReadWrite(0x00);
 		CSN_H();
 
 		return value;
@@ -204,8 +204,8 @@ void Nrf24::ClearIRQFlags() {
 		uint8_t status,i;
 
 		CSN_L();
-		status = _spi.ReadWrite(reg);
-		for (i = 0; i < count; i++) pBuf[i] = _spi.ReadWrite(0);
+		status = _spi->ReadWrite(reg);
+		for (i = 0; i < count; i++) pBuf[i] = _spi->ReadWrite(0);
 		CSN_H();
 
 		return status;
@@ -221,8 +221,8 @@ void Nrf24::ClearIRQFlags() {
 		uint8_t status,i;
 
 		CSN_L();
-		status = _spi.ReadWrite(reg);
-		for (i = 0; i < count; i++) _spi.ReadWrite(*pBuf++);
+		status = _spi->ReadWrite(reg);
+		for (i = 0; i < count; i++) _spi->ReadWrite(*pBuf++);
 		CSN_H();
 
 		return status;

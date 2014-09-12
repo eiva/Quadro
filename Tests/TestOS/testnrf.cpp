@@ -10,6 +10,7 @@
 #include "Nrf24.h"
 #include "Button.h"
 
+/*
 int mainCheckNRF(void)
 {
 	SystemInit();
@@ -79,7 +80,8 @@ int mainCheckNRF(void)
 	}
 	info.B(false);
 	}
-	 */
+
 
 	while(1);
 }
+*/
