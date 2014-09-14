@@ -17,6 +17,7 @@
 #include "Vector.h"
 #include "logger.h"
 #include "stdlib.h"
+#include "MadwickAHRS.h"
 
 QueueHandle_t TheRadioCommandsQueue;
 QueueHandle_t TheIMUDataQueue;
@@ -25,9 +26,7 @@ QueueSetHandle_t TheStabilizerQueueSet;
 
 struct IMUData
 {
-	uint32_t Time; // Milliseconds?
-	Vector3 Gyro;
-	Vector3 Accel;
+	Vector3 EulierAngles;
 };
 
 
@@ -36,7 +35,7 @@ void vFreeRTOSInitAll()
 {
 	TheRadioCommandsQueue = xQueueCreate(1, sizeof(RadioLinkData));
 
-	TheIMUDataQueue = xQueueCreate(5, sizeof(IMUData));
+	TheIMUDataQueue = xQueueCreate(1, sizeof(IMUData));
 
 	TheLogQueue = xQueueCreate(1, sizeof(LogData));
 
@@ -65,52 +64,87 @@ void vTaskRFReciever (void *pvParameters)
     vTaskDelete(NULL);
 }
 
-void vTaskIMUReciever (void *pvParameters)
+void vTaskIMUProcessor (void *pvParameters)
 {
 	IMUData data;
+	MadwickAHRS ahrs;
+	float lastTick = xTaskGetTickCount();
 	while(1)
     {
-		// TODO: read.
-		data.Time = xTaskGetTickCount();
-		if (!xQueueSend(TheIMUDataQueue, &data, 1))
-		{
-			// Overflow?
-		}
+		// Receive data from IMU;
+		// I still dont have one, so just dummies.
 		vTaskDelay(2);
+
+		const float currentTick = xTaskGetTickCount();
+
+		float gx = 0, gy = 0, gz = 0;
+		float ax = 0, ay = 0, az = -1;
+		float mx = 0, my = 0, mz = 0;
+
+		// dT calculation
+		const float dT = (currentTick - lastTick) / 1000.0f; // Seconds
+		lastTick = currentTick;
+
+		// AHRS update
+		ahrs.MadgwickAHRSupdate(dT, gx, gy, gz, ax, ay, az, mx, my, mz);
+
+		// Euler calculation...
+
+		data.EulierAngles.X = ahrs.q0;
+		data.EulierAngles.Y = ahrs.q1;
+		data.EulierAngles.Z = ahrs.q2;
+		// Post to commander unit
+		xQueueOverwrite(TheIMUDataQueue, &data);
+
     }
     vTaskDelete(NULL);
 }
 
-void vTaskStabilizer (void *pvParameters)
+void vTaskCommander (void *pvParameters)
 {
 	QueueSetMemberHandle_t xActivatedMember;
 	RadioLinkData radioData;
 	IMUData imuData;
 	Motors motors;
 	LogData log;
+	bool imuReady = false;
+	bool radioReady = false;
     while(1)
     {
     	xActivatedMember = xQueueSelectFromSet(TheStabilizerQueueSet, 10);
     	if (xActivatedMember == TheRadioCommandsQueue)
     	{
     		xQueueReceive(TheRadioCommandsQueue, &radioData, 0 );
-    		motors.SetRatio(radioData.Throttle, radioData.Throttle, radioData.Throttle, radioData.Throttle);
-    		log.Timer = xTaskGetTickCount();
-    		log.InputThrottle = radioData.Throttle;
-    		log.InputYaw = radioData.Yaw;
-    		log.InputPitch = radioData.Pitch;
-    		log.InputRoll = radioData.Roll;
-    		xQueueOverwrite( TheLogQueue, &log );
+    		radioReady = true;
     	}
     	if (xActivatedMember == TheIMUDataQueue)
     	{
     		xQueueReceive(TheIMUDataQueue, &imuData, 0 );
+    		imuReady = true;
     	}
     	else
     	{
     		// failure!
     		continue;
     	}
+    	if (!imuReady || !radioReady)
+    	{
+    		// Wait for first complete data.
+    		continue;
+    	}
+
+    	motors.SetRatio(radioData.Throttle, radioData.Throttle, radioData.Throttle, radioData.Throttle);
+
+    	log.Timer = xTaskGetTickCount();
+    	log.InputThrottle = radioData.Throttle;
+    	log.InputYaw = radioData.Yaw;
+    	log.InputPitch = radioData.Pitch;
+    	log.InputRoll = radioData.Roll;
+    	log.Yaw = imuData.EulierAngles.Z;
+    	log.Roll = imuData.EulierAngles.Y;
+    	log.Pitch = imuData.EulierAngles.X;
+
+    	xQueueOverwrite( TheLogQueue, &log );
     	// Process Data!
     }
     vTaskDelete(NULL);
@@ -158,9 +192,9 @@ int main(void)
 	Logger *logger = new Logger(info, button);
 
 	vFreeRTOSInitAll();
-    xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 2, NULL);
-    //xTaskCreate(vTaskIMUReciever,(char*)"IMU", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(vTaskStabilizer, (char*)"STB", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 4, NULL);
+    xTaskCreate(vTaskIMUProcessor,(char*)"STB", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(vTaskCommander,  (char*)"CMD", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
     xTaskCreate(vTaskDataLogger, (char*)"LOG", configMINIMAL_STACK_SIZE, logger, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
 
@@ -170,59 +204,10 @@ int main(void)
 }
 
 
-void *operator new(size_t size)
-{
-	return malloc(size);
-}
-
-void *operator new[](size_t size)
-{
-	return malloc(size);
-}
-
-void operator delete(void *p)
-{
-	free(p);
-}
-
-void operator delete[](void *p)
-{
-	free(p);
-}
-
 
 extern "C"
 {
-/*******************************************************************/
-void vApplicationIdleHook( void )
-{
-}
 
-
-
-/*******************************************************************/
-void vApplicationMallocFailedHook( void )
-{
-    for( ;; );
-}
-
-
-
-/*******************************************************************/
-void vApplicationStackOverflowHook( xTaskHandle pxTask, signed char *pcTaskName )
-{
-    ( void ) pcTaskName;
-    ( void ) pxTask;
-
-    for( ;; );
-}
-
-
-
-/*******************************************************************/
-void vApplicationTickHook( void )
-{
-}
 
 void _exit(int status){
 	while(1);

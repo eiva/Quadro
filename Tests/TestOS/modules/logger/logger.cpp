@@ -18,6 +18,8 @@ Logger::Logger(LedInfo *info, Button *button):
 	if (SD_Detect() != SD_PRESENT)
 	{
 		_isDetected = false;
+		_ledInfo->Y(false);
+		_ledInfo->G(false);
 		return;
 	}
 	FRESULT FRes;
@@ -70,10 +72,12 @@ void Logger::Log(const LogData& data)
 	}
 
 	_ledInfo->Y(true);
-	const char* format = "%U %D %D %D %D\r\n";
+	//                    dT iT iY iR iP sY sR sP
+	const char* format = "%U %U %U %U %U %D %D %D\r\n";
 		f_printf(_file, format,
 				data.Timer,
-				data.InputThrottle, data.InputYaw, data.InputPitch, data.InputRoll);
+				data.InputThrottle, data.InputYaw, data.InputPitch, data.InputRoll,
+				ftoi(data.Yaw), ftoi(data.Roll), ftoi(data.Pitch));
 	_ledInfo->Y(false);
 	/*
 	const char* format = "%U %D %D %D %D %D %D %D %D %D %D %D %D %D %D %D %D %D %U %U %U %U\n";

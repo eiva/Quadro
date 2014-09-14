@@ -30,7 +30,7 @@
         <Option name="nostartfiles" value="0"/>
         <Option name="LTO" value="0"/>
         <Option name="IsNewStartupCode" value="1"/>
-        <Option name="Library" value="Use nano C Library"/>
+        <Option name="Library" value="Use base C Library"/>
         <Option name="UserEditLinker" value="-lstdc++; "/>
         <Option name="DiscardUnusedSections" value="1"/>
         <Option name="Printf" value="0"/>
@@ -133,27 +133,28 @@
     <File name="math/Vector.h" path="math/Vector.h" type="1"/>
     <File name="cmsis_boot/system_stm32f4xx.c" path="cmsis_boot/system_stm32f4xx.c" type="1"/>
     <File name="cmsis_lib/include/stm32f4xx_spi.h" path="cmsis_lib/include/stm32f4xx_spi.h" type="1"/>
+    <File name="cpp_impl.cpp" path="cpp_impl.cpp" type="1"/>
     <File name="testmotor.cpp" path="math/testmotor.cpp" type="1"/>
     <File name="fatfs_lib/source/xprintf.c" path="fatfs_lib/source/xprintf.c" type="1"/>
-    <File name="freertos/include/projdefs.h" path="freertos/include/projdefs.h" type="1"/>
     <File name="modules/motors" path="" type="2"/>
+    <File name="freertos/include/projdefs.h" path="freertos/include/projdefs.h" type="1"/>
     <File name="cmsis" path="" type="2"/>
     <File name="fatfs_lib/include/ff_support.h" path="fatfs_lib/include/ff_support.h" type="1"/>
     <File name="cmsis_lib" path="" type="2"/>
     <File name="freertos/source/croutine.c" path="freertos/source/croutine.c" type="1"/>
     <File name="main.cpp" path="main.cpp" type="1"/>
     <File name="cmsis_lib/include/stm32f4xx_rtc.h" path="cmsis_lib/include/stm32f4xx_rtc.h" type="1"/>
-    <File name="fatfs_lib/include/ffconf.h" path="fatfs_lib/include/ffconf.h" type="1"/>
     <File name="freertos/include/croutine.h" path="freertos/include/croutine.h" type="1"/>
-    <File name="modules/radio" path="" type="2"/>
+    <File name="fatfs_lib/include/ffconf.h" path="fatfs_lib/include/ffconf.h" type="1"/>
     <File name="cmsis_lib/include/misc.h" path="cmsis_lib/include/misc.h" type="1"/>
+    <File name="modules/radio" path="" type="2"/>
     <File name="modules/sensors" path="" type="2"/>
     <File name="fatfs_lib/include/diskio.h" path="fatfs_lib/include/diskio.h" type="1"/>
     <File name="freertos/source" path="" type="2"/>
     <File name="modules/radio/RadioLink.cpp" path="modules/radio/RadioLink.cpp" type="1"/>
     <File name="modules/motors/Motors.h" path="modules/motors/Motors.h" type="1"/>
-    <File name="freertos/source/heap_2.c" path="freertos/source/heap_2.c" type="1"/>
     <File name="hal/SpiInterface.h" path="hal/SpiInterface.h" type="1"/>
+    <File name="freertos/source/heap_2.c" path="freertos/source/heap_2.c" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_gpio.c" path="cmsis_lib/source/stm32f4xx_gpio.c" type="1"/>
     <File name="cmsis_lib/include/stm32f4xx_i2c.h" path="cmsis_lib/include/stm32f4xx_i2c.h" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_dma.c" path="cmsis_lib/source/stm32f4xx_dma.c" type="1"/>
@@ -171,15 +172,18 @@
     <File name="modules/info" path="" type="2"/>
     <File name="cmsis_lib/source/stm32f4xx_dbgmcu.c" path="cmsis_lib/source/stm32f4xx_dbgmcu.c" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_crc.c" path="cmsis_lib/source/stm32f4xx_crc.c" type="1"/>
-    <File name="cmsis_lib/source/misc.c" path="cmsis_lib/source/misc.c" type="1"/>
-    <File name="modules" path="" type="2"/>
+    <File name="RTOSRoutines.c" path="RTOSRoutines.c" type="1"/>
     <File name="fatfs_lib/source/ff.c" path="fatfs_lib/source/ff.c" type="1"/>
-    <File name="cmsis_lib/include/stm32f4xx_tim.h" path="cmsis_lib/include/stm32f4xx_tim.h" type="1"/>
+    <File name="modules" path="" type="2"/>
+    <File name="cmsis_lib/source/misc.c" path="cmsis_lib/source/misc.c" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_adc.c" path="cmsis_lib/source/stm32f4xx_adc.c" type="1"/>
+    <File name="cmsis_lib/include/stm32f4xx_tim.h" path="cmsis_lib/include/stm32f4xx_tim.h" type="1"/>
+    <File name="math/MadwickAHRS.cpp" path="math/MadwickAHRS.cpp" type="1"/>
     <File name="fatfs_lib/include/sdio_sd.h" path="fatfs_lib/include/sdio_sd.h" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_i2c.c" path="cmsis_lib/source/stm32f4xx_i2c.c" type="1"/>
     <File name="cmsis_lib/source" path="" type="2"/>
     <File name="hal/Port.h" path="hal/Port.h" type="1"/>
+    <File name="tasks" path="" type="2"/>
     <File name="stm32f4_int.c" path="stm32f4_int.c" type="1"/>
     <File name="cmsis_boot/stm32f4xx_conf.h" path="cmsis_boot/stm32f4xx_conf.h" type="1"/>
     <File name="modules/radio/RadioLink.h" path="modules/radio/RadioLink.h" type="1"/>
@@ -189,14 +193,14 @@
     <File name="freertos/include/mpu_wrappers.h" path="freertos/include/mpu_wrappers.h" type="1"/>
     <File name="freertos/include/list.h" path="freertos/include/list.h" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_sdio.c" path="cmsis_lib/source/stm32f4xx_sdio.c" type="1"/>
-    <File name="cmsis_lib/include/stm32f4xx_sdio.h" path="cmsis_lib/include/stm32f4xx_sdio.h" type="1"/>
     <File name="fatfs_lib/source" path="" type="2"/>
-    <File name="freertos/include/StackMacros.h" path="freertos/include/StackMacros.h" type="1"/>
+    <File name="cmsis_lib/include/stm32f4xx_sdio.h" path="cmsis_lib/include/stm32f4xx_sdio.h" type="1"/>
     <File name="fatfs_lib/include/integer.h" path="fatfs_lib/include/integer.h" type="1"/>
-    <File name="cmsis_lib/include/stm32f4xx_exti.h" path="cmsis_lib/include/stm32f4xx_exti.h" type="1"/>
+    <File name="freertos/include/StackMacros.h" path="freertos/include/StackMacros.h" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_exti.c" path="cmsis_lib/source/stm32f4xx_exti.c" type="1"/>
-    <File name="testnrf.cpp" path="testnrf.cpp" type="1"/>
+    <File name="cmsis_lib/include/stm32f4xx_exti.h" path="cmsis_lib/include/stm32f4xx_exti.h" type="1"/>
     <File name="freertos/include/timers.h" path="freertos/include/timers.h" type="1"/>
+    <File name="testnrf.cpp" path="testnrf.cpp" type="1"/>
     <File name="modules/logger/logger.cpp" path="modules/logger/logger.cpp" type="1"/>
     <File name="freertos/include/task.h" path="freertos/include/task.h" type="1"/>
     <File name="fatfs_lib/include/ff_rtc_if.h" path="fatfs_lib/include/ff_rtc_if.h" type="1"/>
@@ -206,19 +210,21 @@
     <File name="freertos" path="" type="2"/>
     <File name="freertos/source/list.c" path="freertos/source/list.c" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_tim.c" path="cmsis_lib/source/stm32f4xx_tim.c" type="1"/>
-    <File name="cmsis_lib/include/stm32f4xx_gpio.h" path="cmsis_lib/include/stm32f4xx_gpio.h" type="1"/>
     <File name="math/Helpers.h" path="math/Helpers.h" type="1"/>
-    <File name="freertos/source/port.c" path="freertos/source/port.c" type="1"/>
+    <File name="cmsis_lib/include/stm32f4xx_gpio.h" path="cmsis_lib/include/stm32f4xx_gpio.h" type="1"/>
     <File name="syscalls" path="" type="2"/>
+    <File name="freertos/source/port.c" path="freertos/source/port.c" type="1"/>
+    <File name="math/MadwickAHRS.h" path="math/MadwickAHRS.h" type="1"/>
     <File name="freertos/include/queue.h" path="freertos/include/queue.h" type="1"/>
     <File name="hal/Button.h" path="hal/Button.h" type="1"/>
     <File name="cmsis_lib/include" path="" type="2"/>
-    <File name="math" path="" type="2"/>
     <File name="fatfs_lib/source/sdio_sd.c" path="fatfs_lib/source/sdio_sd.c" type="1"/>
+    <File name="math" path="" type="2"/>
     <File name="modules/logger" path="" type="2"/>
     <File name="FreeRTOSConfig.h" path="FreeRTOSConfig.h" type="1"/>
     <File name="freertos/source/queue.c" path="freertos/source/queue.c" type="1"/>
-    <File name="freertos/include/event_groups.h" path="freertos/include/event_groups.h" type="1"/>
     <File name="freertos/include" path="" type="2"/>
+    <File name="freertos/include/event_groups.h" path="freertos/include/event_groups.h" type="1"/>
+    <File name="tasks/IMUProcessor" path="" type="2"/>
   </Files>
 </Project>
