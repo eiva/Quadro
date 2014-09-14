@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Project version="2G - 1.7.6" name="TestOS">
-  <Target name="TestOS" isCurrent="1">
+<Project version="2G - 1.7.6" name="FlightController">
+  <Target name="FlightController" isCurrent="1">
     <Device manufacturerId="9" manufacturerName="ST" chipId="344" chipName="STM32F407VG" boardId="" boardName=""/>
     <BuildOption>
       <Compile>
@@ -41,12 +41,12 @@
           <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
           <Memory name="IRAM2" type="ReadWrite" size="0x00010000" startValue="0x10000000"/>
         </MemoryAreas>
-        <LocateLinkFile path="c:/coide/configuration/programdata/testos/arm-gcc-link.ld" type="0"/>
+        <LocateLinkFile path="arm-gcc-link.ld" type="0"/>
       </Link>
       <Output>
         <Option name="OutputFileType" value="0"/>
         <Option name="Path" value="./"/>
-        <Option name="Name" value="TestOS"/>
+        <Option name="Name" value="FlightController"/>
         <Option name="HEX" value="1"/>
         <Option name="BIN" value="1"/>
       </Output>
