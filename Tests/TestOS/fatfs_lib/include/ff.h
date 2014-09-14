@@ -110,7 +110,7 @@ typedef struct {
 
 /* File object structure (FIL) */
 
-typedef struct {
+typedef struct _FIL {
 	FATFS*	fs;				/* Pointer to the related file system object (**do not change order**) */
 	WORD	id;				/* Owner file system mount ID (**do not change order**) */
 	BYTE	flag;			/* Status flags */

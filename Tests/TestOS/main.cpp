@@ -1,9 +1,6 @@
-#include "stm32f4xx.h"
+
 #include "stm32f4xx_conf.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_rcc.h"
-#include "stm32f4xx_tim.h"
-#include "system_stm32f4xx.h"
+
 #include "portmacro.h"
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
@@ -18,9 +15,12 @@
 #include "Button.h"
 #include "RadioLink.h"
 #include "Vector.h"
+#include "logger.h"
+#include "stdlib.h"
 
 QueueHandle_t TheRadioCommandsQueue;
 QueueHandle_t TheIMUDataQueue;
+QueueHandle_t TheLogQueue;
 QueueSetHandle_t TheStabilizerQueueSet;
 
 struct IMUData
@@ -31,7 +31,6 @@ struct IMUData
 };
 
 
-
 /*******************************************************************/
 void vFreeRTOSInitAll()
 {
@@ -39,9 +38,11 @@ void vFreeRTOSInitAll()
 
 	TheIMUDataQueue = xQueueCreate(5, sizeof(IMUData));
 
+	TheLogQueue = xQueueCreate(1, sizeof(LogData));
+
 	TheStabilizerQueueSet = xQueueCreateSet(1+5);
-	xQueueAddToSet( TheStabilizerQueueSet, TheRadioCommandsQueue );
-	xQueueAddToSet( TheStabilizerQueueSet, TheIMUDataQueue );
+	xQueueAddToSet( TheRadioCommandsQueue, TheStabilizerQueueSet );
+	xQueueAddToSet( TheIMUDataQueue, TheStabilizerQueueSet );
 }
 
 /*******************************************************************/
@@ -86,6 +87,7 @@ void vTaskStabilizer (void *pvParameters)
 	RadioLinkData radioData;
 	IMUData imuData;
 	Motors motors;
+	LogData log;
     while(1)
     {
     	xActivatedMember = xQueueSelectFromSet(TheStabilizerQueueSet, 10);
@@ -93,6 +95,12 @@ void vTaskStabilizer (void *pvParameters)
     	{
     		xQueueReceive(TheRadioCommandsQueue, &radioData, 0 );
     		motors.SetRatio(radioData.Throttle, radioData.Throttle, radioData.Throttle, radioData.Throttle);
+    		log.Timer = xTaskGetTickCount();
+    		log.InputThrottle = radioData.Throttle;
+    		log.InputYaw = radioData.Yaw;
+    		log.InputPitch = radioData.Pitch;
+    		log.InputRoll = radioData.Roll;
+    		xQueueOverwrite( TheLogQueue, &log );
     	}
     	if (xActivatedMember == TheIMUDataQueue)
     	{
@@ -110,9 +118,13 @@ void vTaskStabilizer (void *pvParameters)
 
 void vTaskDataLogger (void *pvParameters)
 {
-    while(1)
+	Logger *logger = (Logger*)pvParameters;
+    LogData data;
+	while(1)
     {
-    	vTaskDelay(50);
+		xQueueReceive(TheLogQueue, &data, portMAX_DELAY  );
+		logger->Log(data); // Extra slow!
+
     }
     vTaskDelete(NULL);
 }
@@ -141,17 +153,41 @@ int main(void)
 
 	RadioLink *radioLink = new RadioLink(nrf, info);
 
+	Logger *logger = new Logger();
+
 	vFreeRTOSInitAll();
     xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 2, NULL);
     //xTaskCreate(vTaskIMUReciever,(char*)"IMU", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(vTaskStabilizer, (char*)"STB", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-    //xTaskCreate(vTaskDataLogger, (char*)"LOG", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(vTaskDataLogger, (char*)"LOG", configMINIMAL_STACK_SIZE, logger, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
 
     // We should not be here.
     info->RGBY(true, true, true, true);
 	while(1);
 }
+
+
+void *operator new(size_t size)
+{
+	return malloc(size);
+}
+
+void *operator new[](size_t size)
+{
+	return malloc(size);
+}
+
+void operator delete(void *p)
+{
+	free(p);
+}
+
+void operator delete[](void *p)
+{
+	free(p);
+}
+
 
 extern "C"
 {

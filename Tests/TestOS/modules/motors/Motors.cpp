@@ -1,14 +1,11 @@
-#include "stm32f4xx.h"
 #include "stm32f4xx_conf.h"
-#include "stm32f4xx_gpio.h"
-#include "stm32f4xx_tim.h"
-#include "stm32f4xx_rcc.h"
+
 
 #include "Motors.h"
 #include "Helpers.h"
 
 
-Motors::Motors() : _min(700), _max(1500)
+Motors::Motors() : _min(850), _max(2000)
 {
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,  ENABLE);

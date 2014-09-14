@@ -85,7 +85,7 @@ public:
       const float dy = v2.Y - v1.Y;
       const float dz = v2.Z - v1.Z;
 
-      return sqrt(dx * dx + dy * dy + dz * dz);
+      return sqrtf(dx * dx + dy * dy + dz * dz);
    }
    // ------------ Overloaded operators ------------
 

@@ -511,7 +511,7 @@ SD_Error SD_Init(void)
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOD | SD_DETECT_GPIO_CLK, ENABLE);
 
   /* SDIO Peripheral Low Level Init */
-  SD_LowLevel_Init();
+  //SD_LowLevel_Init();
 
   /* Enable the SDIO APB2 Clock */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_SDIO, ENABLE);
@@ -636,10 +636,9 @@ uint8_t SD_Detect(void)
   __IO uint8_t status = SD_PRESENT;
 
   /*!< Check GPIO to detect SD */
-  if (GPIO_ReadInputDataBit(SD_DETECT_GPIO_PORT, SD_DETECT_PIN) != Bit_RESET)
+  if (GPIO_ReadInputDataBit(SD_DETECT_GPIO_PORT, SD_DETECT_PIN) == Bit_SET)
   {
-    //status = SD_NOT_PRESENT;
-      status = SD_PRESENT;
+    status = SD_NOT_PRESENT;
   }
   return status;
 }
