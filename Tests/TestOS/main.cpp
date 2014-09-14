@@ -138,8 +138,10 @@ int main(void)
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 	LedInfo *info = new LedInfo();
 	info->RGBY(true, true, true, true);
-	Button button(GPIOA, GPIO_Pin_0);
-	while (!button.GetState());
+
+	Button *button = new Button(GPIOA, GPIO_Pin_0);
+	while (!button->GetState());
+	while (button->GetState());
 	info->Off();
 
 
@@ -153,7 +155,7 @@ int main(void)
 
 	RadioLink *radioLink = new RadioLink(nrf, info);
 
-	Logger *logger = new Logger();
+	Logger *logger = new Logger(info, button);
 
 	vFreeRTOSInitAll();
     xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 2, NULL);

@@ -13,13 +13,21 @@ struct LogData
 	uint16_t Motor1, Motor2, Motor3, Motor4; // Motors output.
 };
 
-typedef struct _FIL FIL; // Forward declaration
+// Forward declarations
+typedef struct _FIL FIL;
+class Button;
+class LedInfo;
 
 class Logger
 {
 	bool _isDetected;
+	bool _isMounted;
 	FIL* _file;
+	LedInfo *_ledInfo;
+	Button *_button; // If button pressed - closes files, unmount
 public:
-	Logger();
+	Logger(LedInfo *info, Button *button);
 	void Log(const LogData& data);
+private:
+	void mount();
 };

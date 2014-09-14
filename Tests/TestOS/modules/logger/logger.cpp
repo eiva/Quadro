@@ -3,9 +3,17 @@
 #include "sdio_sd.h"
 #include "ff.h"
 #include "logger.h"
+#include "Button.h"
+#include "LedInfo.h"
 
-Logger::Logger()
+Logger::Logger(LedInfo *info, Button *button):
+ _ledInfo(info),
+ _button(button),
+ _isMounted(false)
 {
+	_file = new FIL();
+	_ledInfo->Y(true);
+	_ledInfo->G(true);
 	SD_LowLevel_Init();
 	if (SD_Detect() != SD_PRESENT)
 	{
@@ -22,15 +30,14 @@ Logger::Logger()
 	if (FRes != RES_OK) {_isDetected = false; return;};
 
 	_isDetected = true;
-	/*FRes = f_write(_file, buffer, 512*2, &index);
-	if (FRes != RES_OK) {_isDetected = false; return;};
+	_isMounted = true;
+	_ledInfo->Y(false);
+	_ledInfo->G(false);
+}
 
+void Logger::mount()
+{
 
-		FRes = f_close(&File);
-		if (FRes != RES_OK) {_isDetected = false; return;};
-
-
-		f_mount(NULL, "", 0);*/
 }
 
 inline int16_t ftoi(const float input)
@@ -44,10 +51,30 @@ void Logger::Log(const LogData& data)
 	{
 		return;
 	}
-	const char* format = "%U %D %D %D %D\n";
+	if (_button->GetState())
+	{
+		if (_isMounted)
+		{
+			_ledInfo->Y(true);
+			f_close(_file);
+			f_mount(NULL, "", 0);
+			delete _file;
+			_isMounted = false;
+			_ledInfo->Y(false);
+		}
+	}
+
+	if (!_isMounted)
+	{
+		return;
+	}
+
+	_ledInfo->Y(true);
+	const char* format = "%U %D %D %D %D\r\n";
 		f_printf(_file, format,
 				data.Timer,
 				data.InputThrottle, data.InputYaw, data.InputPitch, data.InputRoll);
+	_ledInfo->Y(false);
 	/*
 	const char* format = "%U %D %D %D %D %D %D %D %D %D %D %D %D %D %D %D %D %D %U %U %U %U\n";
 	f_printf(_file, format,

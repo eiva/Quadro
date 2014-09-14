@@ -17,6 +17,8 @@ class Button
 		}
 		// True - on. False - off.
 		inline bool GetState(){
-			return GPIO_ReadInputDataBit(_gpioPort, _portNumber) == SET;
+			return GPIO_ReadInputDataBit(_gpioPort, _portNumber) == SET
+				&& GPIO_ReadInputDataBit(_gpioPort, _portNumber) == SET
+				&& GPIO_ReadInputDataBit(_gpioPort, _portNumber) == SET;
 		}
 };
