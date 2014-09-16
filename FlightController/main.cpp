@@ -133,7 +133,7 @@ void vTaskCommander (void *pvParameters)
     		continue;
     	}
 
-    	motors.SetRatio(radioData.Throttle, radioData.Throttle, radioData.Throttle, radioData.Throttle);
+    	motors.SetRatio(radioData.Throttle, radioData.Yaw, radioData.Pitch, radioData.Roll);
 
     	log.Timer = xTaskGetTickCount();
     	log.InputThrottle = radioData.Throttle;
@@ -163,7 +163,7 @@ void vTaskDataLogger (void *pvParameters)
     vTaskDelete(NULL);
 }
 
-int main(void)
+int maindisabled111(void)
 {
 	SystemInit();
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);

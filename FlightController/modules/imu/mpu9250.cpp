@@ -1,11 +1,8 @@
-#include <string.h>
-#include <stm32f10x.h>
-#include <stm32f10x_gpio.h>
-#include <stm32f10x_spi.h>
-#include "Utils.h"
+#include "stm32f4xx_conf.h"
 #include "Port.h"
 #include "SpiInterface.h"
 #include "mpu9250.h"
+#include <string.h>
 
 /*====================================================================================================*/
 /*====================================================================================================*/
@@ -174,10 +171,11 @@
 #define MPU6500_ZA_OFFSET_L         ((uint8_t)0x7E)
 
 /*====================================================================================================*/
-Mpu9250::Mpu9250(SpiInterface& spiInterface, Port& ncsPort):
-	_spiInterface(spiInterface),_ncsPort(ncsPort){
-	_ncsPort.High();
-	Delay(1);
+Mpu9250::Mpu9250(SpiInterface* spiInterface, Port* ncsPort):
+	_spiInterface(spiInterface),_ncsPort(ncsPort)
+{
+	_ncsPort->High();
+
 	const int MPU9250_InitRegNum = 10;
 	uint8_t MPU6500_Init_Data[MPU9250_InitRegNum][2] = {
 	      {0x80, MPU6500_PWR_MGMT_1},     // Reset Device
@@ -194,8 +192,9 @@ Mpu9250::Mpu9250(SpiInterface& spiInterface, Port& ncsPort):
 	    };
 
 	  for(uint8_t i=0; i<MPU9250_InitRegNum; i++) {
+		int j;
+		for(j = 0; j< 10000; ++j);
 	    WriteReg(MPU6500_Init_Data[i][1], MPU6500_Init_Data[i][0]);
-	    Delay(1);
 	  }
 }
 
@@ -213,9 +212,33 @@ void Mpu9250::Read( uint8_t ReadBuf[14])
   // Read 14 bytes from MPU6500_ACCEL_XOUT_H.
   ReadRegs(MPU6500_ACCEL_XOUT_H, ReadBuf, 14);
 }
-/*void MPU9250_Config( void );
-void MPU9250_Init( void );
-u8   MPU9250_Check( void );
-void MPU9250_Read( u8 *ReadBuf );*/
+
+uint8_t Mpu9250::ReadReg( uint8_t ReadAddr )
+{
+	  _ncsPort->Low();//IMU_CSM = 0;
+	  //SPI_RW(SPIx, 0x80 | ReadAddr);
+	  //*ReadData = SPI_RW(SPIx, 0xFF);
+	  _spiInterface->ReadWrite(0x80 | ReadAddr);
+	  uint8_t data = _spiInterface->ReadWrite(0xFF);
+	  _ncsPort->High();//IMU_CSM = 1;
+	  return data;
+	}
+
+	void Mpu9250::WriteReg( uint8_t WriteAddr, uint8_t WriteData )
+	{
+	  _ncsPort->Low();//IMU_CSM = 0;
+	  _spiInterface->ReadWrite(WriteAddr);
+	  _spiInterface->ReadWrite(WriteData);
+	  _ncsPort->High();//IMU_CSM = 1;
+	}
+
+	void Mpu9250::ReadRegs( uint8_t ReadAddr, uint8_t *ReadBuf, uint8_t Bytes )
+	{
+	  _ncsPort->Low();//IMU_CSM = 0;
+	  _spiInterface->ReadWrite(0x80 | ReadAddr);
+	  for(uint8_t i=0; i<Bytes; i++)
+	    ReadBuf[i] = _spiInterface->ReadWrite(0xFF);
+	  _ncsPort->High();//IMU_CSM = 1;
+	}
 /*====================================================================================================*/
 /*====================================================================================================*/

@@ -18,3 +18,5 @@
 #define radians(deg) ((deg)*DEG_TO_RAD)
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
+
+#define Byte16(hi,lo) (((uint16_t)hi) << 8 | ((uint16_t)lo))
