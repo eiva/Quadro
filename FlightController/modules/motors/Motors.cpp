@@ -28,7 +28,7 @@ Motors::Motors() : _min(850), _max(2000)
     // Timer configuration
     TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
     TIM_TimeBaseStructure.TIM_Period = 20000-1; // Total period = 20ms;
-    TIM_TimeBaseStructure.TIM_Prescaler =  54;//(SystemCoreClock/2)/100000-1; // 1MHz devider - timer ticks with 1MHz
+    TIM_TimeBaseStructure.TIM_Prescaler =  SystemCoreClock / 1000000 - 1;//54;//(SystemCoreClock/2)/100000-1; // 1MHz devider - timer ticks with 1MHz
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);

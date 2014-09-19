@@ -11,7 +11,7 @@ public:
 		GPIO_StructInit(&port);
 		port.GPIO_Pin = portNumber;
 		port.GPIO_Mode = GPIO_Mode_OUT;
-		port.GPIO_Speed = GPIO_Speed_2MHz;
+		port.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_Init(_gpioPort, &port);
 	}
 	// True - on. False - off.

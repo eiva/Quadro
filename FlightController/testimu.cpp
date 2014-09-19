@@ -23,7 +23,7 @@
 
 
 
-int main(void)
+int maintestimu(void)
 {
 	SystemInit();
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
@@ -56,18 +56,17 @@ int main(void)
 	}
 	info->G(true);
 
+	// Read: https://github.com/kriswiner/MPU-9250/blob/master/MPU9250BasicAHRS.ino
 	uint8_t ReadBuf[14];
 	while(1){
 		mpu.Read(ReadBuf);
-		uint16_t AX = Byte16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
-		uint16_t AY = Byte16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
-		uint16_t AZ = Byte16(ReadBuf[4],  ReadBuf[5]);  // Acc.Z
-		uint16_t GX = Byte16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
-		uint16_t GY = Byte16(ReadBuf[10], ReadBuf[11]); // Gyr.Y
-		uint16_t GZ = Byte16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
+		const float aRes = 4.0f/32768.0f;
+
+		float AX = aRes*(float)Byte16ToInt16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
+		float AY = aRes*(float)Byte16ToInt16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
+		float AZ = aRes*(float)Byte16ToInt16(ReadBuf[4],  ReadBuf[5]);  // Acc.Z
+		float GX = (float)Byte16ToInt16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
+		float GY = (float)Byte16ToInt16(ReadBuf[10], ReadBuf[11]); // Gyr.Y
+		float GZ = (float)Byte16ToInt16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
 	}
 }
-
-
-
-
