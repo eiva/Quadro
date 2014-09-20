@@ -18,6 +18,10 @@
 #include "logger.h"
 #include "stdlib.h"
 #include "MadwickAHRS.h"
+#include "telemetry.h"
+#include "GlobalData.h"
+#include "mpu9250.h"
+#include "Helpers.h"
 
 QueueHandle_t TheRadioCommandsQueue;
 QueueHandle_t TheIMUDataQueue;
@@ -28,6 +32,8 @@ struct IMUData
 {
 	Vector3 EulierAngles;
 };
+
+GlobalData TheGlobalData; // Defined in GlobalData file.
 
 
 /*******************************************************************/
@@ -68,34 +74,46 @@ void vTaskIMUProcessor (void *pvParameters)
 {
 	IMUData data;
 	MadwickAHRS ahrs;
+	Mpu9250 *mpu = (Mpu9250*)pvParameters;
 	float lastTick = xTaskGetTickCount();
+	uint8_t ReadBuf[14];
 	while(1)
     {
-		// Receive data from IMU;
-		// I still dont have one, so just dummies.
-		vTaskDelay(2);
-
 		const float currentTick = xTaskGetTickCount();
 
-		float gx = 0, gy = 0, gz = 0;
-		float ax = 0, ay = 0, az = -1;
-		float mx = 0, my = 0, mz = 0;
+		mpu->Read(ReadBuf);
+		const float aRes = 4.0f/32768.0f;
+		const float gRes = 500.0f/32768.0f;
+
+		float AX = aRes*(float)Byte16ToInt16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
+		float AY = -aRes*(float)Byte16ToInt16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
+		float AZ = -aRes*(float)Byte16ToInt16(ReadBuf[4],  ReadBuf[5]);  // Acc.Z
+		float GX = gRes*(float)Byte16ToInt16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
+		float GY = -gRes*(float)Byte16ToInt16(ReadBuf[10], ReadBuf[11]); // Gyr.Y
+		float GZ = -gRes*(float)Byte16ToInt16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
 
 		// dT calculation
-		const float dT = (currentTick - lastTick) / 1000.0f; // Seconds
+		const float dT = (currentTick - lastTick) / 100000.0f; // Seconds
 		lastTick = currentTick;
 
 		// AHRS update
-		ahrs.MadgwickAHRSupdate(dT, gx, gy, gz, ax, ay, az, mx, my, mz);
+		ahrs.MadgwickAHRSupdate(dT, GX, GY, GZ, AX, AY, AZ, 0, 0, 0);
 
 		// Euler calculation...
+
+		TheGlobalData.BootMilliseconds = currentTick;
+
+		TheGlobalData.AttQ0 = ahrs.q0;
+		TheGlobalData.AttQ1 = ahrs.q1;
+		TheGlobalData.AttQ2 = ahrs.q2;
+		TheGlobalData.AttQ3 = ahrs.q3;
 
 		data.EulierAngles.X = ahrs.q0;
 		data.EulierAngles.Y = ahrs.q1;
 		data.EulierAngles.Z = ahrs.q2;
 		// Post to commander unit
 		xQueueOverwrite(TheIMUDataQueue, &data);
-
+		vTaskDelay(10);
     }
     vTaskDelete(NULL);
 }
@@ -144,7 +162,8 @@ void vTaskCommander (void *pvParameters)
     	log.Roll = imuData.EulierAngles.Y;
     	log.Pitch = imuData.EulierAngles.X;
 
-    	xQueueOverwrite( TheLogQueue, &log );
+    	// Testing telemetry.
+    	//xQueueOverwrite( TheLogQueue, &log );
     	// Process Data!
     }
     vTaskDelete(NULL);
@@ -156,20 +175,23 @@ void vTaskDataLogger (void *pvParameters)
     LogData data;
 	while(1)
     {
-		xQueueReceive(TheLogQueue, &data, portMAX_DELAY  );
-		logger->Log(data); // Extra slow!
-
+		//xQueueReceive(TheLogQueue, &data, portMAX_DELAY  );
+		//logger->Log(data); // Extra slow!
+		ProcessMAVLink();
+		vTaskDelay(20);
     }
     vTaskDelete(NULL);
 }
 
-int maindisabled111(void)
+int main(void)
 {
 	SystemInit();
+
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+
 	LedInfo *info = new LedInfo();
 	info->RGBY(true, true, true, true);
 
@@ -178,6 +200,7 @@ int maindisabled111(void)
 	while (button->GetState());
 	info->Off();
 
+	InitMAVLink();
 
 	Port* csn = new Port(GPIOA, GPIO_Pin_4);
 	csn->High();
@@ -189,12 +212,24 @@ int maindisabled111(void)
 
 	RadioLink *radioLink = new RadioLink(nrf, info);
 
+	Port* mpuCSN = new Port(GPIOB, GPIO_Pin_12);
+	mpuCSN->High();
+
+	SpiInterface* spi2 = new SpiInterface(SPI2);
+
+	Mpu9250 *mpu = new Mpu9250(spi2, mpuCSN);
+	if (!mpu->Check())
+	{
+		info->R(true);
+		while(1);
+	}
+
 	Logger *logger = new Logger(info, button);
 
 	vFreeRTOSInitAll();
-    xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 4, NULL);
-    xTaskCreate(vTaskIMUProcessor,(char*)"STB", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(vTaskCommander,  (char*)"CMD", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
+    //xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 4, NULL);
+    xTaskCreate(vTaskIMUProcessor,(char*)"STB", configMINIMAL_STACK_SIZE, mpu, tskIDLE_PRIORITY + 2, NULL);
+    //xTaskCreate(vTaskCommander,  (char*)"CMD", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
     xTaskCreate(vTaskDataLogger, (char*)"LOG", configMINIMAL_STACK_SIZE, logger, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
 

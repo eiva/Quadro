@@ -5,7 +5,7 @@
 /**************************************************************************************/
 
 
-int main(void)
+int maintestusart(void)
 {
   SystemInit();
   InitMAVLink();
@@ -13,7 +13,7 @@ int main(void)
   int i;
   while(true)
   {
-	  for(i = 0; i < 1000000; ++i);
+	  //for(i = 0; i < 1000000; ++i);
 	  ProcessMAVLink();
   }
   /*UsartInterface usart(USART1, 57600);

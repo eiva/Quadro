@@ -29,18 +29,18 @@
 //  MPU_LPS_5Hz     = 0x06,
 //  MPU_LPS_Disable = 0x07,
 //} MPU_LPF_TypeDef;
-//typedef enum {
-//  MPU_GyrFS_250dps  = 0x00,
-//  MPU_GyrFS_500dps  = 0x08,
-//  MPU_GyrFS_1000dps = 0x10,
-//  MPU_GyrFS_2000dps = 0x18
-//} MPU_GyrFS_TypeDef;
-//typedef enum {
-//  MPU_AccFS_2g  = 0x00,
-//  MPU_AccFS_4g  = 0x08,
-//  MPU_AccFS_8g  = 0x10,
-//  MPU_AccFS_16g = 0x18
-//} MPU_AccFS_TypeDef;
+typedef enum {
+  MPU_GyrFS_250dps  = 0x00,
+  MPU_GyrFS_500dps  = 0x08,
+  MPU_GyrFS_1000dps = 0x10,
+  MPU_GyrFS_2000dps = 0x18
+} MPU_GyrFS_TypeDef;
+typedef enum {
+  MPU_AccFS_2g  = 0x00,
+  MPU_AccFS_4g  = 0x08,
+  MPU_AccFS_8g  = 0x10,
+  MPU_AccFS_16g = 0x18
+} MPU_AccFS_TypeDef;
 
 //typedef struct {
 //  MPU_LPF_TypeDef MPU_LowPassFilter;
@@ -182,8 +182,8 @@ Mpu9250::Mpu9250(SpiInterface* spiInterface, Port* ncsPort):
 	      {0x01, MPU6500_PWR_MGMT_1},     // Clock Source
 	      {0x00, MPU6500_PWR_MGMT_2},     // Enable Acc & Gyro
 	      {0x07, MPU6500_CONFIG},         //
-	      {0x18, MPU6500_GYRO_CONFIG},    // +-2000dps
-	      {0x08, MPU6500_ACCEL_CONFIG},   // +-4G
+	      {MPU_GyrFS_500dps, MPU6500_GYRO_CONFIG},    // +-500dps
+	      {MPU_AccFS_4g, MPU6500_ACCEL_CONFIG},   // +-4G
 	      {0x00, MPU6500_ACCEL_CONFIG_2}, // Set Acc Data Rates
 	      {0x30, MPU6500_INT_PIN_CFG},    //
 	      {0x40, MPU6500_I2C_MST_CTRL},   // I2C Speed 348 kHz

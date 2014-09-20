@@ -1,5 +1,6 @@
 #include "stm32f4xx_conf.h"
 #include "mavlink.h"
+#include "GlobalData.h"
 
 namespace
 {
@@ -54,7 +55,7 @@ void initUsart()
 	else while(1);
 
 	// Configure the NVIC Preemption Priority Bits
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
 
     // Enable the USART1 Interrupt
 	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
@@ -151,17 +152,39 @@ void InitMAVLink()
 }
 
 // http://qgroundcontrol.org/mavlink/parameter_protocol
+int lastHbSending = 0;
+int lastAttSending = 0;
 
 void ProcessMAVLink()
 {
+	int current = TheGlobalData.BootMilliseconds;
+	if (current - lastHbSending > 100)
+	{
+		mavlink_msg_heartbeat_pack(mavlink_system.sysid, mavlink_system.compid, &msg, system_type, autopilot_type, system_mode, custom_mode, system_state);
+
+			// Copy the message to the send buffer
+		uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+
+		sendUsart(buf, len);
+		lastHbSending = current;
+	}
+
 	// Pack the message
-	mavlink_msg_heartbeat_pack(mavlink_system.sysid, mavlink_system.compid, &msg, system_type, autopilot_type, system_mode, custom_mode, system_state);
 
-	// Copy the message to the send buffer
-	uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+	//(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
+		//					       uint32_t time_boot_ms, float q1, float q2, float q3, float q4, float rollspeed, float pitchspeed, float yawspeed)
 
-	// Send the message with the standard UART send function
-	// uart0_send might be named differently depending on
-	// the individual microcontroller / library in use.
-	sendUsart(buf, len);
+	if (current - lastAttSending > 12)
+	{
+		mavlink_msg_attitude_quaternion_pack(mavlink_system.sysid, mavlink_system.compid, &msg, current,
+				TheGlobalData.AttQ0, TheGlobalData.AttQ1, TheGlobalData.AttQ2, TheGlobalData.AttQ3, 0, 0, 0);
+
+		uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+
+			// Send the message with the standard UART send function
+			// uart0_send might be named differently depending on
+			// the individual microcontroller / library in use.
+		sendUsart(buf, len);
+		lastAttSending = current;
+	}
 }
