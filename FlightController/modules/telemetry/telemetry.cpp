@@ -149,17 +149,19 @@ struct TelemetryTask_t
 	bool      (*Func)();
 };
 
-#define MAX_TASKS 3
+#define MAX_TASKS 4
 
 bool processHartBeat();
 bool processAttitude();
 bool processRawSensors();
+bool processRCInput();
 
 TelemetryTask_t TelemetryTasks[MAX_TASKS] =
 {
-		{0, 200, processHartBeat},
+		{0, 217, processHartBeat},
 		{0, 201, processAttitude},
-		{0, 11,  processRawSensors}
+		{0, 11,  processRawSensors},
+		{0, 17,  processRCInput}
 };
 
 void InitMAVLink()
@@ -217,7 +219,22 @@ bool processRawSensors()
 			TheGlobalData.AX, TheGlobalData.AY, TheGlobalData.AZ,
 			TheGlobalData.GX, TheGlobalData.GY, TheGlobalData.GZ,
 			TheGlobalData.MX, TheGlobalData.MY, TheGlobalData.MZ,
-			0, 0, 0, 0,
+			0, 0, 0, TheGlobalData.Temperature,
 			0x1FF);
+	return true;
+}
+
+bool processRCInput()
+{
+	//uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
+		//					       uint64_t time_usec,
+	  // uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint16_t chan9_raw, uint16_t chan10_raw, uint16_t chan11_raw, uint16_t chan12_raw, uint8_t rssi)
+
+	mavlink_msg_hil_rc_inputs_raw_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+			TheGlobalData.BootMilliseconds * 1000,
+			TheGlobalData.RT,TheGlobalData.RY, TheGlobalData.RP, TheGlobalData.RR,
+			0, 0,0,0,0,0,0,0,
+			100);
+
 	return true;
 }

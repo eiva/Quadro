@@ -82,7 +82,7 @@ void vTaskIMUProcessor (void *pvParameters)
 	MadwickAHRS ahrs;
 	Mpu9250 *mpu = (Mpu9250*)pvParameters;
 	float lastTick = xTaskGetTickCount();
-	uint8_t ReadBuf[14];
+	uint8_t ReadBuf[21];
 	while(1)
     {
 		const float currentTick = xTaskGetTickCount();
@@ -91,6 +91,9 @@ void vTaskIMUProcessor (void *pvParameters)
 
 		const float aRes = 4.0f/32768.0f;
 		const float gRes = (radians(500.0f))/32768.0f;
+		const float mRes = 0.15f;
+
+		// https://mbed.org/users/kylongmu/code/MPU9250_SPI/file/084e8ba240c1/MPU9250.cpp
 
 		TheGlobalData.BootMilliseconds = currentTick;
 
@@ -98,23 +101,27 @@ void vTaskIMUProcessor (void *pvParameters)
 		TheGlobalData.AY = -aRes * (float)Byte16ToInt16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
 		TheGlobalData.AZ = -aRes * (float)Byte16ToInt16(ReadBuf[4],  ReadBuf[5]);  // Acc.Z
 
-		/*
-		TheGlobalData.MX = Byte16ToInt16(ReadBuf[6],  ReadBuf[7]);  // Mag.X
-		TheGlobalData.MY = Byte16ToInt16(ReadBuf[8],  ReadBuf[3]);  // Mag.Y
-		TheGlobalData.MZ = Byte16ToInt16(ReadBuf[4],  ReadBuf[5]);  // Mag.Z
-		*/
+		TheGlobalData.Temperature =(((float)Byte16ToInt16(ReadBuf[6],  ReadBuf[7])-21.0f)/333.87f)+21.0f;
 
 		TheGlobalData.GX =  gRes * (float)Byte16ToInt16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
 		TheGlobalData.GY = -gRes * (float)Byte16ToInt16(ReadBuf[10], ReadBuf[11]); // Gyr.Y
 		TheGlobalData.GZ = -gRes * (float)Byte16ToInt16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
 
+		// TODO: Need to be calibrated.
+		TheGlobalData.MX =  mRes * (float)Byte16ToInt16(ReadBuf[14],  ReadBuf[15]);  // Mag.X
+		TheGlobalData.MY = -mRes * (float)Byte16ToInt16(ReadBuf[16],  ReadBuf[17]);  // Mag.Y
+		TheGlobalData.MZ = -mRes * (float)Byte16ToInt16(ReadBuf[18],  ReadBuf[19]);  // Mag.Z
 
 		// dT calculation
-		const float dT = (currentTick - lastTick) / 1000.0f; // Seconds why 100000?
+		const float dT = (currentTick - lastTick) / 1000.0f; // Seconds
 		lastTick = currentTick;
 
 		// AHRS update
-		ahrs.MadgwickAHRSupdate(dT, TheGlobalData.GX, TheGlobalData.GY, TheGlobalData.GZ, TheGlobalData.AX, TheGlobalData.AY, TheGlobalData.AZ, 0, 0, 0);
+		ahrs.MadgwickAHRSupdate(dT,
+				TheGlobalData.GX, TheGlobalData.GY, TheGlobalData.GZ,
+				TheGlobalData.AX, TheGlobalData.AY, TheGlobalData.AZ,
+				//TheGlobalData.MX, TheGlobalData.MY, TheGlobalData.MZ);
+				0, 0, 0);
 
 		TheGlobalData.AttQ0 = ahrs.q0;
 		TheGlobalData.AttQ1 = ahrs.q1;
@@ -242,7 +249,7 @@ int main(void)
 	Logger *logger = new Logger(info, button);
 
 	vFreeRTOSInitAll();
-    //xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 4, NULL);
+    xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 4, NULL);
     xTaskCreate(vTaskIMUProcessor,(char*)"STB", configMINIMAL_STACK_SIZE, mpu, tskIDLE_PRIORITY + 2, NULL);
     //xTaskCreate(vTaskCommander,  (char*)"CMD", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
     xTaskCreate(vTaskDataLogger, (char*)"LOG", configMINIMAL_STACK_SIZE, logger, tskIDLE_PRIORITY + 1, NULL);

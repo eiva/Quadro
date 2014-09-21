@@ -13,6 +13,7 @@ public:
 	float AX, AY, AZ; ///< Accelerometer values.
 	float GX, GY, GZ; ///< Gyro values.
 	float MX, MY, MZ; ///< Magnetometer values.
+	float Temperature;
 
 	uint16_t RT, RY, RP, RR; ///< Raw radio link data (4 channel).
 

@@ -170,13 +170,75 @@ typedef enum {
 #define MPU6500_ZA_OFFSET_H         ((uint8_t)0x7D)
 #define MPU6500_ZA_OFFSET_L         ((uint8_t)0x7E)
 
+
+//Magnetometer Registers
+/* ---- AK8963 Reg In MPU9250 ----------------------------------------------- */
+
+#define AK8963_I2C_ADDR             0x0c//0x18
+#define AK8963_Device_ID            0x48
+
+// Read-only Reg
+#define AK8963_WIA                  0x00
+#define AK8963_INFO                 0x01
+#define AK8963_ST1                  0x02
+#define AK8963_HXL                  0x03
+#define AK8963_HXH                  0x04
+#define AK8963_HYL                  0x05
+#define AK8963_HYH                  0x06
+#define AK8963_HZL                  0x07
+#define AK8963_HZH                  0x08
+#define AK8963_ST2                  0x09
+// Write/Read Reg
+#define AK8963_CNTL1                0x0A
+#define AK8963_CNTL2                0x0B
+#define AK8963_ASTC                 0x0C
+#define AK8963_TS1                  0x0D
+#define AK8963_TS2                  0x0E
+#define AK8963_I2CDIS               0x0F
+// Read-only Reg ( ROM )
+#define AK8963_ASAX                 0x10
+#define AK8963_ASAY                 0x11
+#define AK8963_ASAZ                 0x12
+
+// Configuration bits mpu9250
+#define BIT_SLEEP 0x40
+#define BIT_H_RESET 0x80
+#define BITS_CLKSEL 0x07
+#define MPU_CLK_SEL_PLLGYROX 0x01
+#define MPU_CLK_SEL_PLLGYROZ 0x03
+#define MPU_EXT_SYNC_GYROX 0x02
+#define BITS_FS_250DPS              0x00
+#define BITS_FS_500DPS              0x08
+#define BITS_FS_1000DPS             0x10
+#define BITS_FS_2000DPS             0x18
+#define BITS_FS_2G                  0x00
+#define BITS_FS_4G                  0x08
+#define BITS_FS_8G                  0x10
+#define BITS_FS_16G                 0x18
+#define BITS_FS_MASK                0x18
+#define BITS_DLPF_CFG_256HZ_NOLPF2  0x00
+#define BITS_DLPF_CFG_188HZ         0x01
+#define BITS_DLPF_CFG_98HZ          0x02
+#define BITS_DLPF_CFG_42HZ          0x03
+#define BITS_DLPF_CFG_20HZ          0x04
+#define BITS_DLPF_CFG_10HZ          0x05
+#define BITS_DLPF_CFG_5HZ           0x06
+#define BITS_DLPF_CFG_2100HZ_NOLPF  0x07
+#define BITS_DLPF_CFG_MASK          0x07
+#define BIT_INT_ANYRD_2CLEAR        0x10
+#define BIT_RAW_RDY_EN              0x01
+#define BIT_I2C_IF_DIS              0x10
+
+#define READ_FLAG   0x80
+
+
 /*====================================================================================================*/
 Mpu9250::Mpu9250(SpiInterface* spiInterface, Port* ncsPort):
 	_spiInterface(spiInterface),_ncsPort(ncsPort)
 {
 	_ncsPort->High();
 
-	const int MPU9250_InitRegNum = 10;
+	const int MPU9250_InitRegNum = 17;
 	uint8_t MPU6500_Init_Data[MPU9250_InitRegNum][2] = {
 	      {0x80, MPU6500_PWR_MGMT_1},     // Reset Device
 	      {0x01, MPU6500_PWR_MGMT_1},     // Clock Source
@@ -186,8 +248,21 @@ Mpu9250::Mpu9250(SpiInterface* spiInterface, Port* ncsPort):
 	      {MPU_AccFS_4g, MPU6500_ACCEL_CONFIG},   // +-4G
 	      {0x00, MPU6500_ACCEL_CONFIG_2}, // Set Acc Data Rates
 	      {0x30, MPU6500_INT_PIN_CFG},    //
-	      {0x40, MPU6500_I2C_MST_CTRL},   // I2C Speed 348 kHz
+
 	      {0x20, MPU6500_USER_CTRL},      // Enable AUX
+          {0x0D, MPU6500_I2C_MST_CTRL}, //  I2C configuration multi-master  IIC 400KHz
+
+          {AK8963_I2C_ADDR, MPU6500_I2C_SLV0_ADDR},  //Set the I2C slave addres of AK8963 and set for write.
+	      //{0x09, MPUREG_I2C_SLV4_CTRL},
+	      //{0x81, MPUREG_I2C_MST_DELAY_CTRL}, //Enable I2C delay
+
+	      {AK8963_CNTL2, MPU6500_I2C_SLV0_REG}, //I2C slave 0 register address from where to begin data transfer
+	      {0x01, MPU6500_I2C_SLV0_DO}, // Reset AK8963
+	      {0x81, MPU6500_I2C_SLV0_CTRL},  //Enable I2C and set 1 byte
+
+	      {AK8963_CNTL1, MPU6500_I2C_SLV0_REG}, //I2C slave 0 register address from where to begin data transfer
+	      {0x12, MPU6500_I2C_SLV0_DO}, // Register value to continuous measurement in 16bit
+	      {0x81, MPU6500_I2C_SLV0_CTRL}  //Enable I2C and set 1 byte
 
 	    };
 
@@ -207,10 +282,18 @@ bool Mpu9250::Check(){
 	return true;
 }
 
-void Mpu9250::Read( uint8_t ReadBuf[14])
+// Read all.
+void Mpu9250::Read( uint8_t ReadBuf[21])
 {
-  // Read 14 bytes from MPU6500_ACCEL_XOUT_H.
-  ReadRegs(MPU6500_ACCEL_XOUT_H, ReadBuf, 14);
+	//Send I2C command at first
+	WriteReg(MPU6500_I2C_SLV0_ADDR,AK8963_I2C_ADDR|READ_FLAG); //Set the I2C slave addres of AK8963 and set for read.
+	WriteReg(MPU6500_I2C_SLV0_REG, AK8963_HXL); //I2C slave 0 register address from where to begin data transfer
+	WriteReg(MPU6500_I2C_SLV0_CTRL, 0x87); //Read 7 bytes from the magnetometer
+	//must start your read from AK8963A register 0x03 and read seven bytes so that upon read of ST2 register 0x09 the AK8963A will unlatch the data registers for the next measurement.
+
+
+	// Read 14 bytes from MPU6500_ACCEL_XOUT_H.
+	ReadRegs(MPU6500_ACCEL_XOUT_H, ReadBuf, 21);
 }
 
 uint8_t Mpu9250::ReadReg( uint8_t ReadAddr )
