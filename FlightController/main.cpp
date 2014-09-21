@@ -60,7 +60,13 @@ void vTaskRFReciever (void *pvParameters)
     	if (radioLink->Update(data))
     	{
     		xQueueOverwrite( TheRadioCommandsQueue, &data );
-    		vTaskDelay(20);
+
+    		TheGlobalData.RT = data.Throttle;
+    		TheGlobalData.RY = data.Yaw;
+    		TheGlobalData.RP = data.Pitch;
+    		TheGlobalData.RR = data.Roll;
+
+    		vTaskDelay(20); // 50Hz
     	}
     	else
     	{
@@ -82,38 +88,47 @@ void vTaskIMUProcessor (void *pvParameters)
 		const float currentTick = xTaskGetTickCount();
 
 		mpu->Read(ReadBuf);
-		const float aRes = 4.0f/32768.0f;
-		const float gRes = 500.0f/32768.0f;
 
-		float AX = aRes*(float)Byte16ToInt16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
-		float AY = -aRes*(float)Byte16ToInt16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
-		float AZ = -aRes*(float)Byte16ToInt16(ReadBuf[4],  ReadBuf[5]);  // Acc.Z
-		float GX = gRes*(float)Byte16ToInt16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
-		float GY = -gRes*(float)Byte16ToInt16(ReadBuf[10], ReadBuf[11]); // Gyr.Y
-		float GZ = -gRes*(float)Byte16ToInt16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
+		const float aRes = 4.0f/32768.0f;
+		const float gRes = (radians(500.0f))/32768.0f;
+
+		TheGlobalData.BootMilliseconds = currentTick;
+
+		TheGlobalData.AX =  aRes * (float)Byte16ToInt16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
+		TheGlobalData.AY = -aRes * (float)Byte16ToInt16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
+		TheGlobalData.AZ = -aRes * (float)Byte16ToInt16(ReadBuf[4],  ReadBuf[5]);  // Acc.Z
+
+		/*
+		TheGlobalData.MX = Byte16ToInt16(ReadBuf[6],  ReadBuf[7]);  // Mag.X
+		TheGlobalData.MY = Byte16ToInt16(ReadBuf[8],  ReadBuf[3]);  // Mag.Y
+		TheGlobalData.MZ = Byte16ToInt16(ReadBuf[4],  ReadBuf[5]);  // Mag.Z
+		*/
+
+		TheGlobalData.GX =  gRes * (float)Byte16ToInt16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
+		TheGlobalData.GY = -gRes * (float)Byte16ToInt16(ReadBuf[10], ReadBuf[11]); // Gyr.Y
+		TheGlobalData.GZ = -gRes * (float)Byte16ToInt16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
+
 
 		// dT calculation
-		const float dT = (currentTick - lastTick) / 100000.0f; // Seconds
+		const float dT = (currentTick - lastTick) / 1000.0f; // Seconds why 100000?
 		lastTick = currentTick;
 
 		// AHRS update
-		ahrs.MadgwickAHRSupdate(dT, GX, GY, GZ, AX, AY, AZ, 0, 0, 0);
-
-		// Euler calculation...
-
-		TheGlobalData.BootMilliseconds = currentTick;
+		ahrs.MadgwickAHRSupdate(dT, TheGlobalData.GX, TheGlobalData.GY, TheGlobalData.GZ, TheGlobalData.AX, TheGlobalData.AY, TheGlobalData.AZ, 0, 0, 0);
 
 		TheGlobalData.AttQ0 = ahrs.q0;
 		TheGlobalData.AttQ1 = ahrs.q1;
 		TheGlobalData.AttQ2 = ahrs.q2;
 		TheGlobalData.AttQ3 = ahrs.q3;
 
+		// Euler calculation...
+
 		data.EulierAngles.X = ahrs.q0;
 		data.EulierAngles.Y = ahrs.q1;
 		data.EulierAngles.Z = ahrs.q2;
 		// Post to commander unit
 		xQueueOverwrite(TheIMUDataQueue, &data);
-		vTaskDelay(10);
+		vTaskDelay(10); // 100Hz.
     }
     vTaskDelete(NULL);
 }
@@ -178,7 +193,7 @@ void vTaskDataLogger (void *pvParameters)
 		//xQueueReceive(TheLogQueue, &data, portMAX_DELAY  );
 		//logger->Log(data); // Extra slow!
 		ProcessMAVLink();
-		vTaskDelay(20);
+		vTaskDelay(1);
     }
     vTaskDelete(NULL);
 }

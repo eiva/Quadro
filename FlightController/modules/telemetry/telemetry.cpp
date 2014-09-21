@@ -142,49 +142,82 @@ extern "C" void USART1_IRQHandler(void)
   //USART_ClearFlag(USART1, USART_FLAG_TC);
 }
 
+struct TelemetryTask_t
+{
+	uint32_t   LastTickExecuted;
+	uint16_t   TaskTickDelta;
+	bool      (*Func)();
+};
+
+#define MAX_TASKS 3
+
+bool processHartBeat();
+bool processAttitude();
+bool processRawSensors();
+
+TelemetryTask_t TelemetryTasks[MAX_TASKS] =
+{
+		{0, 200, processHartBeat},
+		{0, 201, processAttitude},
+		{0, 11,  processRawSensors}
+};
+
 void InitMAVLink()
 {
 	initUsart();								 ///< Init Comm hardware
 
 	mavlink_system.sysid = 20;                   ///< ID 20 for this airplane
 	mavlink_system.compid = MAV_COMP_ID_IMU;     ///< The component sending the message is the IMU, it could be also a Linux process
-	mavlink_system.type = MAV_TYPE_QUADROTOR;   ///< This system is an quadrotor
+	mavlink_system.type = MAV_TYPE_QUADROTOR;    ///< This system is an quadrotor
 }
 
 // http://qgroundcontrol.org/mavlink/parameter_protocol
-int lastHbSending = 0;
-int lastAttSending = 0;
+
+int currentTick = 0; ///< Current telemetry call number. Used as counter.
 
 void ProcessMAVLink()
 {
-	int current = TheGlobalData.BootMilliseconds;
-	if (current - lastHbSending > 100)
-	{
-		mavlink_msg_heartbeat_pack(mavlink_system.sysid, mavlink_system.compid, &msg, system_type, autopilot_type, system_mode, custom_mode, system_state);
+	++currentTick;
 
+	for (int taskIndex = 0; taskIndex < MAX_TASKS; ++taskIndex)
+	{
+		TelemetryTask_t task = TelemetryTasks[taskIndex];
+		if (currentTick - task.LastTickExecuted < task.TaskTickDelta)
+		{
+			continue;
+		}
+		task.LastTickExecuted = currentTick;
+		if (task.Func())
+		{
 			// Copy the message to the send buffer
-		uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+			uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
 
-		sendUsart(buf, len);
-		lastHbSending = current;
+			sendUsart(buf, len);
+		}
 	}
+}
 
-	// Pack the message
-
-	//(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-		//					       uint32_t time_boot_ms, float q1, float q2, float q3, float q4, float rollspeed, float pitchspeed, float yawspeed)
-
-	if (current - lastAttSending > 12)
-	{
-		mavlink_msg_attitude_quaternion_pack(mavlink_system.sysid, mavlink_system.compid, &msg, current,
-				TheGlobalData.AttQ0, TheGlobalData.AttQ1, TheGlobalData.AttQ2, TheGlobalData.AttQ3, 0, 0, 0);
-
-		uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
-
-			// Send the message with the standard UART send function
-			// uart0_send might be named differently depending on
-			// the individual microcontroller / library in use.
-		sendUsart(buf, len);
-		lastAttSending = current;
-	}
+bool processHartBeat()
+{
+	mavlink_msg_heartbeat_pack(mavlink_system.sysid, mavlink_system.compid, &msg, system_type, autopilot_type, system_mode, custom_mode, system_state);
+	return true;
+}
+bool processAttitude()
+{
+	mavlink_msg_attitude_quaternion_pack(mavlink_system.sysid, mavlink_system.compid, &msg, TheGlobalData.BootMilliseconds,
+					TheGlobalData.AttQ0, TheGlobalData.AttQ1, TheGlobalData.AttQ2, TheGlobalData.AttQ3, 0, 0, 0);
+	return true;
+}
+bool processRawSensors()
+{
+	//uint64_t time_usec, float xacc, float yacc, float zacc, float xgyro, float ygyro, float zgyro, float xmag, float ymag, float zmag,
+	//float abs_pressure, float diff_pressure, float pressure_alt, float temperature, uint32_t fields_updated)
+	mavlink_msg_hil_sensor_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+			TheGlobalData.BootMilliseconds * 1000,
+			TheGlobalData.AX, TheGlobalData.AY, TheGlobalData.AZ,
+			TheGlobalData.GX, TheGlobalData.GY, TheGlobalData.GZ,
+			TheGlobalData.MX, TheGlobalData.MY, TheGlobalData.MZ,
+			0, 0, 0, 0,
+			0x1FF);
+	return true;
 }
