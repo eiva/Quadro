@@ -22,6 +22,7 @@
 #include "GlobalData.h"
 #include "mpu9250.h"
 #include "Helpers.h"
+#include <math.h>
 
 QueueHandle_t TheRadioCommandsQueue;
 QueueHandle_t TheIMUDataQueue;
@@ -97,20 +98,20 @@ void vTaskIMUProcessor (void *pvParameters)
 
 		TheGlobalData.BootMilliseconds = currentTick;
 
-		TheGlobalData.AX =  aRes * (float)Byte16ToInt16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
-		TheGlobalData.AY = -aRes * (float)Byte16ToInt16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
+		TheGlobalData.AX = aRes * (float)Byte16ToInt16(ReadBuf[0],  ReadBuf[1]);  // Acc.X
+		TheGlobalData.AY = aRes * (float)Byte16ToInt16(ReadBuf[2],  ReadBuf[3]);  // Acc.Y
 		TheGlobalData.AZ = -aRes * (float)Byte16ToInt16(ReadBuf[4],  ReadBuf[5]);  // Acc.Z
 
 		TheGlobalData.Temperature =(((float)Byte16ToInt16(ReadBuf[6],  ReadBuf[7])-21.0f)/333.87f)+21.0f;
 
-		TheGlobalData.GX =  gRes * (float)Byte16ToInt16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
+		TheGlobalData.GX = -gRes * (float)Byte16ToInt16(ReadBuf[8],  ReadBuf[9]);  // Gyr.X
 		TheGlobalData.GY = -gRes * (float)Byte16ToInt16(ReadBuf[10], ReadBuf[11]); // Gyr.Y
-		TheGlobalData.GZ = -gRes * (float)Byte16ToInt16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
+		TheGlobalData.GZ = gRes * (float)Byte16ToInt16(ReadBuf[12], ReadBuf[13]); // Gyr.Z
 
 		// TODO: Need to be calibrated.
-		TheGlobalData.MX =  mRes * (float)Byte16ToInt16(ReadBuf[14],  ReadBuf[15]);  // Mag.X
-		TheGlobalData.MY = -mRes * (float)Byte16ToInt16(ReadBuf[16],  ReadBuf[17]);  // Mag.Y
-		TheGlobalData.MZ = -mRes * (float)Byte16ToInt16(ReadBuf[18],  ReadBuf[19]);  // Mag.Z
+		TheGlobalData.MX = mRes * (float)Byte16ToInt16(ReadBuf[14],  ReadBuf[15]);  // Mag.X
+		TheGlobalData.MY = mRes * (float)Byte16ToInt16(ReadBuf[16],  ReadBuf[17]);  // Mag.Y
+		TheGlobalData.MZ = mRes * (float)Byte16ToInt16(ReadBuf[18],  ReadBuf[19]);  // Mag.Z
 
 		// dT calculation
 		const float dT = (currentTick - lastTick) / 1000.0f; // Seconds
@@ -130,9 +131,29 @@ void vTaskIMUProcessor (void *pvParameters)
 
 		// Euler calculation...
 
-		data.EulierAngles.X = ahrs.q0;
-		data.EulierAngles.Y = ahrs.q1;
-		data.EulierAngles.Z = ahrs.q2;
+		const float q23 = ahrs.q2 * ahrs.q3;
+		const float q01 = ahrs.q0 * ahrs.q1;
+		const float q13 = ahrs.q1 * ahrs.q3;
+		const float q02 = ahrs.q0 * ahrs.q2;
+		const float q12 = ahrs.q1 * ahrs.q2;
+		const float q03 = ahrs.q0 * ahrs.q3;
+
+		const float q1s = ahrs.q1 * ahrs.q1;
+		const float q2s = ahrs.q2 * ahrs.q2;
+		const float q3s = ahrs.q3 * ahrs.q3;
+
+		const float roll  =  atan2f(q23 + q01, 0.5f - (q1s + q2s));
+		const float pitch = -asinf(-2.0f * (q13 + q02));
+		const float yaw   =  atan2f(q12 + q03, 0.5f - (q2s + q3s));
+
+		TheGlobalData.EulerRoll = roll;
+		TheGlobalData.EulerPitch = pitch;
+		TheGlobalData.EulerYaw = yaw;
+
+		data.EulierAngles.X = roll;
+		data.EulierAngles.Y = pitch;
+		data.EulierAngles.Z = yaw;
+
 		// Post to commander unit
 		xQueueOverwrite(TheIMUDataQueue, &data);
 		vTaskDelay(10); // 100Hz.

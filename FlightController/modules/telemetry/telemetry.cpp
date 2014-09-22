@@ -206,8 +206,14 @@ bool processHartBeat()
 }
 bool processAttitude()
 {
-	mavlink_msg_attitude_quaternion_pack(mavlink_system.sysid, mavlink_system.compid, &msg, TheGlobalData.BootMilliseconds,
-					TheGlobalData.AttQ0, TheGlobalData.AttQ1, TheGlobalData.AttQ2, TheGlobalData.AttQ3, 0, 0, 0);
+	// Quaternion
+	/*mavlink_msg_attitude_quaternion_pack(mavlink_system.sysid, mavlink_system.compid, &msg, TheGlobalData.BootMilliseconds,
+					TheGlobalData.AttQ0, TheGlobalData.AttQ1, TheGlobalData.AttQ2, TheGlobalData.AttQ3, 0, 0, 0);*/
+
+	// Euler
+	mavlink_msg_attitude_pack(mavlink_system.sysid, mavlink_system.compid, &msg, TheGlobalData.BootMilliseconds,
+			TheGlobalData.EulerRoll, TheGlobalData.EulerPitch, TheGlobalData.EulerYaw, 0, 0, 0);
+
 	return true;
 }
 bool processRawSensors()

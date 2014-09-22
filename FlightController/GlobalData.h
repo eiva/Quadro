@@ -18,6 +18,8 @@ public:
 	uint16_t RT, RY, RP, RR; ///< Raw radio link data (4 channel).
 
 	float AttQ0, AttQ1, AttQ2, AttQ3; ///< Attitude quaternion values from AHRS
+
+	float EulerRoll, EulerPitch, EulerYaw; ///< Euler Tait–Bryan angles
 };
 
 extern GlobalData TheGlobalData;
