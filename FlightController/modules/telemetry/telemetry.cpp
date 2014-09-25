@@ -179,19 +179,21 @@ struct TelemetryTask_t
 	bool      (*Func)();         ///< Processing function.
 };
 
-#define MAX_TASKS 5
+//#define MAX_TASKS 6
 
 bool processHartBeat();
 bool processAttitude();
 bool processRawSensors();
-bool processRCInput();
+bool processRCInputRaw();
+bool processRCInputScaled();
 bool processParameters();
 
-TelemetryTask_t TelemetryTasks[MAX_TASKS] =
+TelemetryTask_t TelemetryTasks[] =
 {
 		{0, 997,   processHartBeat},
+		{0, 769,   processRCInputRaw},
 		{0, 379,   processAttitude},
-		{0, 211,   processRCInput},
+		{0, 211,   processRCInputScaled},
 		{0, 199,   processRawSensors},
 		{0, 2,     processParameters}
 };
@@ -218,7 +220,9 @@ void ProcessMAVLink()
 {
 	++currentTick;
 
-	for (int taskIndex = 0; taskIndex < MAX_TASKS; ++taskIndex)
+	const size_t maxsize = sizeof(TelemetryTasks)/sizeof(TelemetryTask_t);
+
+	for (int taskIndex = 0; taskIndex < maxsize; ++taskIndex)
 	{
 		TelemetryTask_t task = TelemetryTasks[taskIndex];
 		if (currentTick - (int32_t)task.LastTickExecuted < task.TaskTickDelta)
@@ -253,7 +257,9 @@ uint16_t updateParameter(const char* name, float val, uint8_t paramType)
 			{
 				return totalParameters;
 			}
-			*((uint32_t*)param.address) = (uint32_t)val;
+			uint32_t temp;
+			memcpy(&temp, &val, sizeof(uint32_t));
+			*((uint32_t*)param.address) = temp;
 		 }
 		 break;
 		 case PARAM_INT32:
@@ -262,7 +268,9 @@ uint16_t updateParameter(const char* name, float val, uint8_t paramType)
 			 {
 				 return totalParameters;
 			 }
-			 *((int32_t*)param.address) = (int32_t)val;
+			 int32_t temp;
+			 memcpy(&temp, &val, sizeof(int32_t));
+			 *((int32_t*)param.address) = val;
 		 }
 		 break;
 		 case PARAM_FLOAT:
@@ -303,14 +311,14 @@ bool sendParameter(uint16_t index)
 	 	case PARAM_UINT32:
 	 	{
 	   		const uint32_t temp = *((uint32_t*)param.address);
-	   		val = temp;
+	   		memcpy(&val,&temp, sizeof(float));
 	   		paramType = MAV_PARAM_TYPE_UINT32;
 	 	}
 	 		break;
 	    case PARAM_INT32:
 	    {
 	    	const int32_t temp = *((int32_t*)param.address);
-	    	val = temp;
+	    	memcpy(&val,&temp, sizeof(float));
 	    	paramType = MAV_PARAM_TYPE_INT32;
 	    }
 	   		break;
@@ -383,17 +391,29 @@ bool processRawSensors()
 	return true;
 }
 
-bool processRCInput()
+bool processRCInputRaw()
 {
 	//uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
 		//					       uint64_t time_usec,
 	  // uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint16_t chan9_raw, uint16_t chan10_raw, uint16_t chan11_raw, uint16_t chan12_raw, uint8_t rssi)
 
-	mavlink_msg_hil_rc_inputs_raw_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
-			TheGlobalData.BootMilliseconds * 1000,
+	mavlink_msg_rc_channels_raw_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+			TheGlobalData.BootMilliseconds,
+			0,
 			TheGlobalData.RT,TheGlobalData.RY, TheGlobalData.RP, TheGlobalData.RR,
-			0, 0,0,0,0,0,0,0,
-			100);
+			0, 0,0,0,
+			255);
 
 	return true;
+}
+bool processRCInputScaled()
+{
+	mavlink_msg_rc_channels_scaled_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+			TheGlobalData.BootMilliseconds,
+			0,
+			(int16_t)(TheGlobalData.ST * 100),(int16_t)(TheGlobalData.SY * 100), (int16_t)(TheGlobalData.SP * 100), (int16_t)(TheGlobalData.SR * 100),
+			0, 0,0,0,
+			255);
+	return true;
+
 }

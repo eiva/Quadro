@@ -74,7 +74,7 @@ int16_t GetParam(param_s& paramDesk, const char* paramName)
 }
 
 //// TESTING PURPOSES
-
+/*
 float beta = 2;
 float teta = 2.3;
 __attribute__((section(".persist"))) float dzeta = 3.14;
@@ -84,3 +84,4 @@ PARAM_GROUP_START(TEST_PARAMS)
 	PARAM_ADD(PARAM_FLOAT, TEST_TETA, &teta)
 	PARAM_ADD(PARAM_FLOAT, TEST_ZETA, &dzeta)
 PARAM_GROUP_STOP(TEST_PARAMS)
+*/

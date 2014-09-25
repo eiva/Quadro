@@ -13,28 +13,28 @@
 #include "RFReciever.h"
 
 uint32_t param_rc1_dz   = 0;     // 0 - 200
-uint32_t param_rc1_max  = 1824;  // 800 - 2200
+uint32_t param_rc1_max  = 1822;  // 800 - 2200
 uint32_t param_rc1_min  = 800;   // 800 - 2200
 int32_t  param_rc1_rev  = 1;     // -1 = reversed 1 = normal
-uint32_t param_rc1_trim = 1500;  // 800 - 220
+uint32_t param_rc1_trim = 800;   // 800 - 220
 
 uint32_t param_rc2_dz   = 0;     // 0 - 200
-uint32_t param_rc2_max  = 2200;  // 800 - 2200
-uint32_t param_rc2_min  = 800;   // 800 - 2200
+uint32_t param_rc2_max  = 1586;  // 800 - 2200
+uint32_t param_rc2_min  = 832;   // 800 - 2200
 int32_t  param_rc2_rev  = 1;     // -1 = reversed 1 = normal
-uint32_t param_rc2_trim = 1500;  // 800 - 220
+uint32_t param_rc2_trim = 1222;  // 800 - 220
 
 uint32_t param_rc3_dz   = 0;     // 0 - 200
-uint32_t param_rc3_max  = 2200;  // 800 - 2200
+uint32_t param_rc3_max  = 1823;  // 800 - 2200
 uint32_t param_rc3_min  = 800;   // 800 - 2200
 int32_t  param_rc3_rev  = 1;     // -1 = reversed 1 = normal
-uint32_t param_rc3_trim = 1500;  // 800 - 220
+uint32_t param_rc3_trim = 1352;  // 800 - 220
 
 uint32_t param_rc4_dz   = 0;     // 0 - 200
-uint32_t param_rc4_max  = 2200;  // 800 - 2200
-uint32_t param_rc4_min  = 800;   // 800 - 2200
+uint32_t param_rc4_max  = 1799;  // 800 - 2200
+uint32_t param_rc4_min  = 801;   // 800 - 2200
 int32_t  param_rc4_rev  = 1;     // -1 = reversed 1 = normal
-uint32_t param_rc4_trim = 1500;  // 800 - 220
+uint32_t param_rc4_trim = 1316;  // 800 - 220
 
 #define TOV(x) (800.0f + (x)) // From RF (~0 - ~ 1024) to PWM (~800 - ~ 2500)
 
@@ -64,6 +64,11 @@ void vTaskRFReciever (void *pvParameters)
     		data.Yaw   = TOA(Yaw, 2);
     		data.Pitch = TOA(Pitch, 3);
     		data.Roll  = TOA(Roll, 4);
+
+    		TheGlobalData.ST = data.Throttle;
+    		TheGlobalData.SY = data.Yaw;
+    		TheGlobalData.SP = data.Pitch;
+    		TheGlobalData.SR = data.Roll;
 
     		xQueueOverwrite( TheRadioCommandsQueue, &data );
 
