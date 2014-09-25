@@ -18,19 +18,19 @@ uint32_t param_rc1_min  = 800;   // 800 - 2200
 int32_t  param_rc1_rev  = 1;     // -1 = reversed 1 = normal
 uint32_t param_rc1_trim = 800;   // 800 - 220
 
-uint32_t param_rc2_dz   = 0;     // 0 - 200
+uint32_t param_rc2_dz   = 60;     // 0 - 200
 uint32_t param_rc2_max  = 1586;  // 800 - 2200
 uint32_t param_rc2_min  = 832;   // 800 - 2200
 int32_t  param_rc2_rev  = 1;     // -1 = reversed 1 = normal
 uint32_t param_rc2_trim = 1222;  // 800 - 220
 
-uint32_t param_rc3_dz   = 0;     // 0 - 200
+uint32_t param_rc3_dz   = 210     // 0 - 200
 uint32_t param_rc3_max  = 1823;  // 800 - 2200
 uint32_t param_rc3_min  = 800;   // 800 - 2200
 int32_t  param_rc3_rev  = 1;     // -1 = reversed 1 = normal
 uint32_t param_rc3_trim = 1352;  // 800 - 220
 
-uint32_t param_rc4_dz   = 0;     // 0 - 200
+uint32_t param_rc4_dz   = 60;     // 0 - 200
 uint32_t param_rc4_max  = 1799;  // 800 - 2200
 uint32_t param_rc4_min  = 801;   // 800 - 2200
 int32_t  param_rc4_rev  = 1;     // -1 = reversed 1 = normal
@@ -41,7 +41,7 @@ uint32_t param_rc4_trim = 1316;  // 800 - 220
 #define TOA(v, i) (TOV(radioLink->v) - param_rc##i##_trim) > 0 ? \
 		100.0f * ((TOV(radioLink->v) - param_rc##i##_trim) / (param_rc##i##_max - param_rc##i##_trim)) \
         :\
-         -100.0f * ((TOV(radioLink->v) - param_rc##i##_trim) / (param_rc##i##_trim - param_rc##i##_min))
+        100.0f * ((TOV(radioLink->v) - param_rc##i##_trim) / (param_rc##i##_trim - param_rc##i##_min))
 
 void vTaskRFReciever (void *pvParameters)
 {
@@ -58,9 +58,8 @@ void vTaskRFReciever (void *pvParameters)
     		TheGlobalData.RP = (uint16_t)TOV(radioLink->Pitch);
     		TheGlobalData.RR = (uint16_t)TOV(radioLink->Roll);
 
-
-    		// Cailibration
-    		data.Throttle = (param_rc1_min - TOV(radioLink->Throttle))/param_rc1_max;
+    		// Calibration
+    		data.Throttle = 100.0f * (TOV(radioLink->Throttle) - param_rc1_min)/(param_rc1_max - param_rc1_min);
     		data.Yaw   = TOA(Yaw, 2);
     		data.Pitch = TOA(Pitch, 3);
     		data.Roll  = TOA(Roll, 4);
