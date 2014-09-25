@@ -1,6 +1,8 @@
 #include "stm32f4xx_conf.h"
 #include "mavlink.h"
 #include "GlobalData.h"
+#include "parameters.h"
+#include "helpers.h"
 
 namespace
 {
@@ -27,6 +29,12 @@ mavlink_status_t status;
 
 // HAL: Usart used for comm
 USART_TypeDef* _usart = USART1;
+
+// Mavlink Parameters Protocol
+
+volatile uint16_t CurrentParameterSent = 0; ///< Currnt ID of sent parameter. If it is 0 - all parameters from 0 to MAX will be passed.
+
+volatile uint16_t CurrentParameterReRead = 0; ///< Currnt ID of requested to read parameter.
 
 }
 
@@ -109,6 +117,8 @@ static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
     }
 }
 
+uint16_t updateParameter(const char* name, float val, uint8_t paramType); ///< Update parameter value, return parameter index.
+
 extern "C" void USART1_IRQHandler(void)
 {
   if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
@@ -129,7 +139,27 @@ extern "C" void USART1_IRQHandler(void)
     		case MAVLINK_MSG_ID_COMMAND_LONG:
     			// EXECUTE ACTION
     		break;
+    		case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
+    			{
+    				// Start sending parameters
+    				CurrentParameterSent = 0;
+    			}
+    			break;
+    		case MAVLINK_MSG_ID_PARAM_REQUEST_READ:
+    		{
+    			mavlink_param_request_read_t read;
+    			mavlink_msg_param_request_read_decode(&msgRx, &read);
+    			CurrentParameterReRead = read.param_index;
+    		}
+    			break;
+    		case MAVLINK_MSG_ID_PARAM_SET:
+    		{
+    				mavlink_param_set_t set;
+    				mavlink_msg_param_set_decode(&msgRx, &set);
+    				CurrentParameterReRead = updateParameter(set.param_id, set.param_value, set.param_type);
+    		}
     		default:
+
     				//Do nothing
     		break;
     	}
@@ -144,26 +174,29 @@ extern "C" void USART1_IRQHandler(void)
 
 struct TelemetryTask_t
 {
-	uint32_t   LastTickExecuted;
-	uint16_t   TaskTickDelta;
-	bool      (*Func)();
+	int32_t   LastTickExecuted; ///< Last time processing function were called.
+	uint16_t   TaskTickDelta;    ///< Period in ticks. Try to set prime number to avoid several processing per call.
+	bool      (*Func)();         ///< Processing function.
 };
 
-#define MAX_TASKS 4
+#define MAX_TASKS 5
 
 bool processHartBeat();
 bool processAttitude();
 bool processRawSensors();
 bool processRCInput();
+bool processParameters();
 
 TelemetryTask_t TelemetryTasks[MAX_TASKS] =
 {
-		{0, 217, processHartBeat},
-		{0, 201, processAttitude},
-		{0, 11,  processRawSensors},
-		{0, 17,  processRCInput}
+		{0, 997,   processHartBeat},
+		{0, 379,   processAttitude},
+		{0, 211,   processRCInput},
+		{0, 199,   processRawSensors},
+		{0, 2,     processParameters}
 };
 
+/// Init mavlink protocol.
 void InitMAVLink()
 {
 	initUsart();								 ///< Init Comm hardware
@@ -171,11 +204,15 @@ void InitMAVLink()
 	mavlink_system.sysid = 20;                   ///< ID 20 for this airplane
 	mavlink_system.compid = MAV_COMP_ID_IMU;     ///< The component sending the message is the IMU, it could be also a Linux process
 	mavlink_system.type = MAV_TYPE_QUADROTOR;    ///< This system is an quadrotor
+
+	// Parameters protocol
+	CurrentParameterReRead = CurrentParameterSent = GetParamsCount(); ///< Not need to send parameters now.
+
 }
 
 // http://qgroundcontrol.org/mavlink/parameter_protocol
 
-int currentTick = 0; ///< Current telemetry call number. Used as counter.
+int32_t currentTick = 0; ///< Current telemetry call number. Used as counter.
 
 void ProcessMAVLink()
 {
@@ -184,7 +221,7 @@ void ProcessMAVLink()
 	for (int taskIndex = 0; taskIndex < MAX_TASKS; ++taskIndex)
 	{
 		TelemetryTask_t task = TelemetryTasks[taskIndex];
-		if (currentTick - task.LastTickExecuted < task.TaskTickDelta)
+		if (currentTick - (int32_t)task.LastTickExecuted < task.TaskTickDelta)
 		{
 			continue;
 		}
@@ -197,6 +234,122 @@ void ProcessMAVLink()
 			sendUsart(buf, len);
 		}
 	}
+}
+
+uint16_t updateParameter(const char* name, float val, uint8_t paramType)
+{
+	const uint16_t totalParameters = GetParamsCount();
+	param_s param;
+	int16_t index = GetParam(param, name);
+	if (index == -1)
+	{
+		return totalParameters;
+	}
+	switch (param.type)
+	{
+		case PARAM_UINT32:
+		{
+			if (paramType != MAV_PARAM_TYPE_UINT32)
+			{
+				return totalParameters;
+			}
+			*((uint32_t*)param.address) = (uint32_t)val;
+		 }
+		 break;
+		 case PARAM_INT32:
+		 {
+			 if (paramType != MAV_PARAM_TYPE_INT32)
+			 {
+				 return totalParameters;
+			 }
+			 *((int32_t*)param.address) = (int32_t)val;
+		 }
+		 break;
+		 case PARAM_FLOAT:
+			 if (paramType != MAV_PARAM_TYPE_REAL32)
+			 {
+				 return totalParameters;
+			 }
+			 *((float*)param.address) = val;
+			 break;
+		 default:
+			 return false;
+	}
+	return index;
+}
+
+bool sendParameter(uint16_t index)
+{
+	 param_s param;
+
+	 if (!GetParam(param, index))
+	 {
+		 return false; // ?
+	 }
+
+	 char name[MAVLINK_MSG_PARAM_SET_FIELD_PARAM_ID_LEN];
+	 memset(name, 0, MAVLINK_MSG_PARAM_SET_FIELD_PARAM_ID_LEN);
+
+	 const uint8_t size = min(MAVLINK_MSG_PARAM_SET_FIELD_PARAM_ID_LEN-1, strlen(param.name));
+
+	 memcpy(name, param.name, size);
+
+	 float val;
+
+	 MAV_PARAM_TYPE paramType;
+
+	 switch (param.type)
+	  {
+	 	case PARAM_UINT32:
+	 	{
+	   		const uint32_t temp = *((uint32_t*)param.address);
+	   		val = temp;
+	   		paramType = MAV_PARAM_TYPE_UINT32;
+	 	}
+	 		break;
+	    case PARAM_INT32:
+	    {
+	    	const int32_t temp = *((int32_t*)param.address);
+	    	val = temp;
+	    	paramType = MAV_PARAM_TYPE_INT32;
+	    }
+	   		break;
+	    case PARAM_FLOAT:
+	    	val = *((float*)param.address);
+	    	paramType = MAV_PARAM_TYPE_REAL32;
+	   		break;
+	 	  default:
+	 		  return false;
+	  }
+	 //static inline uint16_t mavlink_msg_param_value_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
+	 	//					       const char *param_id, float param_value, uint8_t param_type, uint16_t param_count, uint16_t param_index)
+
+	 mavlink_msg_param_value_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+			 name, val, paramType, GetParamsCount(), index);
+}
+
+bool processParameters()
+{
+
+ const uint16_t totalParameters = GetParamsCount();
+ if (CurrentParameterReRead < totalParameters)
+ {
+	 if (sendParameter(CurrentParameterReRead))
+	 {
+		 sendParameter(CurrentParameterReRead);
+		 CurrentParameterReRead = totalParameters;
+		 return true;
+	 }
+ }
+
+ if (CurrentParameterSent >= totalParameters)
+ {
+	 return false;
+ }
+
+ ++CurrentParameterSent;
+
+ return sendParameter(CurrentParameterSent-1);
 }
 
 bool processHartBeat()

@@ -1,9 +1,7 @@
 #pragma once
 
-struct RadioLinkData
-{
-	uint16_t Throttle, Yaw, Pitch, Roll;
-};
+class LedInfo;
+class Nrf24;
 
 // Controls rf data link
 class RadioLink{
@@ -11,5 +9,6 @@ class RadioLink{
 	LedInfo *_leds;
 public:
 	RadioLink(Nrf24 *nrf, LedInfo *leds);
-	bool Update(RadioLinkData& data);
+	bool Update();
+	uint16_t Throttle, Yaw, Roll, Pitch; // RAW Values.
 };

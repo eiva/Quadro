@@ -35,6 +35,15 @@ SECTIONS
 		*(.rodata*)
 		
 		KEEP(*(.eh_fram e*))
+
+		. = ALIGN(4);
+        _param_start = .;
+        KEEP(*(.param))
+        KEEP(*(.param.*))
+        _param_stop = .;
+
+        . = ALIGN(4);
+        *(.persist)
 	} > rom 
 	
 	.ARM.extab : 
@@ -130,4 +139,4 @@ SECTIONS
 	
 	/* Check if data + heap + stack exceeds ram  limit */
 	ASSERT(__StackLimit >= __HeapLimit, "region ram  overflowed with stack")
-}
+}
