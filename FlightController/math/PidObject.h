@@ -32,15 +32,6 @@ public:
     _deriv     = 0;
   }
 
- /**
-  * Set a new set point for the PID to track.
-  *
-  * @param[in] desired The new desired value
-  */
-  void SetDesired(float desired){
-    _desired = desired;
-  }
-
   /**
    * Update the PID parameters.
    *
@@ -50,16 +41,24 @@ public:
    *                        Set to False if pidSetError() has been used.
    * @return PID algorithm output
    */
-  float Update(const float measured, const float dt, const bool updateError){
+  float Update(const float desired, const float measured, const float dt, const bool updateError)
+  {
+	  _desired = desired;
 
     if (updateError)
+    {
       _error = _desired - measured;
+    }
 
     _integ += _error * dt;
     if (_integ > _iLimit)
+    {
       _integ = _iLimit;
+    }
     else if (_integ < _iLimitLow)
+    {
       _integ = _iLimitLow;
+    }
 
     _deriv = (_error - _prevError) / dt;
 

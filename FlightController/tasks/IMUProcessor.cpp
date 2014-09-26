@@ -17,6 +17,8 @@
 #include "MadwickAHRS.h"
 #include "IMUProcessor.h"
 
+extern LedInfo* TheLedInfo;
+
 void vTaskIMUProcessor (void *pvParameters)
 {
 	IMUData data;
@@ -26,6 +28,7 @@ void vTaskIMUProcessor (void *pvParameters)
 	uint8_t ReadBuf[21];
 	while(1)
     {
+		TheLedInfo->B(true);
 		const float currentTick = xTaskGetTickCount();
 
 		mpu->Read(ReadBuf);
@@ -78,13 +81,13 @@ void vTaskIMUProcessor (void *pvParameters)
 		const float q12 = ahrs.q1 * ahrs.q2;
 		const float q03 = ahrs.q0 * ahrs.q3;
 
-		const float q1s = ahrs.q1 * ahrs.q1;
-		const float q2s = ahrs.q2 * ahrs.q2;
-		const float q3s = ahrs.q3 * ahrs.q3;
+		const float q11 = ahrs.q1 * ahrs.q1;
+		const float q22 = ahrs.q2 * ahrs.q2;
+		const float q33 = ahrs.q3 * ahrs.q3;
 
-		const float roll  =  atan2f(q23 + q01, 0.5f - (q1s + q2s));
-		const float pitch = -asinf(-2.0f * (q13 + q02));
-		const float yaw   =  atan2f(q12 + q03, 0.5f - (q2s + q3s));
+		const float roll  =  atan2f(2.0f * (q01 + q23), 1.0f - 2.0f * (q11 + q22));
+		const float pitch =  asinf( 2.0f * (q02 - q13));
+		const float yaw   =  atan2f(2.0f * (q03 + q12), 1.0f - 2.0f * (q22 + q33));
 
 		TheGlobalData.EulerRoll = roll;
 		TheGlobalData.EulerPitch = pitch;
@@ -96,6 +99,7 @@ void vTaskIMUProcessor (void *pvParameters)
 
 		// Post to commander unit
 		xQueueOverwrite(TheIMUDataQueue, &data);
+		TheLedInfo->B(false);
 		vTaskDelay(10); // 100Hz.
     }
     vTaskDelete(NULL);

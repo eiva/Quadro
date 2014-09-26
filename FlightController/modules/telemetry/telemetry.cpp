@@ -10,12 +10,15 @@ namespace
 mavlink_system_t mavlink_system;
 
 // Define the system type, in this case an airplane
-uint8_t system_type = MAV_TYPE_FIXED_WING;
-uint8_t autopilot_type = MAV_AUTOPILOT_GENERIC;
+static const uint8_t  system_type = MAV_TYPE_FIXED_WING;
+static const uint8_t  autopilot_type = MAV_AUTOPILOT_GENERIC;
 
-uint8_t system_mode = MAV_MODE_PREFLIGHT; ///< Booting up
-uint32_t custom_mode = 0;                 ///< Custom mode, can be defined by user/adopter
-uint8_t system_state = MAV_STATE_STANDBY; ///< System ready for flight
+static const uint8_t  system_mode = MAV_MODE_PREFLIGHT; ///< Booting up
+static const uint32_t custom_mode = 0;                  ///< Custom mode, can be defined by user/adopter
+static const uint8_t  system_state = MAV_STATE_STANDBY; ///< System ready for flight
+
+static const uint32_t sensorPresent = MAV_SYS_STATUS_SENSOR_3D_GYRO | MAV_SYS_STATUS_SENSOR_3D_ACCEL | MAV_SYS_STATUS_SENSOR_ATTITUDE_STABILIZATION
+									| MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS | MAV_SYS_STATUS_SENSOR_RC_RECEIVER | MAV_SYS_STATUS_AHRS;
 
 // Initialize the required buffers for Transmit
 mavlink_message_t msg;
@@ -25,7 +28,6 @@ uint8_t buf[MAVLINK_MAX_PACKET_LEN];
 mavlink_message_t msgRx;
 
 mavlink_status_t status;
-
 
 // HAL: Usart used for comm
 USART_TypeDef* _usart = USART1;
@@ -174,7 +176,7 @@ extern "C" void USART1_IRQHandler(void)
 
 struct TelemetryTask_t
 {
-	int32_t   LastTickExecuted; ///< Last time processing function were called.
+	int32_t   LastTickExecuted;  ///< Last time processing function were called.
 	uint16_t   TaskTickDelta;    ///< Period in ticks. Try to set prime number to avoid several processing per call.
 	bool      (*Func)();         ///< Processing function.
 };
@@ -187,11 +189,17 @@ bool processRawSensors();
 bool processRCInputRaw();
 bool processRCInputScaled();
 bool processParameters();
+bool processSysStatus();
+bool processSystemTime();
+bool processMotorsOutputRaw();
 
 TelemetryTask_t TelemetryTasks[] =
 {
+		{0, 1019,  processSystemTime},
+		{0, 1009,  processSysStatus},
 		{0, 997,   processHartBeat},
 		{0, 769,   processRCInputRaw},
+		{0, 577, processMotorsOutputRaw},
 		{0, 379,   processAttitude},
 		{0, 211,   processRCInputScaled},
 		{0, 199,   processRawSensors},
@@ -212,8 +220,6 @@ void InitMAVLink()
 
 }
 
-// http://qgroundcontrol.org/mavlink/parameter_protocol
-
 int32_t currentTick = 0; ///< Current telemetry call number. Used as counter.
 
 void ProcessMAVLink()
@@ -224,7 +230,7 @@ void ProcessMAVLink()
 
 	for (int taskIndex = 0; taskIndex < maxsize; ++taskIndex)
 	{
-		TelemetryTask_t task = TelemetryTasks[taskIndex];
+		TelemetryTask_t &task = TelemetryTasks[taskIndex];
 		if (currentTick - (int32_t)task.LastTickExecuted < task.TaskTickDelta)
 		{
 			continue;
@@ -292,7 +298,7 @@ bool sendParameter(uint16_t index)
 
 	 if (!GetParam(param, index))
 	 {
-		 return false; // ?
+		 return false;
 	 }
 
 	 char name[MAVLINK_MSG_PARAM_SET_FIELD_PARAM_ID_LEN];
@@ -329,8 +335,6 @@ bool sendParameter(uint16_t index)
 	 	  default:
 	 		  return false;
 	  }
-	 //static inline uint16_t mavlink_msg_param_value_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-	 	//					       const char *param_id, float param_value, uint8_t param_type, uint16_t param_count, uint16_t param_index)
 
 	 mavlink_msg_param_value_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
 			 name, val, paramType, GetParamsCount(), index);
@@ -368,8 +372,8 @@ bool processHartBeat()
 bool processAttitude()
 {
 	// Quaternion
-	/*mavlink_msg_attitude_quaternion_pack(mavlink_system.sysid, mavlink_system.compid, &msg, TheGlobalData.BootMilliseconds,
-					TheGlobalData.AttQ0, TheGlobalData.AttQ1, TheGlobalData.AttQ2, TheGlobalData.AttQ3, 0, 0, 0);*/
+	//mavlink_msg_attitude_quaternion_pack(mavlink_system.sysid, mavlink_system.compid, &msg, TheGlobalData.BootMilliseconds,
+	//				TheGlobalData.AttQ0, TheGlobalData.AttQ1, TheGlobalData.AttQ2, TheGlobalData.AttQ3, 0, 0, 0);
 
 	// Euler
 	mavlink_msg_attitude_pack(mavlink_system.sysid, mavlink_system.compid, &msg, TheGlobalData.BootMilliseconds,
@@ -379,24 +383,16 @@ bool processAttitude()
 }
 bool processRawSensors()
 {
-	//uint64_t time_usec, float xacc, float yacc, float zacc, float xgyro, float ygyro, float zgyro, float xmag, float ymag, float zmag,
-	//float abs_pressure, float diff_pressure, float pressure_alt, float temperature, uint32_t fields_updated)
-	mavlink_msg_hil_sensor_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+	mavlink_msg_raw_imu_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
 			TheGlobalData.BootMilliseconds * 1000,
 			TheGlobalData.AX, TheGlobalData.AY, TheGlobalData.AZ,
 			TheGlobalData.GX, TheGlobalData.GY, TheGlobalData.GZ,
-			TheGlobalData.MX, TheGlobalData.MY, TheGlobalData.MZ,
-			0, 0, 0, TheGlobalData.Temperature,
-			0x1FF);
+			TheGlobalData.MX, TheGlobalData.MY, TheGlobalData.MZ);
 	return true;
 }
 
 bool processRCInputRaw()
 {
-	//uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-		//					       uint64_t time_usec,
-	  // uint16_t chan1_raw, uint16_t chan2_raw, uint16_t chan3_raw, uint16_t chan4_raw, uint16_t chan5_raw, uint16_t chan6_raw, uint16_t chan7_raw, uint16_t chan8_raw, uint16_t chan9_raw, uint16_t chan10_raw, uint16_t chan11_raw, uint16_t chan12_raw, uint8_t rssi)
-
 	mavlink_msg_rc_channels_raw_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
 			TheGlobalData.BootMilliseconds,
 			0,
@@ -415,5 +411,33 @@ bool processRCInputScaled()
 			0, 0,0,0,
 			255);
 	return true;
-
+}
+bool processSysStatus()
+{
+	mavlink_msg_sys_status_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+			sensorPresent, sensorPresent, sensorPresent,
+			500,
+			0, 0, 100,
+			(100*status.packet_rx_drop_count) / (status.packet_rx_success_count + status.packet_rx_drop_count),
+			status.packet_rx_drop_count,
+			0,0,0,0);
+	return true;
+}
+bool processSystemTime()
+{
+	mavlink_msg_system_time_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+			0, TheGlobalData.BootMilliseconds);
+	return true;
+}
+bool processMotorsOutputRaw()
+{
+	mavlink_msg_servo_output_raw_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+			TheGlobalData.BootMilliseconds * 1000,
+			0,
+			TheGlobalData.MO1,
+			TheGlobalData.MO2,
+			TheGlobalData.MO3,
+			TheGlobalData.MO4,
+			0,0,0,0);
+	return true;
 }

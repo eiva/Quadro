@@ -2,10 +2,10 @@
 
 
 class Motors{
-	uint16_t _min;
-	uint16_t _max;
+	const uint16_t _min;
+	const uint16_t _max;
 public:
 	Motors();
-	// Input - value from 0 - 1800 = 1/10 degree.
-	void SetRatio(const uint16_t m1, const uint16_t m2, const uint16_t m3, const uint16_t m4);
+	// Input - value from 0 - 100 = 1/10 degree.
+	void SetRatio(const float m1, const float m2, const float m3, const float m4);
 };

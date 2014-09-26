@@ -22,6 +22,8 @@ public:
 	float AttQ0, AttQ1, AttQ2, AttQ3; ///< Attitude quaternion values from AHRS.
 
 	float EulerRoll, EulerPitch, EulerYaw; ///< Euler Tait–Bryan angles.
+
+	uint16_t MO1, MO2, MO3, MO4; ///< Motors outputs in PWM?
 };
 
 extern GlobalData TheGlobalData;

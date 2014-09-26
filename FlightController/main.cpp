@@ -23,6 +23,7 @@
 #include "parameters.h"
 #include "IMUProcessor.h"
 #include "RFReciever.h"
+#include "Commander.h"
 
 QueueHandle_t TheRadioCommandsQueue;
 QueueHandle_t TheIMUDataQueue;
@@ -31,6 +32,8 @@ QueueSetHandle_t TheStabilizerQueueSet;
 
 
 GlobalData TheGlobalData; // Defined in GlobalData file.
+
+LedInfo *TheLedInfo;
 
 
 /*******************************************************************/
@@ -47,66 +50,17 @@ void vFreeRTOSInitAll()
 	xQueueAddToSet( TheIMUDataQueue, TheStabilizerQueueSet );
 }
 
-void vTaskCommander (void *pvParameters)
-{
-	QueueSetMemberHandle_t xActivatedMember;
-	RadioLinkData radioData;
-	IMUData imuData;
-	Motors motors;
-	LogData log;
-	bool imuReady = false;
-	bool radioReady = false;
-    while(1)
-    {
-    	xActivatedMember = xQueueSelectFromSet(TheStabilizerQueueSet, 10);
-    	if (xActivatedMember == TheRadioCommandsQueue)
-    	{
-    		xQueueReceive(TheRadioCommandsQueue, &radioData, 0 );
-    		radioReady = true;
-    	}
-    	if (xActivatedMember == TheIMUDataQueue)
-    	{
-    		xQueueReceive(TheIMUDataQueue, &imuData, 0 );
-    		imuReady = true;
-    	}
-    	else
-    	{
-    		// failure!
-    		continue;
-    	}
-    	if (!imuReady || !radioReady)
-    	{
-    		// Wait for first complete data.
-    		continue;
-    	}
-
-    	motors.SetRatio(radioData.Throttle, radioData.Yaw, radioData.Pitch, radioData.Roll);
-
-    	log.Timer = xTaskGetTickCount();
-    	log.InputThrottle = radioData.Throttle;
-    	log.InputYaw = radioData.Yaw;
-    	log.InputPitch = radioData.Pitch;
-    	log.InputRoll = radioData.Roll;
-    	log.Yaw = imuData.EulierAngles.Z;
-    	log.Roll = imuData.EulierAngles.Y;
-    	log.Pitch = imuData.EulierAngles.X;
-
-    	// Testing telemetry.
-    	//xQueueOverwrite( TheLogQueue, &log );
-    	// Process Data!
-    }
-    vTaskDelete(NULL);
-}
-
 void vTaskDataLogger (void *pvParameters)
 {
 	Logger *logger = (Logger*)pvParameters;
     LogData data;
 	while(1)
     {
+		TheLedInfo->R(true);
 		//xQueueReceive(TheLogQueue, &data, portMAX_DELAY  );
 		//logger->Log(data); // Extra slow!
 		ProcessMAVLink();
+		TheLedInfo->R(false);
 		vTaskDelay(1);
     }
     vTaskDelete(NULL);
@@ -121,13 +75,13 @@ int main(void)
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
-	LedInfo *info = new LedInfo();
-	info->RGBY(true, true, true, true);
+	TheLedInfo = new LedInfo();
+	TheLedInfo->RGBY(true, true, true, true);
 
 	Button *button = new Button(GPIOA, GPIO_Pin_0);
 	while (!button->GetState());
 	while (button->GetState());
-	info->Off();
+	TheLedInfo->Off();
 
 	InitParams();
 
@@ -141,7 +95,7 @@ int main(void)
 
 	Nrf24* nrf = new Nrf24(spi, csn, ce);
 
-	RadioLink *radioLink = new RadioLink(nrf, info);
+	RadioLink *radioLink = new RadioLink(nrf, TheLedInfo);
 
 	Port* mpuCSN = new Port(GPIOB, GPIO_Pin_12);
 	mpuCSN->High();
@@ -151,32 +105,19 @@ int main(void)
 	Mpu9250 *mpu = new Mpu9250(spi2, mpuCSN);
 	if (!mpu->Check())
 	{
-		info->R(true);
+		TheLedInfo->R(true);
 		while(1);
 	}
 
-	Logger *logger = new Logger(info, button);
+	Logger *logger = new Logger(TheLedInfo, button);
 
 	vFreeRTOSInitAll();
-    xTaskCreate(vTaskRFReciever, (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 4, NULL);
-    xTaskCreate(vTaskIMUProcessor,(char*)"STB", configMINIMAL_STACK_SIZE, mpu, tskIDLE_PRIORITY + 2, NULL);
-    //xTaskCreate(vTaskCommander,  (char*)"CMD", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
-    xTaskCreate(vTaskDataLogger, (char*)"LOG", configMINIMAL_STACK_SIZE, logger, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(vTaskRFReciever,  (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 4, NULL);
+    xTaskCreate(vTaskIMUProcessor,(char*)"STB", configMINIMAL_STACK_SIZE, mpu,       tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(vTaskCommander,   (char*)"CMD", configMINIMAL_STACK_SIZE, NULL,      tskIDLE_PRIORITY + 3, NULL);
+    xTaskCreate(vTaskDataLogger,  (char*)"LOG", configMINIMAL_STACK_SIZE, logger,    tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
 
     // We should not be here.
-    info->RGBY(true, true, true, true);
 	while(1);
-}
-
-
-
-extern "C"
-{
-
-
-void _exit(int status){
-	while(1);
-}
-
 }

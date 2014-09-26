@@ -8,9 +8,12 @@
 #include "RadioLink.h"
 #include "GlobalData.h"
 #include "Helpers.h"
+#include "LedInfo.h"
 #include "parameters.h"
 
 #include "RFReciever.h"
+
+extern LedInfo* TheLedInfo;
 
 uint32_t param_rc1_dz   = 0;     // 0 - 200
 uint32_t param_rc1_max  = 1822;  // 800 - 2200
@@ -24,7 +27,7 @@ uint32_t param_rc2_min  = 832;   // 800 - 2200
 int32_t  param_rc2_rev  = 1;     // -1 = reversed 1 = normal
 uint32_t param_rc2_trim = 1222;  // 800 - 220
 
-uint32_t param_rc3_dz   = 210     // 0 - 200
+uint32_t param_rc3_dz   = 200;     // 0 - 200
 uint32_t param_rc3_max  = 1823;  // 800 - 2200
 uint32_t param_rc3_min  = 800;   // 800 - 2200
 int32_t  param_rc3_rev  = 1;     // -1 = reversed 1 = normal
@@ -52,6 +55,7 @@ void vTaskRFReciever (void *pvParameters)
     {
     	if (radioLink->Update())
     	{
+    		TheLedInfo->G(true);
     		// For telemetry.
     		TheGlobalData.RT = (uint16_t)TOV(radioLink->Throttle);
     		TheGlobalData.RY = (uint16_t)TOV(radioLink->Yaw);
@@ -71,22 +75,24 @@ void vTaskRFReciever (void *pvParameters)
 
     		xQueueOverwrite( TheRadioCommandsQueue, &data );
 
+    		TheLedInfo->G(false);
+
     		vTaskDelay(20); // 50Hz
     	}
     	else
     	{
-    		vTaskDelay(1);
+    		vTaskDelay(5);
     	}
     }
     vTaskDelete(NULL);
 }
 
-// Constant just for QGC compartability
+// Constant just for QGC compatability
 uint32_t param_rc_speed = 60; // Hz
-uint32_t param_rcmap_pitch = 2;
-uint32_t param_rcmap_roll = 1;
-uint32_t param_rcmap_throttle = 3;
-uint32_t param_rcmap_yaw = 4;
+uint32_t param_rcmap_pitch = 3;
+uint32_t param_rcmap_roll = 4;
+uint32_t param_rcmap_throttle = 1;
+uint32_t param_rcmap_yaw = 2;
 
 PARAM_GROUP_START(RFParameters)
 
@@ -120,4 +126,4 @@ PARAM_GROUP_START(RFParameters)
 	PARAM_ADD(PARAM_UINT32, RCMAP_ROLL,     &param_rcmap_roll)
 	PARAM_ADD(PARAM_UINT32, RCMAP_THROTTLE, &param_rcmap_throttle)
 	PARAM_ADD(PARAM_UINT32, RCMAP_YAW,      &param_rcmap_yaw)
-PARAM_GROUP_STOP(TEST_PARAMS)
+PARAM_GROUP_STOP(RFParameters)
