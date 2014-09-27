@@ -182,9 +182,9 @@
     <File name="modules/telemetry/common/mavlink_msg_mission_item_int.h" path="modules/telemetry/common/mavlink_msg_mission_item_int.h" type="1"/>
     <File name="RTOSRoutines.c" path="RTOSRoutines.c" type="1"/>
     <File name="fatfs_lib/source/ff.c" path="fatfs_lib/source/ff.c" type="1"/>
-    <File name="cmsis_lib/include/stm32f4xx_tim.h" path="cmsis_lib/include/stm32f4xx_tim.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_local_position_ned_system_global_offset.h" path="modules/telemetry/common/mavlink_msg_local_position_ned_system_global_offset.h" type="1"/>
     <File name="cmsis_lib/source/stm32f4xx_adc.c" path="cmsis_lib/source/stm32f4xx_adc.c" type="1"/>
+    <File name="cmsis_lib/include/stm32f4xx_tim.h" path="cmsis_lib/include/stm32f4xx_tim.h" type="1"/>
     <File name="fatfs_lib/include/sdio_sd.h" path="fatfs_lib/include/sdio_sd.h" type="1"/>
     <File name="modules/telemetry/common/version.h" path="modules/telemetry/common/version.h" type="1"/>
     <File name="modules/telemetry/common/testsuite.h" path="modules/telemetry/common/testsuite.h" type="1"/>
@@ -337,9 +337,9 @@
     <File name="GlobalData.h" path="GlobalData.h" type="1"/>
     <File name="freertos/include/StackMacros.h" path="freertos/include/StackMacros.h" type="1"/>
     <File name="fatfs_lib/include/integer.h" path="fatfs_lib/include/integer.h" type="1"/>
-    <File name="modules/parameters/parameters.h" path="modules/parameters/parameters.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_autopilot_version.h" path="modules/telemetry/common/mavlink_msg_autopilot_version.h" type="1"/>
     <File name="modules/telemetry/common/mavlink.h" path="modules/telemetry/common/mavlink.h" type="1"/>
+    <File name="modules/parameters/parameters.h" path="modules/parameters/parameters.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_sys_status.h" path="modules/telemetry/common/mavlink_msg_sys_status.h" type="1"/>
     <File name="cmsis_lib/include/stm32f4xx_exti.h" path="cmsis_lib/include/stm32f4xx_exti.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_hil_state.h" path="modules/telemetry/common/mavlink_msg_hil_state.h" type="1"/>

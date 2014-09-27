@@ -192,6 +192,7 @@ bool processParameters();
 bool processSysStatus();
 bool processSystemTime();
 bool processMotorsOutputRaw();
+bool processDBG();
 
 TelemetryTask_t TelemetryTasks[] =
 {
@@ -202,6 +203,7 @@ TelemetryTask_t TelemetryTasks[] =
 		{0, 577, processMotorsOutputRaw},
 		{0, 379,   processAttitude},
 		{0, 211,   processRCInputScaled},
+		{0, 207,   processDBG},
 		{0, 199,   processRawSensors},
 		{0, 2,     processParameters}
 };
@@ -432,12 +434,26 @@ bool processSystemTime()
 bool processMotorsOutputRaw()
 {
 	mavlink_msg_servo_output_raw_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
-			TheGlobalData.BootMilliseconds * 1000,
+			TheGlobalData.MOUpdateTime * 1000,
 			0,
 			TheGlobalData.MO1,
 			TheGlobalData.MO2,
 			TheGlobalData.MO3,
 			TheGlobalData.MO4,
 			0,0,0,0);
+	return true;
+}
+bool processDBG()
+{
+//	static inline uint16_t mavlink_msg_highres_imu_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
+	//						       uint64_t time_usec, float xacc, float yacc, float zacc, float xgyro, float ygyro, float zgyro, float xmag, float ymag, float zmag,
+	//float abs_pressure, float diff_pressure, float pressure_alt, float temperature, uint16_t fields_updated)
+
+	mavlink_msg_highres_imu_pack(mavlink_system.sysid, mavlink_system.compid, &msg,
+			TheGlobalData.MOUpdateTime * 1000,
+			TheGlobalData.DBG_PID_YAW, TheGlobalData.DBG_PID_ROLL, TheGlobalData.DBG_PID_PITCH,
+			TheGlobalData.DBG_CO_YAW, TheGlobalData.DBG_CO_ROLL, TheGlobalData.DBG_CO_PITCH,
+			0,0,0,
+			0,0,0,0,0x1ff);
 	return true;
 }

@@ -23,7 +23,13 @@ public:
 
 	float EulerRoll, EulerPitch, EulerYaw; ///< Euler Tait–Bryan angles.
 
+	uint32_t MOUpdateTime; ///< Milliseconds from start.
 	uint16_t MO1, MO2, MO3, MO4; ///< Motors outputs in PWM?
+
+	float DBG_PID_YAW, DBG_PID_ROLL, DBG_PID_PITCH;
+	float DBG_CO_YAW, DBG_CO_ROLL, DBG_CO_PITCH;
+
+
 };
 
 extern GlobalData TheGlobalData;

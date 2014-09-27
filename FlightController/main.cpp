@@ -79,8 +79,8 @@ int main(void)
 	TheLedInfo->RGBY(true, true, true, true);
 
 	Button *button = new Button(GPIOA, GPIO_Pin_0);
-	while (!button->GetState());
-	while (button->GetState());
+	//while (!button->GetState());
+	//while (button->GetState());
 	TheLedInfo->Off();
 
 	InitParams();

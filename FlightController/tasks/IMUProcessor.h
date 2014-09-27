@@ -4,7 +4,7 @@
 
 struct IMUData
 {
-	Vector3 EulierAngles;
+	float Yaw, Pitch, Roll;
 };
 
 extern QueueHandle_t TheIMUDataQueue;

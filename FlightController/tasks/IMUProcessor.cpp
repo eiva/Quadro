@@ -89,13 +89,13 @@ void vTaskIMUProcessor (void *pvParameters)
 		const float pitch =  asinf( 2.0f * (q02 - q13));
 		const float yaw   =  atan2f(2.0f * (q03 + q12), 1.0f - 2.0f * (q22 + q33));
 
-		TheGlobalData.EulerRoll = roll;
+		TheGlobalData.EulerRoll  = roll;
 		TheGlobalData.EulerPitch = pitch;
-		TheGlobalData.EulerYaw = yaw;
+		TheGlobalData.EulerYaw   = yaw;
 
-		data.EulierAngles.X = roll;
-		data.EulierAngles.Y = pitch;
-		data.EulierAngles.Z = yaw;
+		data.Roll  = roll;
+		data.Pitch = pitch;
+		data.Yaw   = yaw;
 
 		// Post to commander unit
 		xQueueOverwrite(TheIMUDataQueue, &data);

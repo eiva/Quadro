@@ -29,9 +29,9 @@ void vTaskCommander (void *pvParameters)
 	float lastTick = xTaskGetTickCount();
 
 	//(const float kp, const float ki, const float kd, const float intLimit)
-	PidObject yawRatePid(1.3f, 0, 0.1f, 1);
-	PidObject pitchPid(1.8f, 0, 0, 1);
-	PidObject rollPid(1.8f, 0, 0, 1);
+	PidObject yawRatePid(0.3f, 0, 0.1f, 1);
+	PidObject pitchPid(0.8f, 0, 0, 1);
+	PidObject rollPid(0.8f, 0, 0, 1);
 
 	bool imuReady = false;
 	bool radioReady = false;
@@ -51,52 +51,61 @@ void vTaskCommander (void *pvParameters)
     	else
     	{
     		// failure!
-    		lastTick = xTaskGetTickCount();
     		continue;
     	}
     	if (!imuReady || !radioReady)
     	{
     		// Wait for first complete data.
-    		lastTick = xTaskGetTickCount();
     		continue;
     	}
 
     	TheLedInfo->Y(true);
 
+    	if (radioData.Throttle <=1 )
+    	{
+    		TheLedInfo->Y(false);
+    		motors.SetRatio(0, 0, 0, 0);
+    		continue;
+    	}
+
     	// dT calculation
     	const float currentTick = xTaskGetTickCount();
     	const float dT = (currentTick - lastTick) / 1000.0f; // Seconds
     	lastTick = currentTick;
+    	if (dT == 0)
+    	{
+    		continue; // Skip first iteration.
+    	}
+
 
     	// Convert radio to angles
     	const float angle_max = radians(30.0f);
-    	const float yawRateDesired = map(radioData.Yaw,   -100.0f, 100.0f, -angle_max, angle_max); // [-angle_max, angle_max] radians
-    	const float pitchDesired   = map(radioData.Pitch, -100.0f, 100.0f, -angle_max, angle_max); // [-angle_max, angle_max] radians
-    	const float rollDesired    = map(radioData.Roll,  -100.0f, 100.0f, -angle_max, angle_max); // [-angle_max, angle_max] radians
+    	const float yawRateDesired =  map(radioData.Yaw,   -100.0f, 100.0f, -angle_max, angle_max); // [-angle_max, angle_max] radians
+    	const float pitchDesired   = -map(radioData.Pitch, -100.0f, 100.0f, -angle_max, angle_max); // [-angle_max, angle_max] radians
+    	const float rollDesired    =  map(radioData.Roll,  -100.0f, 100.0f, -angle_max, angle_max); // [-angle_max, angle_max] radians
 
     	const float throttleDesired = radioData.Throttle; // [0, 100] percent of motor power
 
     	// Feed PID regulators
-    	const float yawCorrection   = yawRatePid.Update(yawRateDesired, radioData.Yaw,   dT, true); // radians
-    	const float pitchCorrection = pitchPid.Update(  pitchDesired,   radioData.Pitch, dT, true); // radians
-    	const float rollCorrection  = rollPid.Update(   rollDesired,    radioData.Roll,  dT, true); // radians
+    	const float yawCorrection   = yawRatePid.Update( yawRateDesired, imuData.Yaw,   dT, true); // radians
+    	const float pitchCorrection = pitchPid  .Update( pitchDesired,   imuData.Pitch, dT, true); // radians
+    	const float rollCorrection  = rollPid   .Update( rollDesired,    imuData.Roll,  dT, true); // radians
 
     	// Calculate motors power
-    	const float pm = 10.0f; // Multiplier for Pitch
-    	const float rm = 10.0f; // Multiplier for Roll
+    	const float pm = 30.0f * throttleDesired / 100.0f; // Multiplier for Pitch
+    	const float rm = 30.0f * throttleDesired / 100.0f; // Multiplier for Roll
     	const float ym = 5.0f;  // Multiplier for Yaw
 
-    	const float pitchK = cosf(pitchCorrection); // [-1, 1] pitch correction
-    	const float rollK  = cosf(rollCorrection);  // [-1, 1] roll correction
+    	const float pitchK = pitchCorrection * pm; // [-1, 1] pitch correction
+    	const float rollK  = rollCorrection  * rm;  // [-1, 1] roll correction
     	const float yawK   = cosf(yawCorrection);   // [-1, 1] yaw correction
 
-#define MIX(R, P, Y) throttleDesired
+#define MIXRP(P, R) throttleDesired + (R) * rollK + (P) * pitchK
 
-    	float m1 = throttleDesired;
-    	float m2 = throttleDesired;
-    	float m3 = throttleDesired;
-    	float m4 = throttleDesired;
-
+    	float m1 = MIXRP( 1,-1);
+    	float m2 = MIXRP(-1, 1);
+    	float m3 = MIXRP( 1, 1);
+    	float m4 = MIXRP(-1,-1);
 
     	// Normalize motors power
 
@@ -104,10 +113,19 @@ void vTaskCommander (void *pvParameters)
     	motors.SetRatio(m1, m2, m3, m4);
 
     	// Telemetry
-    	TheGlobalData.MO1 = m1 * 100.0f;
-    	TheGlobalData.MO2 = m2 * 100.0f;
-    	TheGlobalData.MO3 = m3 * 100.0f;
-    	TheGlobalData.MO4 = m4 * 100.0f;
+    	TheGlobalData.MOUpdateTime = currentTick;
+    	TheGlobalData.MO1 = m1;
+    	TheGlobalData.MO2 = m2;
+    	TheGlobalData.MO3 = m3;
+    	TheGlobalData.MO4 = m4;
+
+    	TheGlobalData.DBG_PID_YAW   = yawCorrection;
+    	TheGlobalData.DBG_PID_PITCH = pitchCorrection;
+    	TheGlobalData.DBG_PID_ROLL  = rollCorrection;
+
+    	TheGlobalData.DBG_CO_YAW    = yawK;
+    	TheGlobalData.DBG_CO_PITCH  = pitchK;
+    	TheGlobalData.DBG_CO_ROLL   = rollK;
 
     	TheLedInfo->Y(false);
 
@@ -124,6 +142,7 @@ void vTaskCommander (void *pvParameters)
     	// Testing telemetry.
     	//xQueueOverwrite( TheLogQueue, &log );
     	// Process Data!
+    	vTaskDelay(10);
     }
     vTaskDelete(NULL);
 }
