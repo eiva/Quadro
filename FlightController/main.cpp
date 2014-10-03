@@ -24,11 +24,13 @@
 #include "IMUProcessor.h"
 #include "RFReciever.h"
 #include "Commander.h"
+#include "MotorsMatrix.h"
 
 QueueHandle_t TheRadioCommandsQueue;
 QueueHandle_t TheIMUDataQueue;
 QueueHandle_t TheLogQueue;
 QueueSetHandle_t TheStabilizerQueueSet;
+QueueHandle_t TheCommanderDataQueue;
 
 
 GlobalData TheGlobalData; // Defined in GlobalData file.
@@ -44,6 +46,8 @@ void vFreeRTOSInitAll()
 	TheIMUDataQueue = xQueueCreate(1, sizeof(IMUData));
 
 	TheLogQueue = xQueueCreate(1, sizeof(LogData));
+
+	TheCommanderDataQueue = xQueueCreate(1, sizeof(CommanderData));
 
 	TheStabilizerQueueSet = xQueueCreateSet(1+5);
 	xQueueAddToSet( TheRadioCommandsQueue, TheStabilizerQueueSet );
@@ -112,9 +116,10 @@ int main(void)
 	Logger *logger = new Logger(TheLedInfo, button);
 
 	vFreeRTOSInitAll();
-    xTaskCreate(vTaskRFReciever,  (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 4, NULL);
-    xTaskCreate(vTaskIMUProcessor,(char*)"STB", configMINIMAL_STACK_SIZE, mpu,       tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(vTaskCommander,   (char*)"CMD", configMINIMAL_STACK_SIZE, NULL,      tskIDLE_PRIORITY + 3, NULL);
+    xTaskCreate(vTaskRFReciever,  (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 5, NULL);
+    xTaskCreate(vTaskIMUProcessor,(char*)"STB", configMINIMAL_STACK_SIZE, mpu,       tskIDLE_PRIORITY + 3, NULL);
+    xTaskCreate(vTaskCommander,   (char*)"CMD", configMINIMAL_STACK_SIZE, NULL,      tskIDLE_PRIORITY + 4, NULL);
+    xTaskCreate(vTaskMotorMatrix, (char*)"MTR", configMINIMAL_STACK_SIZE, NULL,      tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(vTaskDataLogger,  (char*)"LOG", configMINIMAL_STACK_SIZE, logger,    tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
 

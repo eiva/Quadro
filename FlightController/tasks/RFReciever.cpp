@@ -46,6 +46,8 @@ uint32_t param_rc4_trim = 1316;  // 800 - 220
         :\
         100.0f * ((TOV(radioLink->v) - param_rc##i##_trim) / (param_rc##i##_trim - param_rc##i##_min))
 
+#define DZ(v, i) (abs(TOA(v, i)) > param_rc##i##_dz / (param_rc##i##_max - param_rc##i##_min) ? (TOA(v,i)) : 0)
+
 void vTaskRFReciever (void *pvParameters)
 {
 	const uint16_t minoffset = 800;
@@ -64,9 +66,9 @@ void vTaskRFReciever (void *pvParameters)
 
     		// Calibration
     		data.Throttle = 100.0f * (TOV(radioLink->Throttle) - param_rc1_min)/(param_rc1_max - param_rc1_min);
-    		data.Yaw   = TOA(Yaw, 2);
-    		data.Pitch = TOA(Pitch, 3);
-    		data.Roll  = TOA(Roll, 4);
+    		data.Yaw   = DZ(Yaw, 2);
+    		data.Pitch = DZ(Pitch, 3);
+    		data.Roll  = DZ(Roll, 4);
 
     		TheGlobalData.ST = data.Throttle;
     		TheGlobalData.SY = data.Yaw;

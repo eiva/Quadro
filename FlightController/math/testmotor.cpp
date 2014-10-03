@@ -18,8 +18,9 @@
 #include "Button.h"
 #include "RadioLink.h"
 #include "Vector.h"
+#include "Helpers.h"
 
-int mainTESTMOTOR(void)
+int main_dis_test_motorts(void)
 {
 	SystemInit();
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
@@ -27,46 +28,32 @@ int mainTESTMOTOR(void)
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
-	/*
-	 * 	Port csn(GPIOA, GPIO_Pin_4);
+	LedInfo * info = new LedInfo();
+	Port csn(GPIOA, GPIO_Pin_4);
 	csn.High();
 	Port ce (GPIOA, GPIO_Pin_3);
 
 	SpiInterface spi(SPI1);
 
-	Nrf24 nrf(spi, csn, ce);
+	Nrf24 nrf(&spi, &csn, &ce);
 
-	RadioLink radioLink(nrf, info);
+	RadioLink radioLink(&nrf, info);
 
 	Motors motors;
-	RadioLinkData radioData;
+	info->Off();
 	while(true)
 	{
-		if (radioLink.Update(radioData))
+		if (radioLink.Update())
 		{
-			motors.SetRatio(radioData.Throttle, radioData.Throttle, radioData.Throttle, radioData.Throttle);
-			info.Y(true);
+			int f = map(radioLink.Throttle, 0.0f, 1023.0f, 0.0f, 100.0f);
+			motors.SetRatio(f, f, f, f);
+			info->G(true);
 		}
 		else
 		{
-			info.R(true);
+			info->R(true);
 		}
 	}
-	 */
-
-	/*
-	LedInfo info;
-	info.RGBY(true, true, true, true);
-	Button button(GPIOA, GPIO_Pin_0);
-	while (!button.GetState());
-	info.Off();
-
-
-	Motors motors;
-
-    info.RGBY(true, true, false, false);
-	while(1);
-	*/
 }
 
 

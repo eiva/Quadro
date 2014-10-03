@@ -77,7 +77,7 @@ void initUsart()
 	// Configure USART
 	USART_InitTypeDef USART_InitStructure;
 	USART_StructInit(&USART_InitStructure);
-	USART_InitStructure.USART_BaudRate = 57600; // TODO: Extract as constant
+	USART_InitStructure.USART_BaudRate = 115200;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART_InitStructure.USART_Parity = USART_Parity_No;
@@ -200,7 +200,7 @@ TelemetryTask_t TelemetryTasks[] =
 		{0, 1009,  processSysStatus},
 		{0, 997,   processHartBeat},
 		{0, 769,   processRCInputRaw},
-		{0, 577, processMotorsOutputRaw},
+		{0, 577,   processMotorsOutputRaw},
 		{0, 379,   processAttitude},
 		{0, 211,   processRCInputScaled},
 		{0, 207,   processDBG},

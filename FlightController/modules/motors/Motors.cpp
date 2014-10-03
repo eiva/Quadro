@@ -5,7 +5,7 @@
 #include "Helpers.h"
 
 
-Motors::Motors() : _min(850), _max(1400)//_max(2000)
+Motors::Motors() : _min(800), _max(2500)//_max(2000)
 {
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,  ENABLE);
@@ -27,8 +27,8 @@ Motors::Motors() : _min(850), _max(1400)//_max(2000)
 
     // Timer configuration
     TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-    TIM_TimeBaseStructure.TIM_Period = 20000-1; // Total period = 20ms;
-    TIM_TimeBaseStructure.TIM_Prescaler =  SystemCoreClock / 1000000;//54;//(SystemCoreClock/2)/100000-1; // 1MHz devider - timer ticks with 1MHz
+    TIM_TimeBaseStructure.TIM_Prescaler =  SystemCoreClock / 900000; // 10MHz devider - timer ticks with 10MHz
+    TIM_TimeBaseStructure.TIM_Period = 20000-1; // Total period = 2ms; PWM = 400Hz
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);
@@ -59,10 +59,10 @@ Motors::Motors() : _min(850), _max(1400)//_max(2000)
 	TIM_CtrlPWMOutputs(TIM1, ENABLE);
 }
 
-// Input - value from 0 - 1800 = 1/10 degree.
-	void Motors::SetRatio(const float m1, const float m2, const float m3, const float m4){
-		TIM_SetCompare1(TIM1, (uint32_t)map(m1, 0.0f, 100.0f, _min, _max));
-		TIM_SetCompare2(TIM1, (uint32_t)map(m2, 0.0f, 100.0f, _min, _max));
-		TIM_SetCompare3(TIM1, (uint32_t)map(m3, 0.0f, 100.0f, _min, _max));
-		TIM_SetCompare4(TIM1, (uint32_t)map(m4, 0.0f, 100.0f, _min, _max));
-	}
+void Motors::SetRatio(const float m1, const float m2, const float m3, const float m4)
+{
+	TIM_SetCompare1(TIM1, (uint32_t)map(m1, 0.0f, 100.0f, _min, _max));
+	TIM_SetCompare2(TIM1, (uint32_t)map(m2, 0.0f, 100.0f, _min, _max));
+	TIM_SetCompare3(TIM1, (uint32_t)map(m3, 0.0f, 100.0f, _min, _max));
+	TIM_SetCompare4(TIM1, (uint32_t)map(m4, 0.0f, 100.0f, _min, _max));
+}

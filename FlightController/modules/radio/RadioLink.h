@@ -10,5 +10,5 @@ class RadioLink{
 public:
 	RadioLink(Nrf24 *nrf, LedInfo *leds);
 	bool Update();
-	uint16_t Throttle, Yaw, Roll, Pitch; // RAW Values.
+	uint16_t Throttle, Yaw, Roll, Pitch; // RAW Values. (0-1023 range in ideal).
 };
