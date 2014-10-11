@@ -116,7 +116,7 @@ int main(void)
 	Logger *logger = new Logger(TheLedInfo, button);
 
 	vFreeRTOSInitAll();
-    xTaskCreate(vTaskRFReciever,  (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 5, NULL);
+    xTaskCreate(vTaskRFReciever,  (char*)"nRF", configMINIMAL_STACK_SIZE, radioLink, tskIDLE_PRIORITY + 4, NULL);
     xTaskCreate(vTaskIMUProcessor,(char*)"STB", configMINIMAL_STACK_SIZE, mpu,       tskIDLE_PRIORITY + 3, NULL);
     xTaskCreate(vTaskCommander,   (char*)"CMD", configMINIMAL_STACK_SIZE, NULL,      tskIDLE_PRIORITY + 4, NULL);
     xTaskCreate(vTaskMotorMatrix, (char*)"MTR", configMINIMAL_STACK_SIZE, NULL,      tskIDLE_PRIORITY + 2, NULL);

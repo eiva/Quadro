@@ -20,7 +20,7 @@
 #include "Vector.h"
 #include "Helpers.h"
 
-int main_dis_test_motorts(void)
+int main_testmotor_disabled()
 {
 	SystemInit();
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);

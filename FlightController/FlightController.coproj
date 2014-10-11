@@ -219,16 +219,16 @@
     <File name="math/PidObject.h" path="math/PidObject.h" type="1"/>
     <File name="fatfs_lib/include/xprintf.h" path="fatfs_lib/include/xprintf.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_heartbeat.h" path="modules/telemetry/common/mavlink_msg_heartbeat.h" type="1"/>
-    <File name="freertos" path="" type="2"/>
     <File name="freertos/source/list.c" path="freertos/source/list.c" type="1"/>
+    <File name="freertos" path="" type="2"/>
     <File name="cmsis_lib/include/stm32f4xx_gpio.h" path="cmsis_lib/include/stm32f4xx_gpio.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_vision_position_estimate.h" path="modules/telemetry/common/mavlink_msg_vision_position_estimate.h" type="1"/>
     <File name="freertos/source/port.c" path="freertos/source/port.c" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_file_transfer_protocol.h" path="modules/telemetry/common/mavlink_msg_file_transfer_protocol.h" type="1"/>
     <File name="freertos/include/queue.h" path="freertos/include/queue.h" type="1"/>
     <File name="fatfs_lib/source/sdio_sd.c" path="fatfs_lib/source/sdio_sd.c" type="1"/>
-    <File name="modules/parameters/parameters.cpp" path="modules/parameters/parameters.cpp" type="1"/>
     <File name="modules/logger" path="" type="2"/>
+    <File name="modules/parameters/parameters.cpp" path="modules/parameters/parameters.cpp" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_param_request_list.h" path="modules/telemetry/common/mavlink_msg_param_request_list.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_set_position_target_local_ned.h" path="modules/telemetry/common/mavlink_msg_set_position_target_local_ned.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_named_value_float.h" path="modules/telemetry/common/mavlink_msg_named_value_float.h" type="1"/>
@@ -271,8 +271,8 @@
     <File name="modules/telemetry/common/mavlink_msg_log_entry.h" path="modules/telemetry/common/mavlink_msg_log_entry.h" type="1"/>
     <File name="hal" path="" type="2"/>
     <File name="modules/imu/mpu9250.cpp" path="modules/imu/mpu9250.cpp" type="1"/>
-    <File name="tasks/MotorsMatrix" path="" type="2"/>
     <File name="cmsis_lib/include/stm32f4xx_adc.h" path="cmsis_lib/include/stm32f4xx_adc.h" type="1"/>
+    <File name="tasks/MotorsMatrix" path="" type="2"/>
     <File name="modules/radio/Nrf24.h" path="modules/radio/Nrf24.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_highres_imu.h" path="modules/telemetry/common/mavlink_msg_highres_imu.h" type="1"/>
     <File name="cmsis_boot/system_stm32f4xx.c" path="cmsis_boot/system_stm32f4xx.c" type="1"/>
@@ -297,8 +297,8 @@
     <File name="hal/SpiInterface.h" path="hal/SpiInterface.h" type="1"/>
     <File name="freertos/source/heap_2.c" path="freertos/source/heap_2.c" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_attitude_quaternion.h" path="modules/telemetry/common/mavlink_msg_attitude_quaternion.h" type="1"/>
-    <File name="fatfs_lib/include/ff.h" path="fatfs_lib/include/ff.h" type="1"/>
     <File name="modules/telemetry" path="" type="2"/>
+    <File name="fatfs_lib/include/ff.h" path="fatfs_lib/include/ff.h" type="1"/>
     <File name="cmsis_lib/include/stm32f4xx_syscfg.h" path="cmsis_lib/include/stm32f4xx_syscfg.h" type="1"/>
     <File name="modules/motors/Motors.cpp" path="modules/motors/Motors.cpp" type="1"/>
     <File name="modules/telemetry/missionlib/mavlink_missionlib_data.h" path="modules/telemetry/missionlib/mavlink_missionlib_data.h" type="1"/>
@@ -309,8 +309,8 @@
     <File name="modules/telemetry/common/mavlink_msg_debug_vect.h" path="modules/telemetry/common/mavlink_msg_debug_vect.h" type="1"/>
     <File name="modules/info" path="" type="2"/>
     <File name="cmsis_lib/source/stm32f4xx_crc.c" path="cmsis_lib/source/stm32f4xx_crc.c" type="1"/>
-    <File name="modules" path="" type="2"/>
     <File name="cmsis_lib/source/misc.c" path="cmsis_lib/source/misc.c" type="1"/>
+    <File name="modules" path="" type="2"/>
     <File name="tasks/IMUProcessor/IMUProcessor.h" path="tasks/IMUProcessor.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_param_set.h" path="modules/telemetry/common/mavlink_msg_param_set.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_safety_allowed_area.h" path="modules/telemetry/common/mavlink_msg_safety_allowed_area.h" type="1"/>
@@ -322,8 +322,8 @@
     <File name="modules/telemetry/common/mavlink_msg_mission_clear_all.h" path="modules/telemetry/common/mavlink_msg_mission_clear_all.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_data_transmission_handshake.h" path="modules/telemetry/common/mavlink_msg_data_transmission_handshake.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_rc_channels.h" path="modules/telemetry/common/mavlink_msg_rc_channels.h" type="1"/>
-    <File name="modules/telemetry/common/mavlink_msg_terrain_check.h" path="modules/telemetry/common/mavlink_msg_terrain_check.h" type="1"/>
     <File name="tasks" path="" type="2"/>
+    <File name="modules/telemetry/common/mavlink_msg_terrain_check.h" path="modules/telemetry/common/mavlink_msg_terrain_check.h" type="1"/>
     <File name="stm32f4_int.c" path="stm32f4_int.c" type="1"/>
     <File name="cmsis_boot/stm32f4xx_conf.h" path="cmsis_boot/stm32f4xx_conf.h" type="1"/>
     <File name="modules/radio/RadioLink.h" path="modules/radio/RadioLink.h" type="1"/>
@@ -355,8 +355,8 @@
     <File name="cmsis_lib/source/stm32f4xx_tim.c" path="cmsis_lib/source/stm32f4xx_tim.c" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_log_erase.h" path="modules/telemetry/common/mavlink_msg_log_erase.h" type="1"/>
     <File name="math/Helpers.h" path="math/Helpers.h" type="1"/>
-    <File name="modules/telemetry/common/mavlink_msg_mission_request_partial_list.h" path="modules/telemetry/common/mavlink_msg_mission_request_partial_list.h" type="1"/>
     <File name="syscalls" path="" type="2"/>
+    <File name="modules/telemetry/common/mavlink_msg_mission_request_partial_list.h" path="modules/telemetry/common/mavlink_msg_mission_request_partial_list.h" type="1"/>
     <File name="modules/telemetry/common/mavlink_msg_mission_request.h" path="modules/telemetry/common/mavlink_msg_mission_request.h" type="1"/>
     <File name="math/MadwickAHRS.h" path="math/MadwickAHRS.h" type="1"/>
     <File name="modules/imu/mpu9250.h" path="modules/imu/mpu9250.h" type="1"/>

@@ -5,7 +5,7 @@
 #include "Helpers.h"
 
 
-Motors::Motors() : _min(800), _max(2500)//_max(2000)
+Motors::Motors() : _min(980), _max(2000)//_max(2000)
 {
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,  ENABLE);
@@ -27,8 +27,8 @@ Motors::Motors() : _min(800), _max(2500)//_max(2000)
 
     // Timer configuration
     TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-    TIM_TimeBaseStructure.TIM_Prescaler =  SystemCoreClock / 900000; // 10MHz devider - timer ticks with 10MHz
-    TIM_TimeBaseStructure.TIM_Period = 20000-1; // Total period = 2ms; PWM = 400Hz
+    TIM_TimeBaseStructure.TIM_Prescaler =  167;//SystemCoreClock / 6000000;
+    TIM_TimeBaseStructure.TIM_Period = 2500-1; // Total period = 2ms; PWM = 400Hz
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);

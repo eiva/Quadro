@@ -56,6 +56,7 @@ RadioLink::RadioLink(Nrf24 *nrf, LedInfo *leds):
 	if (!check)
 	{
 		_leds->R(true);
+		while(true);
 	}
 	_nrf->RXMode(sizeof(Packet), 10); // Channel 10.
 	_leds->Off();

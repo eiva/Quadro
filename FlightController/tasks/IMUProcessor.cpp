@@ -29,7 +29,7 @@ void vTaskIMUProcessor (void *pvParameters)
 	while(1)
     {
 		TheLedInfo->B(true);
-		const float currentTick = xTaskGetTickCount();
+		TickType_t currentTick = xTaskGetTickCount();
 
 		mpu->Read(ReadBuf);
 
@@ -57,7 +57,7 @@ void vTaskIMUProcessor (void *pvParameters)
 		TheGlobalData.MZ = mRes * (float)Byte16ToInt16(ReadBuf[18],  ReadBuf[19]);  // Mag.Z
 
 		// dT calculation
-		const float dT = (currentTick - lastTick) / 1000.0f; // Seconds
+		const float dT = ((float)currentTick - lastTick) / 1000.0f; // Seconds
 		lastTick = currentTick;
 
 		// AHRS update
@@ -100,7 +100,7 @@ void vTaskIMUProcessor (void *pvParameters)
 		// Post to commander unit
 		xQueueOverwrite(TheIMUDataQueue, &data);
 		TheLedInfo->B(false);
-		vTaskDelay(10); // 100Hz.
+		vTaskDelayUntil(&currentTick, 10); // 100Hz.
     }
     vTaskDelete(NULL);
 }

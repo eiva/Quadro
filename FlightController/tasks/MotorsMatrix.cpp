@@ -19,10 +19,18 @@ void vTaskMotorMatrix(void *pvParameters)
 {
 	Motors motors;
 	CommanderData commanderData;
+
+	const TickType_t frequency = 4; // 4ms interval.
 	while(1)
 	{
+		TickType_t currentTick = xTaskGetTickCount();
 		xQueueReceive(TheCommanderDataQueue, &commanderData, portMAX_DELAY);
-		const float currentTick = xTaskGetTickCount();
+
+    	if (commanderData.Throttle == 0 )
+    	{
+    		motors.SetRatio(0, 0, 0, 0);
+    		continue;
+    	}
 
 #define MIXRP(P, R) commanderData.Throttle + (R) * commanderData.Roll + (P) * commanderData.Pitch
 
@@ -43,6 +51,6 @@ void vTaskMotorMatrix(void *pvParameters)
     	TheGlobalData.MO3 = m3;
     	TheGlobalData.MO4 = m4;
 
-    	vTaskDelay(20); // 50Hz
+    	vTaskDelayUntil(&currentTick, frequency); // 250Hz
 	}
 }

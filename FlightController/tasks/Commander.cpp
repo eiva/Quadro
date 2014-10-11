@@ -18,24 +18,29 @@
 
 extern LedInfo* TheLedInfo;
 
+bool Arm(CommanderData &o_rCommanderData); // Enter ESC to arming mode. Long term.
+bool Stabilize(CommanderData &o_rCommanderData); // Process stabilization mode.
+bool CalibrateAccelerometer(const IMUData &i_rImuData, CommanderData &o_rCommanderData); // State of altimeter calibration.
+
 void vTaskCommander (void *pvParameters)
 {
 	QueueSetMemberHandle_t xActivatedMember;
 	RadioLinkData radioData;
 	IMUData imuData;
-	Motors motors;
 	LogData log;
 	CommanderData commanderData;
 
-	float lastTick = xTaskGetTickCount();
+	static bool isArmed = false;
+
+	static float lastTick = xTaskGetTickCount();
 
 	//(const float kp, const float ki, const float kd, const float intLimit)
 	PidObject yawRatePid(0.3f, 0, 0.1f, 1);
-	PidObject pitchPid  (3.5f, 0.0f, 0.0f, 0.0f);
-	PidObject rollPid   (3.5f, 0.0f, 0.0f, 0.0f);
+	PidObject pitchPid  (2.0f, 10.0f, 0.13f, 10.0f);
+	PidObject rollPid   (2.0f, 10.0f, 0.13f, 10.0f);
 
-	bool imuReady = false;
-	bool radioReady = false;
+	static bool imuReady = false; // We need at last one IMU data packet to start work.
+	static bool radioReady = false; // We need at last one radio data packet to start work.
     while(1)
     {
     	xActivatedMember = xQueueSelectFromSet(TheStabilizerQueueSet, 10);
@@ -61,14 +66,19 @@ void vTaskCommander (void *pvParameters)
     		continue;
     	}
 
-    	TheLedInfo->Y(true);
-
-    	if (radioData.Throttle <=1 )
+    	if (!isArmed)
     	{
-    		TheLedInfo->Y(false);
-    		motors.SetRatio(0, 0, 0, 0);
-    		continue;
+    		// We can arm only if IMU and radio ready.
+    		if (Arm(commanderData))
+    		{
+    			xQueueOverwrite( TheCommanderDataQueue, &commanderData );
+    			continue;
+    		}
+    		// Arm done.
+    		isArmed = true;
     	}
+
+    	TheLedInfo->Y(true);
 
     	// dT calculation
     	const float currentTick = xTaskGetTickCount();
@@ -77,6 +87,20 @@ void vTaskCommander (void *pvParameters)
     	if (dT == 0)
     	{
     		continue; // Skip first iteration.
+    	}
+
+    	if (radioData.Throttle <= 2 )
+    	{
+    		yawRatePid.Reset();
+    		pitchPid.Reset();
+    		rollPid.Reset();
+    		commanderData.Throttle = 0;
+    		commanderData.Pitch    = 0;
+    		commanderData.Roll     = 0;
+    		commanderData.Yaw      = 0;
+
+    		xQueueOverwrite( TheCommanderDataQueue, &commanderData );
+    		continue;
     	}
 
     	// Convert radio to angles
@@ -106,7 +130,7 @@ void vTaskCommander (void *pvParameters)
     	commanderData.Roll     = rollK;
     	commanderData.Yaw      = yawK;
 
-    	xQueueOverwrite( TheRadioCommandsQueue, &commanderData );
+    	xQueueOverwrite( TheCommanderDataQueue, &commanderData );
 
     	TheGlobalData.DBG_PID_YAW   = yawCorrection;
     	TheGlobalData.DBG_PID_PITCH = pitchCorrection;
@@ -133,4 +157,58 @@ void vTaskCommander (void *pvParameters)
     	// Process Data!
     }
     vTaskDelete(NULL);
+}
+
+// Enter ESC to arming mode.
+// This is specific for BLHeli ESC flash: it need to be raised to 50% of pwm level and back to 0.
+bool Arm(CommanderData &o_rCommanderData)
+{
+	// TODO: Need to check throttle stick position. if it is not zero - do not arm.
+	const int period = 1500;
+	static const TickType_t firstTick = xTaskGetTickCount();
+	const TickType_t currentTick = xTaskGetTickCount();
+	const int delta = currentTick - firstTick;
+	static bool down = false;
+
+	o_rCommanderData.Yaw = 0;
+	o_rCommanderData.Roll = 0;
+	o_rCommanderData.Pitch = 0;
+
+	if (delta  < period) // Prearm - wait ESC init.
+	{
+		o_rCommanderData.Throttle = 0;
+		return true;
+	}
+
+	if (delta  > 4*period) // End of arm
+	{
+		o_rCommanderData.Throttle = 0;
+		return false;
+	}
+
+	if (delta > 2*period) // Switch up front to down front.
+	{
+		down = true;
+	}
+
+	int step;
+	if (delta < 3*period)
+	{
+		if (down) // From 50% to 0%
+		{
+			step = 50 - (delta - 3000) / 30;
+		}
+		else // From 0% to 50%
+		{
+			step = (delta - 1500) / 30;
+		}
+	}
+	else
+	{
+		step = 0;
+	}
+
+	o_rCommanderData.Throttle = step;
+
+	return true; // Continue arming.
 }
