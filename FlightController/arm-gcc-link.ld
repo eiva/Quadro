@@ -2,17 +2,34 @@ OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 /* Internal Memory Map*/
 MEMORY
 {
-	rom (rx)  : ORIGIN = 0x08000000, LENGTH = 0x00100000
-	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00020000
-	ram1 (rwx) : ORIGIN = 0x10000000, LENGTH = 0x00010000
+	vector (rx)  : ORIGIN = 0x08000000, LENGTH = 16K
+	eeprom (rx)  : ORIGIN = 0x08004000, LENGTH = 16K
+	rom (rx)     : ORIGIN = 0x08008000, LENGTH = 992K
+	ram (rwx)    : ORIGIN = 0x20000000, LENGTH = 0x00020000
+	ram1 (rwx)   : ORIGIN = 0x10000000, LENGTH = 0x00010000
 }
 
 _eram = 0x20000000 + 0x00020000;
 SECTIONS
 {
+	/* The startup code goes first into FLASH */
+  	.isr_vector :
+  	{
+    	. = ALIGN(4);
+    	KEEP(*(.isr_vector)) /* Startup code */
+    	. = ALIGN(4);
+  	} > vector
+
+ 	.eeprom :
+ 	{
+    	. = ALIGN(4);
+    	*(.eeprom)
+    	. = ALIGN(4);
+  	} >EEPROM
+
 	.text :
 	{
-		KEEP(*(.isr_vector))
+		. = ALIGN(4);
 		*(.text*)
 		
 		KEEP(*(.init))
@@ -41,9 +58,6 @@ SECTIONS
         KEEP(*(.param))
         KEEP(*(.param.*))
         _param_stop = .;
-
-        . = ALIGN(4);
-        *(.persist)
 	} > rom 
 	
 	.ARM.extab : 
