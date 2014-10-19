@@ -24,6 +24,7 @@
   */ 
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32f4xx_conf.h"
 #include "eeprom.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,50 +54,24 @@ static uint16_t EE_PageTransfer(uint16_t VirtAddress, uint16_t Data);
   */
 uint16_t EE_Init(void)
 {
-  uint16_t PageStatus0 = 6, PageStatus1 = 6;
   uint16_t VarIdx = 0;
   uint16_t EepromStatus = 0, ReadStatus = 0;
   int16_t x = -1;
   uint16_t  FlashStatus;
 
   /* Get Page0 status */
-  PageStatus0 = (*(__IO uint16_t*)PAGE0_BASE_ADDRESS);
-  /* Get Page1 status */
-  PageStatus1 = (*(__IO uint16_t*)PAGE1_BASE_ADDRESS);
+  uint32_t PageStatus0 = (*(__IO uint32_t*)PAGE0_BASE_ADDRESS);
 
   /* Check for invalid header states and repair if necessary */
   switch (PageStatus0)
   {
     case ERASED:
-      if (PageStatus1 == VALID_PAGE) /* Page0 erased, Page1 valid */
-      {
-        /* Erase Page0 */
         FlashStatus = FLASH_EraseSector(PAGE0_ID,VOLTAGE_RANGE);
         /* If erase operation was failed, a Flash error code is returned */
         if (FlashStatus != FLASH_COMPLETE)
         {
           return FlashStatus;
         }
-      }
-      else if (PageStatus1 == RECEIVE_DATA) /* Page0 erased, Page1 receive */
-      {
-        /* Erase Page0 */
-        FlashStatus = FLASH_EraseSector(PAGE0_ID, VOLTAGE_RANGE);
-        /* If erase operation was failed, a Flash error code is returned */
-        if (FlashStatus != FLASH_COMPLETE)
-        {
-          return FlashStatus;
-        }
-        /* Mark Page1 as valid */
-        FlashStatus = FLASH_ProgramHalfWord(PAGE1_BASE_ADDRESS, VALID_PAGE);
-        /* If program operation was failed, a Flash error code is returned */
-        if (FlashStatus != FLASH_COMPLETE)
-        {
-          return FlashStatus;
-        }
-      }
-      else /* First EEPROM access (Page0&1 are erased) or invalid state -> format EEPROM */
-      {
         /* Erase both Page0 and Page1 and set Page0 as valid page */
         FlashStatus = EE_Format();
         /* If erase/program operation was failed, a Flash error code is returned */
@@ -104,7 +79,6 @@ uint16_t EE_Init(void)
         {
           return FlashStatus;
         }
-      }
       break;
 
     case RECEIVE_DATA:

@@ -36,30 +36,27 @@
 #define VOLTAGE_RANGE           (uint8_t)VoltageRange_3
 
 /* EEPROM start address in Flash */
-#define EEPROM_START_ADDRESS  ((uint32_t)0x08008000) /* EEPROM emulation start address:
+#define EEPROM_START_ADDRESS  ((uint32_t)0x08004000) /* EEPROM emulation start address:
                                                   from sector2 : after 16KByte of used 
                                                   Flash memory */
+
+extern uint32_t _eeprom_start; // Need to test it. // Setted by the linker
 
 /* Pages 0 and 1 base and end addresses */
 #define PAGE0_BASE_ADDRESS    ((uint32_t)(EEPROM_START_ADDRESS + 0x0000))
 #define PAGE0_END_ADDRESS     ((uint32_t)(EEPROM_START_ADDRESS + (PAGE_SIZE - 1)))
-#define PAGE0_ID               FLASH_Sector_2
-
-#define PAGE1_BASE_ADDRESS    ((uint32_t)(EEPROM_START_ADDRESS + 0x4000))
-#define PAGE1_END_ADDRESS     ((uint32_t)(EEPROM_START_ADDRESS + (2 * PAGE_SIZE - 1)))
-#define PAGE1_ID               FLASH_Sector_3
+#define PAGE0_ID               FLASH_Sector_1
 
 /* Used Flash pages for EEPROM emulation */
 #define PAGE0                 ((uint16_t)0x0000)
-#define PAGE1                 ((uint16_t)0x0001)
 
 /* No valid page define */
 #define NO_VALID_PAGE         ((uint16_t)0x00AB)
 
 /* Page status definitions */
-#define ERASED                ((uint16_t)0xFFFF)     /* Page is empty */
-#define RECEIVE_DATA          ((uint16_t)0xEEEE)     /* Page is marked to receive data */
-#define VALID_PAGE            ((uint16_t)0x0000)     /* Page containing valid data */
+#define ERASED                ((uint16_t)0xFFFFFFFF)     /* Page is empty */
+#define RECEIVE_DATA          ((uint16_t)0xEEEEEEEE)     /* Page is marked as modified so we need to read all data from it */
+#define VALID_PAGE            ((uint16_t)0x00000000)     /* Page is clear and can receive data */
 
 /* Valid pages in read and write defines */
 #define READ_FROM_VALID_PAGE  ((uint8_t)0x00)

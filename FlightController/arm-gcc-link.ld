@@ -23,6 +23,7 @@ SECTIONS
  	.eeprom :
  	{
     	. = ALIGN(4);
+    	_eeprom_start = .;
     	*(.eeprom)
     	. = ALIGN(4);
   	} >EEPROM
