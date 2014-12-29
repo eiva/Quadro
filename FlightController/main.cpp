@@ -70,7 +70,7 @@ void vTaskDataLogger (void *pvParameters)
     vTaskDelete(NULL);
 }
 
-int main(void)
+int maindisabled(void)
 {
 	SystemInit();
 
@@ -89,7 +89,7 @@ int main(void)
 
 	InitParams();
 
-	InitMAVLink();
+	InitMAV3Link();
 
 	Port* csn = new Port(GPIOA, GPIO_Pin_4);
 	csn->High();

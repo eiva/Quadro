@@ -27,7 +27,7 @@ float LowPassFilter::apply(float sample)
         return sample;
     }
     // do the filtering
-    const float delay_element_0 = sample - _delay_element_1 * _a1 - _delay_element_2 * _a2;
+    float delay_element_0 = sample - _delay_element_1 * _a1 - _delay_element_2 * _a2;
     if (isnan(delay_element_0) || isinf(delay_element_0)) {
         // don't allow bad values to propagate via the filter
         delay_element_0 = sample;
